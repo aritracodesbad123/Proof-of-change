@@ -1,0 +1,2743 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-931-3d096ee20688-2026-11-11",
+ "date_ist": "2026-11-11 11:31 IST",
+ "run_date": "2026-11-11",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 931,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/931",
+  "title": "Lex a minus directly after an operand as an operator (issue370)",
+  "base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+  "merge_commit": null,
+  "tested_main_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "adarshsm",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-30T07:26:57Z",
+ "updated_at_ist": "2026-10-30 12:56 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-11 11:31 IST",
+ "files": {
+  "all": [
+   "sqlparse/keywords.py",
+   "tests/test_grouping.py",
+   "tests/test_tokenize.py"
+  ],
+  "package_py": [
+   "sqlparse/keywords.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_grouping.py",
+   "tests/test_tokenize.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_grouping.py, tests/test_tokenize.py, tests/test_keywords.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 177,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "177 passed in 0.89s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 189,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "189 passed in 1.08s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 177,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "177 passed in 0.93s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 189,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "189 passed in 0.97s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 177,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "177 passed in 0.90s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 189,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "189 passed in 0.88s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Unary minus is lexed exactly as before wherever it follows an operator, punctuation or whitespace: `x = -1`, `values(-1)`, `in (1,-2)`, `a*-1`, `select -1`, and the ambiguous `a -1` all still give...",
+   "pattern": "exactly as before"
+  },
+  {
+   "source": "PR description",
+   "quote": "The `E-?` exponent sign is untouched.",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-931/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "sqlparse/keywords.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 2.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "some AI probes were rejected",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.7 GB (of 15.6 GB).",
+   "Setup check: free disk 92.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse/pyproject.toml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/pyproject.toml",
+   "Source: msqlparse \u00b7 PyPI \u2014 https://pypi.org/project/msqlparse/",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+   "Source: sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+   "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install build (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/python-app.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "benchmarks/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "build",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "build"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: build."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "build",
+    "requirement": "build",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 931,
+  "head_sha": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+  "base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "pr_sha": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "master @ 60cdc649726b (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 3d096ee20688"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p3' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C3",
+    "text": "Unary minus tokenization remains unchanged when the minus follows an operator, punctuation, or whitespace.",
+    "source_quote": "Unary minus is lexed exactly as before wherever it follows an operator, punctuation or whitespace: `x = -1`, `values(-1)`, `in (1,-2)`, `a*-1`, `select -1`, and the ambiguous `a -1` all still give an `Integer '-1'`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Exponent sign handling is unchanged by the fix.",
+    "source_quote": "The `E-?` exponent sign is untouched.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "With the fix, format(..., reindent=True) correctly aligns columns after 'a-1', whereas before it indented the following column too far.",
+    "source_quote": "With `-` now a separate token, `format(..., reindent=True)` aligns the next column after `a-1` correctly. `select a-1, b from t` used to indent `b` one column too far.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "After the fix, a keyword directly followed by a minus without space (e.g., 'select-1') is tokenized as keyword, Operator '-', Integer '1' instead of keyword, Integer '-1'.",
+    "source_quote": "One behavior change to be aware of: a keyword directly followed by a minus with no space (`select-1`, `then-1`) now lexes as keyword, `-`, `1` instead of keyword, `-1`, since a lookbehind can't tell keywords from names.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C1",
+    "text": "In the original lexer, tokenizing '1-1' produces two integer tokens: '1' and '-1'.",
+    "source_quote": ">>> list(lexer.tokenize('1-1'))\\n[(Token.Literal.Number.Integer, '1'), (Token.Literal.Number.Integer, '-1')]",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C2",
+    "text": "After the fix, tokenizing 'a-1' yields a Name token 'a', an Operator token '-', and an Integer token '1'.",
+    "source_quote": ">>> list(lexer.tokenize('a-1'))\\n[(Token.Name, 'a'), (Token.Operator, '-'), (Token.Literal.Number.Integer, '1')]",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "d0f8ab75bdeabf6e7e5c61b8395ebdf899722e261bbfdd08c88d78311b7e9126",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T06:04:27.631702+00:00",
+    "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+    "inputs": {
+     "title_chars": 63,
+     "body_chars": 2923,
+     "base_files": {
+      "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "3882f26bc1365848fc53c3703747933ec5c940feb83b9ab3bf171d3bb476e9a0",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T06:04:27.631895+00:00",
+    "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+    "inputs": {
+     "title_chars": 63,
+     "body_chars": 2923,
+     "base_files": {
+      "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p4.py",
+    "source": "model",
+    "sha256": "852d0831ccbe6048593a1f58d0bda785b4168046c98c9375ba63cbf9d485bbfc",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T06:04:27.631986+00:00",
+    "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+    "inputs": {
+     "title_chars": 63,
+     "body_chars": 2923,
+     "base_files": {
+      "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "build"
+ ],
+ "pr_side_started_at": "2026-11-11T06:04:27.827044+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_grouping.py",
+   "tests/test_tokenize.py",
+   "tests/test_keywords.py"
+  ],
+  "pr": [
+   "tests/test_grouping.py",
+   "tests/test_tokenize.py",
+   "tests/test_keywords.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sqlparse",
+   "expected": "60cdc649726bf1bc4f1b336050560b336da715ec",
+   "installed": "60cdc649726bf1bc4f1b336050560b336da715ec",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sqlparse",
+   "expected": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+   "installed": "3d096ee2068834894bbfad8731e0f337ab20c36b",
+   "ok": true
+  }
+ },
+ "base_head_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+ "comparison": {
+  "same": 177,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_grouping::test_operation_minus_without_whitespace",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[\"a\"-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand['a'-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[1-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[`a`-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-.5]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-0x1F]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1.5]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1e3]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a[1]-1]",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[f(a)-1]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 189,
+   "pr": 189
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_grouping::test_operation_minus_without_whitespace": "AssertionError: assert False",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[\"a\"-1]": "AssertionError: assert (Token.Litera...Symbol, '\"a\"') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand['a'-1]": "AssertionError: assert (Token.Litera...Single, \"'a'\") == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[1-1]": "AssertionError: assert (Token.Litera....Integer, '1') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[`a`-1]": "AssertionError: assert (Token.Name, '`a`') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-.5]": "AssertionError: assert (Token.Name, 'a') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-0x1F]": "AssertionError: assert (Token.Name, 'a') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1.5]": "AssertionError: assert (Token.Name, 'a') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1]": "AssertionError: assert (Token.Name, 'a') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a-1e3]": "AssertionError: assert (Token.Name, 'a') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[a[1]-1]": "AssertionError: assert (Token.Punctuation, ']') == (Token.Operator, '-')",
+   "tests.test_tokenize::test_tokenize_minus_after_operand[f(a)-1]": "AssertionError: assert (Token.Punctuation, ')') == (Token.Operator, '-')"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "d0f8ab75bdeabf6e7e5c61b8395ebdf899722e261bbfdd08c88d78311b7e9126",
+    "target": "andialbrecht/sqlparse#931",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      },
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      },
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      }
+     ],
+     "pr": [
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      },
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      },
+      {
+       "p1.result": {
+        "x = -1": [
+         [
+          "Token.Name",
+          "x"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Operator.Comparison",
+          "="
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "values(-1)": [
+         [
+          "Token.Keyword",
+          "values"
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "in (1,-2)": [
+         [
+          "Token.Keyword",
+          "in"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Punctuation",
+          "("
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ],
+         [
+          "Token.Punctuation",
+          ","
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-2"
+         ],
+         [
+          "Token.Punctuation",
+          ")"
+         ]
+        ],
+        "a*-1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Wildcard",
+          "*"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "select -1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "a -1": [
+         [
+          "Token.Name",
+          "a"
+         ],
+         [
+          "Token.Text.Whitespace",
+          " "
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p1.result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "x = -1": [
+        [
+         "Token.Name",
+         "x"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Operator.Comparison",
+         "="
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "values(-1)": [
+        [
+         "Token.Keyword",
+         "values"
+        ],
+        [
+         "Token.Punctuation",
+         "("
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ],
+        [
+         "Token.Punctuation",
+         ")"
+        ]
+       ],
+       "in (1,-2)": [
+        [
+         "Token.Keyword",
+         "in"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Punctuation",
+         "("
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "1"
+        ],
+        [
+         "Token.Punctuation",
+         ","
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-2"
+        ],
+        [
+         "Token.Punctuation",
+         ")"
+        ]
+       ],
+       "a*-1": [
+        [
+         "Token.Name",
+         "a"
+        ],
+        [
+         "Token.Wildcard",
+         "*"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "select -1": [
+        [
+         "Token.Keyword.DML",
+         "select"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "a -1": [
+        [
+         "Token.Name",
+         "a"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ]
+      },
+      "pr": {
+       "x = -1": [
+        [
+         "Token.Name",
+         "x"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Operator.Comparison",
+         "="
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "values(-1)": [
+        [
+         "Token.Keyword",
+         "values"
+        ],
+        [
+         "Token.Punctuation",
+         "("
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ],
+        [
+         "Token.Punctuation",
+         ")"
+        ]
+       ],
+       "in (1,-2)": [
+        [
+         "Token.Keyword",
+         "in"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Punctuation",
+         "("
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "1"
+        ],
+        [
+         "Token.Punctuation",
+         ","
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-2"
+        ],
+        [
+         "Token.Punctuation",
+         ")"
+        ]
+       ],
+       "a*-1": [
+        [
+         "Token.Name",
+         "a"
+        ],
+        [
+         "Token.Wildcard",
+         "*"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "select -1": [
+        [
+         "Token.Keyword.DML",
+         "select"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "a -1": [
+        [
+         "Token.Name",
+         "a"
+        ],
+        [
+         "Token.Text.Whitespace",
+         " "
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ]
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p1.result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p1.result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "d0f8ab75bdeabf6e7e5c61b8395ebdf899722e261bbfdd08c88d78311b7e9126",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T06:04:27.631702+00:00",
+     "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+     "inputs": {
+      "title_chars": 63,
+      "body_chars": 2923,
+      "base_files": {
+       "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T06:04:27.827044+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/keywords.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "3882f26bc1365848fc53c3703747933ec5c940feb83b9ab3bf171d3bb476e9a0",
+    "target": "andialbrecht/sqlparse#931",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      }
+     ],
+     "pr": [
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p2.result": {
+        "1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "1e-2"
+         ]
+        ],
+        "1E+3": [
+         [
+          "Token.Name",
+          "1E"
+         ],
+         [
+          "Token.Operator",
+          "+"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "3"
+         ]
+        ],
+        "2.5e-4": [
+         [
+          "Token.Literal.Number.Float",
+          "2.5e-4"
+         ]
+        ],
+        "-1e-2": [
+         [
+          "Token.Literal.Number.Float",
+          "-1e-2"
+         ]
+        ],
+        "3E-0": [
+         [
+          "Token.Literal.Number.Float",
+          "3E-0"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p2.result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "1e-2": [
+        [
+         "Token.Literal.Number.Float",
+         "1e-2"
+        ]
+       ],
+       "1E+3": [
+        [
+         "Token.Name",
+         "1E"
+        ],
+        [
+         "Token.Operator",
+         "+"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "3"
+        ]
+       ],
+       "2.5e-4": [
+        [
+         "Token.Literal.Number.Float",
+         "2.5e-4"
+        ]
+       ],
+       "-1e-2": [
+        [
+         "Token.Literal.Number.Float",
+         "-1e-2"
+        ]
+       ],
+       "3E-0": [
+        [
+         "Token.Literal.Number.Float",
+         "3E-0"
+        ]
+       ]
+      },
+      "pr": {
+       "1e-2": [
+        [
+         "Token.Literal.Number.Float",
+         "1e-2"
+        ]
+       ],
+       "1E+3": [
+        [
+         "Token.Name",
+         "1E"
+        ],
+        [
+         "Token.Operator",
+         "+"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "3"
+        ]
+       ],
+       "2.5e-4": [
+        [
+         "Token.Literal.Number.Float",
+         "2.5e-4"
+        ]
+       ],
+       "-1e-2": [
+        [
+         "Token.Literal.Number.Float",
+         "-1e-2"
+        ]
+       ],
+       "3E-0": [
+        [
+         "Token.Literal.Number.Float",
+         "3E-0"
+        ]
+       ]
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.result\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "3882f26bc1365848fc53c3703747933ec5c940feb83b9ab3bf171d3bb476e9a0",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T06:04:27.631895+00:00",
+     "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+     "inputs": {
+      "title_chars": 63,
+      "body_chars": 2923,
+      "base_files": {
+       "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T06:04:27.827044+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/keywords.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p4",
+    "source": "model",
+    "path": "model-probes/model-p4.py",
+    "sha256": "852d0831ccbe6048593a1f58d0bda785b4168046c98c9375ba63cbf9d485bbfc",
+    "target": "andialbrecht/sqlparse#931",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p4-main-1.jsonl",
+      "probe-model-p4-main-2.jsonl",
+      "probe-model-p4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p4-pr-1.jsonl",
+      "probe-model-p4-pr-2.jsonl",
+      "probe-model-p4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-0"
+         ]
+        ]
+       }
+      },
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-0"
+         ]
+        ]
+       }
+      }
+     ],
+     "pr": [
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "0"
+         ]
+        ]
+       }
+      },
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "0"
+         ]
+        ]
+       }
+      },
+      {
+       "p4.result": {
+        "select-1": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "then-1": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ],
+        "if-0": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "0"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p4.result",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "select-1": [
+        [
+         "Token.Keyword.DML",
+         "select"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "then-1": [
+        [
+         "Token.Keyword",
+         "then"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-1"
+        ]
+       ],
+       "if-0": [
+        [
+         "Token.Keyword",
+         "if"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "-0"
+        ]
+       ]
+      },
+      "pr": {
+       "select-1": [
+        [
+         "Token.Keyword.DML",
+         "select"
+        ],
+        [
+         "Token.Operator",
+         "-"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "1"
+        ]
+       ],
+       "then-1": [
+        [
+         "Token.Keyword",
+         "then"
+        ],
+        [
+         "Token.Operator",
+         "-"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "1"
+        ]
+       ],
+       "if-0": [
+        [
+         "Token.Keyword",
+         "if"
+        ],
+        [
+         "Token.Operator",
+         "-"
+        ],
+        [
+         "Token.Literal.Number.Integer",
+         "0"
+        ]
+       ]
+      },
+      "diffs": [
+       {
+        "field": "if-0",
+        "main": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-0"
+         ]
+        ],
+        "pr": [
+         [
+          "Token.Keyword",
+          "if"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "0"
+         ]
+        ]
+       },
+       {
+        "field": "select-1",
+        "main": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "pr": [
+         [
+          "Token.Keyword.DML",
+          "select"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ]
+       },
+       {
+        "field": "then-1",
+        "main": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "-1"
+         ]
+        ],
+        "pr": [
+         [
+          "Token.Keyword",
+          "then"
+         ],
+         [
+          "Token.Operator",
+          "-"
+         ],
+         [
+          "Token.Literal.Number.Integer",
+          "1"
+         ]
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p4.result\""
+       },
+       "pr": {
+        "file": "probe-model-p4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p4.result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "852d0831ccbe6048593a1f58d0bda785b4168046c98c9375ba63cbf9d485bbfc",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T06:04:27.631986+00:00",
+     "inputs_sha256": "cb663200435bed75c43cde792be93c987e6da745eb902f8f5a05b4f9a29fcbd6",
+     "inputs": {
+      "title_chars": 63,
+      "body_chars": 2923,
+      "base_files": {
+       "sqlparse/keywords.py": "681939d424c60fe70eb9b543d6e4b4a88d1417d4ee1ba99a08de41e6c4a1a9b3"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T06:04:27.827044+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/keywords.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p4.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "unmentioned"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p4",
+     "name": "p4.result",
+     "label": "unmentioned",
+     "claim": null
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 1 observation(s) need attention: p4.result differs and no claim covers it; probe: 2 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-p2": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-p4": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 1 observation(s) need attention: p4.result differs and no claim covers it; probe: 2 other observation(s) identical on both sides; tests: 12 test(s) fail on main and pass on the PR; 189 test(s) ran on main, 189 on the PR; 0 new test(s) pass, 177 unchanged",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 1 observation(s) need attention: p4.result differs and no claim covers it; probe: 2 other observation(s) identical on both sides; tests: 12 test(s) fail on main and pass on the PR; 189 test(s) ran on main, 189 on the PR; 0 new test(s) pass, 177 unchanged",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/keywords.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_grouping.py",
+   "tests/test_tokenize.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 192.5,
+  "tests": 8.9
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 26651,
+  "output_tokens": 13381,
+  "thinking_tokens": 12173,
+  "cost_usd": 0.020038,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.020038,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 192.5,
+   "tests": 8.9
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.012833,
+  "total_cost_usd": 0.032871,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-11/ef12096/sqlparse-931"
+ }
+}
