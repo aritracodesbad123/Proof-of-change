@@ -1,0 +1,568 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-5259-ab13f9526da6-2026-11-11",
+ "date_ist": "2026-11-11 12:36 IST",
+ "run_date": "2026-11-11",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 5259,
+  "url": "https://github.com/urllib3/urllib3/pull/5259",
+  "title": "Add retries attribute to MaxRetryError",
+  "base_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "ab13f9526da637ff6247d0397598967fe7985791",
+  "merge_commit": "31147eb45a7fc2a7d68e1bee17b81ce18ddb48c5",
+  "tested_main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "eachimei",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-10T11:32:13Z",
+ "updated_at_ist": "2026-11-10 17:02 IST",
+ "ci_state": "passing",
+ "ci_detail": "37 check runs completed without failure",
+ "tested_at_ist": "2026-11-11 12:36 IST",
+ "files": {
+  "all": [
+   "changelog/2096.feature.rst",
+   "src/urllib3/exceptions.py",
+   "src/urllib3/util/retry.py",
+   "test/test_exceptions.py",
+   "test/test_retry.py"
+  ],
+  "package_py": [
+   "src/urllib3/exceptions.py",
+   "src/urllib3/util/retry.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/2096.feature.rst",
+   "test/test_exceptions.py",
+   "test/test_retry.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: test/test_exceptions.py, test/test_retry.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 95,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.1,
+   "pytest_summary": "95 passed in 3.46s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.6,
+   "pytest_summary": "100 passed in 3.07s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 95,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.7,
+   "pytest_summary": "95 passed in 3.02s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.4,
+   "pytest_summary": "100 passed in 2.85s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 95,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.5,
+   "pytest_summary": "95 passed in 2.90s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.7,
+   "pytest_summary": "100 passed in 3.11s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-5259/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "src/urllib3/exceptions.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   },
+   {
+    "file": "src/urllib3/util/retry.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 7.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "ab13f9526da637ff6247d0397598967fe7985791",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.3 GB (of 15.6 GB).",
+   "Setup check: free disk 92.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: urllib3 \u00b7 PyPI \u2014 https://pypi.org/project/urllib3/",
+   "Source: GitHub - urllib3/urllib3 at 1.26.4 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/tree/1.26.4",
+   "Source: GitHub - urllib3/urllib3 at 1.25.11 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/tree/1.25.11",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: Installing urllib3 \u00b7 Issue #829 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/829",
+   "Source: urllib3>=2.0 does not work with system Python on macOS \u2014 https://github.com/urllib3/urllib3/issues/3020?timeline_page=1",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install trustme>=1.2.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "noxfile.py",
+   "pyproject.toml",
+   "docs/Makefile",
+   "docs/contributing.rst",
+   ".github/workflows/lint.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/downstream.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/changelog.yml",
+   ".github/workflows/scorecards.yml",
+   ".github/workflows/ci.yml",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "trustme>=1.2.1",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "trustme>=1.2.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: trustme>=1.2.1."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "trustme",
+    "requirement": "trustme>=1.2.1",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "pr_sha": "31147eb45a7fc2a7d68e1bee17b81ce18ddb48c5",
+  "merge_commit": "31147eb45a7fc2a7d68e1bee17b81ce18ddb48c5",
+  "merge_parents": [
+   "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "ab13f9526da637ff6247d0397598967fe7985791"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ c5347bbd3920 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 31147eb45a7f (refs/pull/5259/merge) of head ab13f9526da6"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind src.urllib3.exceptions.MaxRetryError: MaxRetryError() got unexpected keyword(s) 'retries'; parameters: pool, url, reason; an unknown keyword was not removed, because dropping it would discard the scenario, and it was not mapped to a base parameter. A base call exists (src/urllib3/util/retry.py:564 MaxRetryError(_pool, url, reason)) and was not copied in its place. The probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Adds a `retries` attribute to `MaxRetryError`, containing the exhausted `Retry` object so that its `history` of individual attempts can be inspected after the exception is raised.",
+    "source_quote": "Adds a `retries` attribute to `MaxRetryError`, containing the exhausted `Retry` object so that its `history` of individual attempts (method, url, error, status, redirect_location) can be inspected after the exception is raised.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "`MaxRetryError.__init__` gains an optional `retries: Retry | None = None` keyword parameter, stored as `self.retries`, defaulting to `None` and thus not changing existing behavior.",
+    "source_quote": "* `MaxRetryError.__init__` gains an optional `retries: Retry | None = None` keyword parameter, stored as `self.retries`. The parameter is optional and defaults to `None`, so this is purely additive and does not change any existing behavior or call sites outside of this library.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "`Retry.increment()` now passes the fully updated `new_retry` object (which already carries the accumulated `history`) into `MaxRetryError` when raising due to exhaustion.",
+    "source_quote": "* `Retry.increment()` now passes the fully updated `new_retry` object (which already carries the accumulated `history`) into `MaxRetryError` at the point where it raises due to exhaustion.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "`MaxRetryError.__reduce__` was updated so the `retries` attribute survives pickling.",
+    "source_quote": "* `MaxRetryError.__reduce__` was updated so `retries` survives pickling.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_name_checks": [
+   {
+    "probe": "probe1",
+    "error": [
+     "MaxRetryError() got unexpected keyword(s) 'retries'; parameters: pool, url, reason"
+    ],
+    "outcome": "still missing: MaxRetryError() got unexpected keyword(s) 'retries'; parameters: pool, url, reason"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest-socket>=0.7.0",
+  "pytest-timeout>=2.3.1",
+  "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+  "pytest-xdist>=3.8.0",
+  "pytest-pyodide>=0.58.4"
+ ],
+ "pr_side_started_at": "2026-11-11T07:08:12.074858+00:00",
+ "test_targets": {
+  "main": [
+   "test/test_exceptions.py",
+   "test/test_retry.py"
+  ],
+  "pr": [
+   "test/test_exceptions.py",
+   "test/test_retry.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "urllib3",
+   "expected": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "installed": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "ok": true
+  },
+  "pr": {
+   "dist": "urllib3",
+   "expected": "31147eb45a7fc2a7d68e1bee17b81ce18ddb48c5",
+   "installed": "31147eb45a7fc2a7d68e1bee17b81ce18ddb48c5",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-socket>=0.7.0",
+   "pytest-timeout>=2.3.1",
+   "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+   "pytest-xdist>=3.8.0",
+   "pytest-pyodide>=0.58.4"
+  ],
+  "installed": true
+ },
+ "pytest_plugins_off": [
+  "asyncio"
+ ],
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "worked",
+  "main_error": "",
+  "pr_error": ""
+ },
+ "collection_plugin_note": "Setup: pytest plugin asyncio was turned off. Pytest stopped at startup the same way on both sides, and the traceback pointed into that third-party plugin (AttributeError: module 'pytest' has no attribute 'pyodide_options_stack'). The tests were run again with the plugin turned off. This does not change how the verdict is chosen. Detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: worked.",
+ "base_head_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+ "comparison": {
+  "same": 95,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 5,
+  "new_tests_passing_ids": [
+   "test.test_exceptions.TestMaxRetryError::test_retries_defaults_to_none",
+   "test.test_exceptions.TestMaxRetryError::test_retries_exposes_history",
+   "test.test_exceptions.TestMaxRetryError::test_retries_survives_pickling",
+   "test.test_exceptions.TestPickle::test_exceptions[exception17]",
+   "test.test_retry.TestRetry::test_max_retry_error_exposes_retries_and_history"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 95,
+   "pr": 100
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 95 test(s) ran on main, 100 on the PR; 5 new test(s) pass, 95 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "95 test(s) ran on main, 100 on the PR; 5 new test(s) pass, 95 unchanged",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/exceptions.py",
+   "src/urllib3/util/retry.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/2096.feature.rst",
+   "test/test_exceptions.py",
+   "test/test_retry.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 177.0,
+  "tests": 28.0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 19788,
+  "output_tokens": 12328,
+  "thinking_tokens": 8391,
+  "cost_usd": 0.017032,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017032,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 177.0,
+   "tests": 28.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0118,
+  "total_cost_usd": 0.028832,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-11/ef12096/urllib3-5259"
+ }
+}
