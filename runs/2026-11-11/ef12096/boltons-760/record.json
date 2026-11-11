@@ -1,0 +1,1101 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-760-bb94dcd37d88-2026-11-11",
+ "date_ist": "2026-11-11 11:40 IST",
+ "run_date": "2026-11-11",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 760,
+  "url": "https://github.com/mahmoud/boltons/pull/760",
+  "title": "Preserve ManyToMany relationships across subclasses",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "bb94dcd37d882ad915510e5a28a8e1fe31e90d1c",
+  "merge_commit": "2db6d2ed9d3ff4afa7e57a803ece276d4168faaa",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-11T01:52:32Z",
+ "updated_at_ist": "2026-11-11 07:22 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-11 11:40 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/dictutils.py",
+   "tests/test_dictutils.py"
+  ],
+  "package_py": [
+   "boltons/dictutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_dictutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_dictutils.py, tests/test_iterutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 98,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "98 passed in 1.00s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "100 passed in 0.85s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 98,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "98 passed in 1.10s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "100 passed in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 98,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "98 passed in 0.93s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "100 passed in 0.84s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-760/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "boltons/dictutils.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 2.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "bb94dcd37d882ad915510e5a28a8e1fe31e90d1c",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/README.md at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/README.md",
+   "Source: boltons/README.md at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/README.md",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "2db6d2ed9d3ff4afa7e57a803ece276d4168faaa",
+  "merge_commit": "2db6d2ed9d3ff4afa7e57a803ece276d4168faaa",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "bb94dcd37d882ad915510e5a28a8e1fe31e90d1c"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 2db6d2ed9d3f (refs/pull/760/merge) of head bb94dcd37d88"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Both cross-class regressions fail on the base commit and pass with the patch, checking construction, updates into an existing mapping, reverse keys, and independent subsequent changes in both directions.",
+    "source_quote": "Both cross-class regressions fail on d31d821 and pass with the patch. They check construction, update into an existing mapping, reverse keys and independent subsequent changes in both directions.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "When a ManyToMany source has a different class, the code uses the existing relationship\u2011pair path and each relationship keeps its individual value and reverse key.",
+    "source_quote": "Use the existing relationship-pair path when a ManyToMany source has a different class. Each relationship keeps its individual value and reverse key.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "For same\u2011type ManyToMany relationships, the path still copies its internal sets and normal mappings continue to treat each mapped value as a single relationship.",
+    "source_quote": "The same-type path still copies its internal sets and normal mappings still treat each mapped value as a single relationship.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "bad probe id ', '"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "8a7a0737abf4729f6ac521d3ea8b893a5b9b4c2a4c34ae7055c089e73f098f53",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T06:14:34.903963+00:00",
+    "inputs_sha256": "036e3b1a73254d8d87465ff8a6c3f665d02b97d87fa415099c8e68aaf1b14a21",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1185,
+     "base_files": {
+      "boltons/dictutils.py": "68d9a7a55dd50b577d470d0df4f537e57f056da6e4749014d408c153bc8b1e7f"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "2d0a05943d3d545c9a3f5835198aae4703736fd9c16c6028dd40f05428acf085",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T06:14:34.904149+00:00",
+    "inputs_sha256": "036e3b1a73254d8d87465ff8a6c3f665d02b97d87fa415099c8e68aaf1b14a21",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1185,
+     "base_files": {
+      "boltons/dictutils.py": "68d9a7a55dd50b577d470d0df4f537e57f056da6e4749014d408c153bc8b1e7f"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-11T06:14:35.056361+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_dictutils.py",
+   "tests/test_iterutils.py"
+  ],
+  "pr": [
+   "tests/test_dictutils.py",
+   "tests/test_iterutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "2db6d2ed9d3ff4afa7e57a803ece276d4168faaa",
+   "installed": "2db6d2ed9d3ff4afa7e57a803ece276d4168faaa",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 98,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_dictutils::test_many_to_many_update_between_types[DerivedManyToMany-ManyToMany]",
+   "tests.test_dictutils::test_many_to_many_update_between_types[ManyToMany-DerivedManyToMany]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 100,
+   "pr": 100
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_dictutils::test_many_to_many_update_between_types[DerivedManyToMany-ManyToMany]": "AssertionError: assert frozenset({0,...nset({1, 2})}) == frozenset({0, 1, 2})",
+   "tests.test_dictutils::test_many_to_many_update_between_types[ManyToMany-DerivedManyToMany]": "AssertionError: assert frozenset({0,...nset({1, 2})}) == frozenset({0, 1, 2})"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "8a7a0737abf4729f6ac521d3ea8b893a5b9b4c2a4c34ae7055c089e73f098f53",
+    "target": "mahmoud/boltons#760",
+    "about": "Test ManyToMany construction via _PAIRING path and subclass construction/independence.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Both cross-class regressions fail on the base commit and pass with the patch, checking construction, updates into an existing mapping, reverse keys, and independent subsequent changes in both directions.",
+      "covers": [
+       "c1.sub_err",
+       "c1.m_err",
+       "c1.data_ok",
+       "c1.inv_sep",
+       "c1.indep"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "When a ManyToMany source has a different class, the code uses the existing relationship\u2011pair path and each relationship keeps its individual value and reverse key.",
+      "covers": [
+       "c2.a_err",
+       "c2.b_err",
+       "c2.inv_shared",
+       "c2.data_empty"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": false,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      },
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": false,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      },
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": false,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      }
+     ],
+     "pr": [
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": true,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      },
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": true,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      },
+      {
+       "c2.inv_shared": false,
+       "c2.data_empty": true,
+       "c1.data_ok": true,
+       "c1.inv_sep": true,
+       "c1.indep": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.data_ok",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.data_ok\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.data_ok\""
+       }
+      }
+     },
+     {
+      "name": "c1.indep",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.indep\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.indep\""
+       }
+      }
+     },
+     {
+      "name": "c1.inv_sep",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.inv_sep\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.inv_sep\""
+       }
+      }
+     },
+     {
+      "name": "c2.data_empty",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.data_empty\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.data_empty\""
+       }
+      }
+     },
+     {
+      "name": "c2.inv_shared",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.inv_shared\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.inv_shared\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8a7a0737abf4729f6ac521d3ea8b893a5b9b4c2a4c34ae7055c089e73f098f53",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T06:14:34.903963+00:00",
+     "inputs_sha256": "036e3b1a73254d8d87465ff8a6c3f665d02b97d87fa415099c8e68aaf1b14a21",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1185,
+      "base_files": {
+       "boltons/dictutils.py": "68d9a7a55dd50b577d470d0df4f537e57f056da6e4749014d408c153bc8b1e7f"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T06:14:35.056361+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "boltons/dictutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "2d0a05943d3d545c9a3f5835198aae4703736fd9c16c6028dd40f05428acf085",
+    "target": "mahmoud/boltons#760",
+    "about": "Test same-type ManyToMany update copies internal sets and normal mapping treats each value as single.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "For same\u2011type ManyToMany relationships, the path still copies its internal sets and normal mappings continue to treat each mapped value as a single relationship.",
+      "covers": [
+       "c3.m1_err",
+       "c3.m2_err",
+       "c3.up_err",
+       "c3.sets_copied",
+       "c3.inv_copied",
+       "c3.m3_err",
+       "c3.set_err",
+       "c3.single_val"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      },
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      },
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      }
+     ],
+     "pr": [
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      },
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      },
+      {
+       "c3.sets_copied": true,
+       "c3.inv_copied": true,
+       "c3.set_err": "TypeError",
+       "c3.single_val": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.inv_copied",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.inv_copied\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.inv_copied\""
+       }
+      }
+     },
+     {
+      "name": "c3.set_err",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C3",
+      "main": "TypeError",
+      "pr": "TypeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.set_err\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.set_err\""
+       }
+      }
+     },
+     {
+      "name": "c3.sets_copied",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.sets_copied\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.sets_copied\""
+       }
+      }
+     },
+     {
+      "name": "c3.single_val",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c3.single_val\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c3.single_val\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "2d0a05943d3d545c9a3f5835198aae4703736fd9c16c6028dd40f05428acf085",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T06:14:34.904149+00:00",
+     "inputs_sha256": "036e3b1a73254d8d87465ff8a6c3f665d02b97d87fa415099c8e68aaf1b14a21",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1185,
+      "base_files": {
+       "boltons/dictutils.py": "68d9a7a55dd50b577d470d0df4f537e57f056da6e4749014d408c153bc8b1e7f"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T06:14:35.056361+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "boltons/dictutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe2.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "not_testable",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C3"
+   ],
+   "reason": "probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.indep (C1); c1.inv_sep (C1); probe: 2 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.data_empty (C2); c2.inv_shared (C2); probe: claim(s) C1, C3 proven; probe: 1 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.indep",
+    "c1.inv_sep"
+   ],
+   "advisory_agreeing_differs": [
+    "c2.data_empty",
+    "c2.inv_shared"
+   ],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "2 test(s) fail on main and pass on the PR; 100 test(s) ran on main, 100 on the PR; 0 new test(s) pass, 98 unchanged; probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.indep (C1); c1.inv_sep (C1); probe: 2 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.data_empty (C2); c2.inv_shared (C2); probe: claim(s) C1, C3 proven; probe: 1 probe(s) could not run on either side",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 100 test(s) ran on main, 100 on the PR; 0 new test(s) pass, 98 unchanged; probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.indep (C1); c1.inv_sep (C1); probe: 2 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.data_empty (C2); c2.inv_shared (C2); probe: claim(s) C1, C3 proven; probe: 1 probe(s) could not run on either side",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/dictutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_dictutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 282.9,
+  "tests": 9.0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 22581,
+  "output_tokens": 29032,
+  "thinking_tokens": 27365,
+  "cost_usd": 0.032903,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.032903,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 282.9,
+   "tests": 9.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01886,
+  "total_cost_usd": 0.051763,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-11/ef12096/boltons-760"
+ }
+}
