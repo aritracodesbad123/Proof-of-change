@@ -1,0 +1,2519 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-757-417de49cc629-2026-11-12",
+ "date_ist": "2026-11-12 11:50 IST",
+ "run_date": "2026-11-12",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 757,
+  "url": "https://github.com/mahmoud/boltons/pull/757",
+  "title": "Preserve required fields in repr helpers",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "417de49cc6295b8b276a1a572a426f9af8d84fb6",
+  "merge_commit": "c73be1cc1527a0d2fdcdb0ea7e28b251153374cc",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-11T19:56:13Z",
+ "updated_at_ist": "2026-11-12 01:26 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-12 11:50 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/funcutils.py",
+   "tests/test_funcutils.py"
+  ],
+  "package_py": [
+   "boltons/funcutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_funcutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_funcutils.py, tests/test_funcutils_fb.py, tests/test_funcutils_fb_py3.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "46 passed in 1.16s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "48 passed in 1.14s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "46 passed in 1.09s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "48 passed in 1.10s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "46 passed in 1.11s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "48 passed in 1.12s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-757/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "boltons/funcutils.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 2.7,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "417de49cc6295b8b276a1a572a426f9af8d84fb6",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 2.2 GB (of 15.6 GB).",
+   "Setup check: free disk 91.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/pyproject.toml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/pyproject.toml",
+   "Source: boltons/pyproject.toml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/pyproject.toml",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/tree/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "c73be1cc1527a0d2fdcdb0ea7e28b251153374cc",
+  "merge_commit": "c73be1cc1527a0d2fdcdb0ea7e28b251153374cc",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "417de49cc6295b8b276a1a572a426f9af8d84fb6"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit c73be1cc1527 (refs/pull/757/merge) of head 417de49cc629"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Always include required fields when an attribute is listed as both required and optional.",
+    "source_quote": "Always include required fields when an attribute is listed as both required and optional.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Apply the omission predicate only to optional-only fields in format_exp_repr and format_nonexp_repr.",
+    "source_quote": "Apply the omission predicate only to optional-only fields in `format_exp_repr` and `format_nonexp_repr`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Field order and deduplication are preserved.",
+    "source_quote": "Field order and deduplication are preserved.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Both regressions fail on d31d821 and pass with the patch.",
+    "source_quote": "Both regressions fail on d31d821 and pass with the patch.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "boltons.funcutils.format_exp_repr",
+   "boltons.funcutils.format_nonexp_repr"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "16a2a561efc62dd94e8c3853de935f4d070f4e37cedae9755db25a688f28769a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-12T06:21:34.751766+00:00",
+    "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+    "inputs": {
+     "title_chars": 40,
+     "body_chars": 1162,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "56429aef091c16c0a3e4796b1982172080e5483355e5e81242e4811bf2bb1238",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-12T06:21:34.751895+00:00",
+    "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+    "inputs": {
+     "title_chars": 40,
+     "body_chars": 1162,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "5478659ae49a177f4182693fe2270cda1272ac037431b607daed96bb2862389d",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-12T06:21:34.751969+00:00",
+    "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+    "inputs": {
+     "title_chars": 40,
+     "body_chars": 1162,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe4.py",
+    "source": "model",
+    "sha256": "8733ef5b50ebb0ffd72007c8ea648236515e1e39c3ff6f8e2eb1e02dcd6a2cee",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-12T06:21:34.752051+00:00",
+    "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+    "inputs": {
+     "title_chars": 40,
+     "body_chars": 1162,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "fa4273faba176ec329c16776a53afb7a70e4a6021dbdf607221d310107c22cd1",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-12T06:21:34.755460+00:00",
+    "inputs_sha256": "c214c699f8c49075ffe5bf4688e0b2c7992b774ad132cabe7b3bfe692512398f",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-12T06:21:34.919617+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_funcutils.py",
+   "tests/test_funcutils_fb.py",
+   "tests/test_funcutils_fb_py3.py"
+  ],
+  "pr": [
+   "tests/test_funcutils.py",
+   "tests/test_funcutils_fb.py",
+   "tests/test_funcutils_fb_py3.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "c73be1cc1527a0d2fdcdb0ea7e28b251153374cc",
+   "installed": "c73be1cc1527a0d2fdcdb0ea7e28b251153374cc",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 46,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_funcutils::test_format_exp_repr_keeps_required_fields_listed_as_optional",
+   "tests.test_funcutils::test_format_nonexp_repr_keeps_required_fields_listed_as_optional"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 48,
+   "pr": 48
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_funcutils::test_format_exp_repr_keeps_required_fields_listed_as_optional": "AssertionError: assert 'SimpleNamespace(visible=1)' == 'SimpleNamesp...e, visible=1)'",
+   "tests.test_funcutils::test_format_nonexp_repr_keeps_required_fields_listed_as_optional": "AssertionError: assert '<SimpleNamespace visible=1>' == '<SimpleNames...=0 visible=1>'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "16a2a561efc62dd94e8c3853de935f4d070f4e37cedae9755db25a688f28769a",
+    "target": "mahmoud/boltons#757",
+    "about": "Test claim C1: Always include required fields when an attribute is listed as both required and optional.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Always include required fields when an attribute is listed as both required and optional.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.exp_repr_both": "Foo(1)",
+       "c1.nonexp_repr_both": "<Foo id=139968048836256>"
+      },
+      {
+       "c1.exp_repr_both": "Foo(1)",
+       "c1.nonexp_repr_both": "<Foo id=140625614761632>"
+      },
+      {
+       "c1.exp_repr_both": "Foo(1)",
+       "c1.nonexp_repr_both": "<Foo id=140348052418064>"
+      }
+     ],
+     "pr": [
+      {
+       "c1.exp_repr_both": "Foo(1, b=None)",
+       "c1.nonexp_repr_both": "<Foo b=None>"
+      },
+      {
+       "c1.exp_repr_both": "Foo(1, b=None)",
+       "c1.nonexp_repr_both": "<Foo b=None>"
+      },
+      {
+       "c1.exp_repr_both": "Foo(1, b=None)",
+       "c1.nonexp_repr_both": "<Foo b=None>"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.exp_repr_both",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "Foo(1)",
+      "pr": "Foo(1, b=None)",
+      "diffs": [
+       {
+        "field": "",
+        "main": "Foo(1)",
+        "pr": "Foo(1, b=None)"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.exp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.exp_repr_both\""
+       }
+      }
+     },
+     {
+      "name": "c1.nonexp_repr_both",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C1",
+      "main": "<Foo id=139968048836256>",
+      "pr": "<Foo b=None>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<Foo id=139968048836256>",
+        "pr": "<Foo b=None>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.nonexp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.nonexp_repr_both\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "16a2a561efc62dd94e8c3853de935f4d070f4e37cedae9755db25a688f28769a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-12T06:21:34.751766+00:00",
+     "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+     "inputs": {
+      "title_chars": 40,
+      "body_chars": 1162,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-12T06:21:34.919617+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "56429aef091c16c0a3e4796b1982172080e5483355e5e81242e4811bf2bb1238",
+    "target": "mahmoud/boltons#757",
+    "about": "Test claim C2: Apply the omission predicate only to optional-only fields in format_exp_repr and format_nonexp_repr.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Apply the omission predicate only to optional-only fields in format_exp_repr and format_nonexp_repr.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.exp_repr_both": "Foo(1)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo id=140206613312624>",
+       "c2.nonexp_repr_optional_only": "<Foo id=140206613312624>"
+      },
+      {
+       "c2.exp_repr_both": "Foo(1)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo id=140422513013872>",
+       "c2.nonexp_repr_optional_only": "<Foo id=140422513013872>"
+      },
+      {
+       "c2.exp_repr_both": "Foo(1)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo id=139834892923872>",
+       "c2.nonexp_repr_optional_only": "<Foo id=139834892923872>"
+      }
+     ],
+     "pr": [
+      {
+       "c2.exp_repr_both": "Foo(1, b=None)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo b=None>",
+       "c2.nonexp_repr_optional_only": "<Foo id=140576609645824>"
+      },
+      {
+       "c2.exp_repr_both": "Foo(1, b=None)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo b=None>",
+       "c2.nonexp_repr_optional_only": "<Foo id=140468583429376>"
+      },
+      {
+       "c2.exp_repr_both": "Foo(1, b=None)",
+       "c2.exp_repr_optional_only": "Foo(1)",
+       "c2.nonexp_repr_both": "<Foo b=None>",
+       "c2.nonexp_repr_optional_only": "<Foo id=139736049349888>"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.exp_repr_both",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "Foo(1)",
+      "pr": "Foo(1, b=None)",
+      "diffs": [
+       {
+        "field": "",
+        "main": "Foo(1)",
+        "pr": "Foo(1, b=None)"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.exp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.exp_repr_both\""
+       }
+      }
+     },
+     {
+      "name": "c2.exp_repr_optional_only",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "Foo(1)",
+      "pr": "Foo(1)",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.exp_repr_optional_only\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.exp_repr_optional_only\""
+       }
+      }
+     },
+     {
+      "name": "c2.nonexp_repr_both",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C2",
+      "main": "<Foo id=140206613312624>",
+      "pr": "<Foo b=None>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<Foo id=140206613312624>",
+        "pr": "<Foo b=None>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.nonexp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.nonexp_repr_both\""
+       }
+      }
+     },
+     {
+      "name": "c2.nonexp_repr_optional_only",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C2",
+      "main": "<Foo id=140206613312624>",
+      "pr": "<Foo id=140576609645824>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<Foo id=140206613312624>",
+        "pr": "<Foo id=140576609645824>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.nonexp_repr_optional_only\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.nonexp_repr_optional_only\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "56429aef091c16c0a3e4796b1982172080e5483355e5e81242e4811bf2bb1238",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-12T06:21:34.751895+00:00",
+     "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+     "inputs": {
+      "title_chars": 40,
+      "body_chars": 1162,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-12T06:21:34.919617+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "5478659ae49a177f4182693fe2270cda1272ac037431b607daed96bb2862389d",
+    "target": "mahmoud/boltons#757",
+    "about": "Test claim C3: Field order and deduplication are preserved.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Field order and deduplication are preserved.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      },
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      },
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      }
+     ],
+     "pr": [
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      },
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      },
+      {
+       "c3.exp_repr_output": "Foo(1, b=2, c=3)",
+       "c3.nonexp_repr_output": "<Foo b=2 c=3>"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.exp_repr_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "Foo(1, b=2, c=3)",
+      "pr": "Foo(1, b=2, c=3)",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.exp_repr_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.exp_repr_output\""
+       }
+      }
+     },
+     {
+      "name": "c3.nonexp_repr_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "<Foo b=2 c=3>",
+      "pr": "<Foo b=2 c=3>",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.nonexp_repr_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.nonexp_repr_output\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "5478659ae49a177f4182693fe2270cda1272ac037431b607daed96bb2862389d",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-12T06:21:34.751969+00:00",
+     "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+     "inputs": {
+      "title_chars": 40,
+      "body_chars": 1162,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-12T06:21:34.919617+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe4",
+    "source": "model",
+    "path": "model-probes/model-probe4.py",
+    "sha256": "8733ef5b50ebb0ffd72007c8ea648236515e1e39c3ff6f8e2eb1e02dcd6a2cee",
+    "target": "mahmoud/boltons#757",
+    "about": "Test claim C4: Both regressions fail on d31d821 and pass with the patch.",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Both regressions fail on d31d821 and pass with the patch.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe4-main-1.jsonl",
+      "probe-model-probe4-main-2.jsonl",
+      "probe-model-probe4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe4-pr-1.jsonl",
+      "probe-model-probe4-pr-2.jsonl",
+      "probe-model-probe4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.exp_repr_both": "Foo(1)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo id=140678289388656>",
+       "c4.nonexp_repr_optional_only": "<Foo id=140678289388656>"
+      },
+      {
+       "c4.exp_repr_both": "Foo(1)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo id=139735475287152>",
+       "c4.nonexp_repr_optional_only": "<Foo id=139735475287152>"
+      },
+      {
+       "c4.exp_repr_both": "Foo(1)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo id=140349376050288>",
+       "c4.nonexp_repr_optional_only": "<Foo id=140349376050288>"
+      }
+     ],
+     "pr": [
+      {
+       "c4.exp_repr_both": "Foo(1, b=None)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo b=None>",
+       "c4.nonexp_repr_optional_only": "<Foo id=139662193177856>"
+      },
+      {
+       "c4.exp_repr_both": "Foo(1, b=None)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo b=None>",
+       "c4.nonexp_repr_optional_only": "<Foo id=140083716863232>"
+      },
+      {
+       "c4.exp_repr_both": "Foo(1, b=None)",
+       "c4.exp_repr_optional_only": "Foo(1)",
+       "c4.nonexp_repr_both": "<Foo b=None>",
+       "c4.nonexp_repr_optional_only": "<Foo id=140640887551232>"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c4.exp_repr_both",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "Foo(1)",
+      "pr": "Foo(1, b=None)",
+      "diffs": [
+       {
+        "field": "",
+        "main": "Foo(1)",
+        "pr": "Foo(1, b=None)"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.exp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.exp_repr_both\""
+       }
+      }
+     },
+     {
+      "name": "c4.exp_repr_optional_only",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C4",
+      "main": "Foo(1)",
+      "pr": "Foo(1)",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c4.exp_repr_optional_only\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c4.exp_repr_optional_only\""
+       }
+      }
+     },
+     {
+      "name": "c4.nonexp_repr_both",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C4",
+      "main": "<Foo id=140678289388656>",
+      "pr": "<Foo b=None>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<Foo id=140678289388656>",
+        "pr": "<Foo b=None>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c4.nonexp_repr_both\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c4.nonexp_repr_both\""
+       }
+      }
+     },
+     {
+      "name": "c4.nonexp_repr_optional_only",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C4",
+      "main": "<Foo id=140678289388656>",
+      "pr": "<Foo id=139662193177856>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<Foo id=140678289388656>",
+        "pr": "<Foo id=139662193177856>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.nonexp_repr_optional_only\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.nonexp_repr_optional_only\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8733ef5b50ebb0ffd72007c8ea648236515e1e39c3ff6f8e2eb1e02dcd6a2cee",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-12T06:21:34.752051+00:00",
+     "inputs_sha256": "1494d3bd0ef00abefe043731bc92c10585aa2d573123c13db5f744ba66285e49",
+     "inputs": {
+      "title_chars": 40,
+      "body_chars": 1162,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-12T06:21:34.919617+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe4.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "fa4273faba176ec329c16776a53afb7a70e4a6021dbdf607221d310107c22cd1",
+    "target": "mahmoud/boltons#757",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=140277961969472>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=140277961977920>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=140277965485168>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=140277961978240>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      },
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=140048780775232>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=140048780783680>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=140048784290928>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=140048780784000>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      },
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=139937487982400>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=139937487990848>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=139937491481712>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=139937487991168>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      }
+     ],
+     "pr": [
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=140508007812928>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=140508007821376>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=140508011328624>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=140508007821696>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      },
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=139726181535552>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=139726181537664>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=139726185051248>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=139726181537984>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      },
+      {
+       "boltons.funcutils.format_exp_repr.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input10": "list()",
+       "boltons.funcutils.format_exp_repr.input11": "dict()",
+       "boltons.funcutils.format_exp_repr.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input4": "str(None, None, None)",
+       "boltons.funcutils.format_exp_repr.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.funcutils.format_exp_repr.input9": "str()",
+       "boltons.funcutils.format_nonexp_repr.input0": "<int id=22395336>",
+       "boltons.funcutils.format_nonexp_repr.input1": "<int id=22395304>",
+       "boltons.funcutils.format_nonexp_repr.input10": "<list id=140001898909504>",
+       "boltons.funcutils.format_nonexp_repr.input11": "<dict id=140001898917952>",
+       "boltons.funcutils.format_nonexp_repr.input2": "<int id=22395272>",
+       "boltons.funcutils.format_nonexp_repr.input3": "<float id=140001902425200>",
+       "boltons.funcutils.format_nonexp_repr.input4": "<str id=21617408>",
+       "boltons.funcutils.format_nonexp_repr.input5": "<list id=140001898918272>",
+       "boltons.funcutils.format_nonexp_repr.input6": "<NoneType id=22347016>",
+       "boltons.funcutils.format_nonexp_repr.input7": "<bool id=22347464>",
+       "boltons.funcutils.format_nonexp_repr.input8": "<bool id=22347432>",
+       "boltons.funcutils.format_nonexp_repr.input9": "<str id=22416560>"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.funcutils.format_exp_repr.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "list()",
+      "pr": "list()",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "dict()",
+      "pr": "dict()",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "str(None, None, None)",
+      "pr": "str(None, None, None)",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_exp_repr.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "str()",
+      "pr": "str()",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.funcutils.format_exp_repr.input9\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<int id=22395336>",
+      "pr": "<int id=22395336>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<int id=22395304>",
+      "pr": "<int id=22395304>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input10",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": null,
+      "main": "<list id=140277961969472>",
+      "pr": "<list id=140508007812928>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<list id=140277961969472>",
+        "pr": "<list id=140508007812928>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input11",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": null,
+      "main": "<dict id=140277961977920>",
+      "pr": "<dict id=140508007821376>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<dict id=140277961977920>",
+        "pr": "<dict id=140508007821376>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<int id=22395272>",
+      "pr": "<int id=22395272>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input3",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": null,
+      "main": "<float id=140277965485168>",
+      "pr": "<float id=140508011328624>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<float id=140277965485168>",
+        "pr": "<float id=140508011328624>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<str id=21617408>",
+      "pr": "<str id=21617408>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input5",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": null,
+      "main": "<list id=140277961978240>",
+      "pr": "<list id=140508007821696>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "<list id=140277961978240>",
+        "pr": "<list id=140508007821696>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<NoneType id=22347016>",
+      "pr": "<NoneType id=22347016>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<bool id=22347464>",
+      "pr": "<bool id=22347464>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<bool id=22347432>",
+      "pr": "<bool id=22347432>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.funcutils.format_nonexp_repr.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<str id=22416560>",
+      "pr": "<str id=22416560>",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"boltons.funcutils.format_nonexp_repr.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "fa4273faba176ec329c16776a53afb7a70e4a6021dbdf607221d310107c22cd1",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-12T06:21:34.755460+00:00",
+     "inputs_sha256": "c214c699f8c49075ffe5bf4688e0b2c7992b774ad132cabe7b3bfe692512398f",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-12T06:21:34.919617+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "flaky",
+    "proven",
+    "needs_human",
+    "flaky",
+    "flaky",
+    "proven",
+    "proven",
+    "proven",
+    "needs_human",
+    "flaky",
+    "flaky",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "flaky",
+    "flaky",
+    "no_difference",
+    "flaky",
+    "no_difference",
+    "flaky",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "reason": "probe: 9 observation(s) ignored as noise (they change between runs of the same side); probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.exp_repr_optional_only (C2); c4.exp_repr_optional_only (C4); probe: claim(s) C1, C2, C3, C4 proven; probe: 12 other observation(s) identical on both sides; probe: 8 probe(s) could not run on either side",
+   "ignored_noise": [
+    "c1.nonexp_repr_both",
+    "c2.nonexp_repr_both",
+    "c2.nonexp_repr_optional_only",
+    "c4.nonexp_repr_both",
+    "c4.nonexp_repr_optional_only",
+    "boltons.funcutils.format_nonexp_repr.input10",
+    "boltons.funcutils.format_nonexp_repr.input11",
+    "boltons.funcutils.format_nonexp_repr.input3",
+    "boltons.funcutils.format_nonexp_repr.input5"
+   ],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c2.exp_repr_optional_only",
+    "c4.exp_repr_optional_only"
+   ],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-probe3": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-probe4": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "2 test(s) fail on main and pass on the PR; 48 test(s) ran on main, 48 on the PR; 0 new test(s) pass, 46 unchanged; probe: 5 observation(s) ignored as noise (they change between runs of the same side); probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.exp_repr_optional_only (C2); c4.exp_repr_optional_only (C4); probe: claim(s) C1, C2, C3, C4 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 48 test(s) ran on main, 48 on the PR; 0 new test(s) pass, 46 unchanged; probe: 5 observation(s) ignored as noise (they change between runs of the same side); probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.exp_repr_optional_only (C2); c4.exp_repr_optional_only (C4); probe: claim(s) C1, C2, C3, C4 proven",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/funcutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_funcutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 94.2,
+  "tests": 9.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 10946,
+  "output_tokens": 12649,
+  "thinking_tokens": 10587,
+  "cost_usd": 0.014668,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.014668,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 94.2,
+   "tests": 9.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00628,
+  "total_cost_usd": 0.020948,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-12/ef12096/boltons-757"
+ }
+}
