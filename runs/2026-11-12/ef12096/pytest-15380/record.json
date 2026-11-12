@@ -2549,7 +2549,7 @@
  },
  "pdf_push": {
   "ok": true,
-  "attempts": 2,
+  "attempts": 1,
   "error": null,
   "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-12/ef12096/pytest-15380"
  }
