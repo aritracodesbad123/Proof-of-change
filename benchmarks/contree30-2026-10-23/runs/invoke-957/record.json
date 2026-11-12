@@ -1,0 +1,676 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-957-967a6d11ae87-invoke-957",
+ "date_ist": "2026-10-24 07:14 IST",
+ "run_date": "2026-10-24",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 957,
+  "url": "https://github.com/pyinvoke/invoke/pull/957",
+  "title": "Default run.shell to /bin/sh",
+  "base_sha": "2e6609818ffa5e5f9ae69380997faa98fd189f8e",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "967a6d11ae8710a671b49a88ba0d32490f249a80",
+  "merge_commit": null,
+  "tested_main_sha": "ee9d862540f0f9ffcd58382389c8b8995822db76",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "tobim",
+ "base_ref": "main",
+ "updated_at_utc": "2026-04-05T23:40:20Z",
+ "updated_at_ist": "2026-04-06 05:10 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-24 07:14 IST",
+ "files": {
+  "all": [
+   "invoke/config.py",
+   "invoke/runners.py",
+   "tests/config.py",
+   "tests/runners.py"
+  ],
+  "package_py": [
+   "invoke/config.py",
+   "invoke/runners.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/config.py",
+   "tests/runners.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: ",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-957/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "967a6d11ae8710a671b49a88ba0d32490f249a80",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+    "invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+    "invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "invoke/pyproject.toml at main \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/tree/main/pyproject.toml",
+     "query": "invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "invoke \u00b7 PyPI",
+     "url": "https://pypi.org/project/invoke/",
+     "query": "invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org"
+    },
+    {
+     "title": "neoxelox-invoke \u00b7 PyPI",
+     "url": "https://pypi.org/project/neoxelox-invoke/",
+     "query": "invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org"
+    },
+    {
+     "title": "Documentation for users of invoke based projects \u00b7 Issue #1020 \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/issues/1020",
+     "query": "invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "Instructions to install dev version don't work \u00b7 Issue #391 \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/issues/391",
+     "query": "invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+     "query": "invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "Logging & other output concerns \u00b7 Issue #15 \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/issues/15",
+     "query": "invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "Issue with Python 3.11, or type annotations: the inspect module changed \u00b7 Issue #833 \u00b7 pyinvoke/invoke \u00b7 GitHub",
+     "url": "https://github.com/pyinvoke/invoke/issues/833",
+     "query": "invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke"
+    },
+    {
+     "title": "PyPI \u00b7 The Python Package Index",
+     "url": "https://pypi.org",
+     "query": "invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org"
+    }
+   ],
+   "text": "To install invoke, use `pip install invoke`. For the development version, the sources indicate that `pip install invoke==dev --allow-unverified invoke` was previously used but is now deprecated. The sources do not provide current installation instructions for the development version. The sources also mention that `invoke` searches for `setup.py` or `setup.cfg` to run tasks, but do not provide specific details on invoking `setup` or configuration files.\nThe sources do not provide specific instructions on how to install the Python package `invoke` from the GitHub repository `https://github.com/pyinvoke/invoke`. However, they do mention various aspects of the `invoke` package, including its use of `.StreamWatcher` instances for handling input/output, logging concerns, and issues related to Python 3.11 and type annotations. The sources do not cover installation details directly.\nTo install the Python library \"invoke,\" you can use the pip command: `pip install invoke`. The sources confirm that Invoke is a Python library for managing shell-oriented subprocesses and organizing executable Python code into CLI-invokable tasks, compatible with Python versions 2.7 and 3.4+. The sources also mention that PyPI verified the artifact's origin, ensuring its authenticity.\nTitle: invoke/pyproject.toml at main \u00b7 pyinvoke/invoke \u00b7 GitHub\n## Navigation Menu. You signed in with another tab or window. Reload to refresh your session. You switched accounts on another tab or window. ## Repository navigation. ## Expand file tree. # pyproject.toml. ## Latest commit. ## History. 108 lines (92 loc) \u00b7 2.84 KB. ## File metadata and controls. authors = [{ name = \"Jeff Forcier\", email = \"jeff@bitprophet.org\" }]. # We have a few 'dependencies' but we vendor them internally. \"Devel\nWelcome to Invoke ! Invoke is a Python library for managing shell-oriented subprocesses and organizing executable Python code into CLI-invokable tasks. It draws... The Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and install software developed and shared by the ... May 19, 2023 \u00b7 Welcome to Invoke ! Invoke is a Python (2.7 and 3.4+) library for managing shell-oriented subprocesses and organizing executable Python code into CLI\nMay 19, 2023 \u00b7 Welcome to Invoke ! Invoke is a Python (2.7 and 3.4+) library for managing shell-oriented subprocesses and organizing executable Python code into CLI-invokable tasks. It... invoke -tasklib Reusable Invoke tasks shared across Python projects: formatting, linting, type-checking, testing, environment setup, security auditing, releasing,... Sep 20, 2018 \u00b7 pyinvoke pyinvoke is a simple module that is used to invoked Python applications using a full function specifier, similar to distli\nTitle: Documentation for users of invoke based projects \u00b7 Issue #1020 \u00b7 pyinvoke/invoke \u00b7 GitHub\n## Navigation Menu. You signed in with another tab or window. Reload to refresh your session. You switched accounts on another tab or window. ## Repository navigation. # Documentation for users of invoke based projects\u00a0#1020. ## Description. opened on Feb 4, 2025. I was onboarded to a project that uses invoke. The README had instructions of install invoke, then run `invoke setup`. As my first interac\nTitle: Instructions to install dev version don't work \u00b7 Issue #391 \u00b7 pyinvoke/invoke \u00b7 GitHub\n## Navigation Menu. # Search code, repositories, users, issues, pull requests... You signed in with another tab or window. Reload to refresh your session. You switched accounts on another tab or window. ### Uh oh! There was an error while loading. * Notifications  You must be signed in to change notification settings. # Instructions to install dev version don't work\u00a0#391. ## Description. opened on Sep 1\n\"\"\"\n\nWrite to the program's stdin in response to patterns in ``buffer\\_``.\n\nThe patterns and responses are driven by the `.StreamWatcher` instances\n\nfrom the ``watchers`` kwarg of `run` - see :doc:`/concepts/watchers`\n\nfor a conceptual overview.\n\n:param buffer:\n\nThe capture buffer for this thread's particular IO stream.\n\n:returns: ``None``.\n\n.. versionadded:: 1.0\n\n\"\"\"\n\n# Join buffer contents into a single string; without this, [...] fcntl = None # type: ignore[assignment]\n\ntry:\n\nimport termios\n\n\nDisplay the task or tasks being invoked so users can follow the \"flow\" of nontrivial execution\n  + plus parameters\n  + plus dependency chain info\n    - even skipped/satisfied dependencies\n Display subprocess commands being called so users can tell what's actually being done on their behalf\n  + plus which task is currently in play (optionally) in case the per-task info has already scrolled by [...] ``` [...] ```\nFile \"/root/.cache/pypoetry/virtualenvs/blake2signer-uv6dtlQx-py3.11/lib/python3.11/site-packages/invoke/program.py\", line 465, in parse_collection self.load_collection() ^^^^^^^^^^^^^^^^^^^^^^ File \"/root/.cache/pypoetry/virtualenvs/blake2signer-uv6dtlQx-py3.11/lib/python3.11/site-packages/invoke/program.py\", line 696, in load_collection module, parent = loader.load(coll_name) ^^^^^^^^^^^^^^^^^^^^^^ File [...] File \"/root/.cache/pypoetry/virtualenvs/blake2signer-uv6dtlQx-py3.11/lib/python3.11/s\nThe Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and install software developed and shared by the ... May 19, 2023 \u00b7 Welcome to Invoke ! Invoke is a Python (2.7 and 3.4+) library for managing shell-oriented subprocesses and organizing executable Python code into CLI-invokable tasks. It... invoke -tasklib Reusable Invoke tasks shared across Python projects: formatting, linting, type-checking, testing, environment setup, securit",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 9 results",
+    "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+    "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+    "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+    "Source: invoke/pyproject.toml at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/tree/main/pyproject.toml",
+    "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+    "Source: neoxelox-invoke \u00b7 PyPI \u2014 https://pypi.org/project/neoxelox-invoke/",
+    "Source: Documentation for users of invoke based projects \u00b7 Issue #1020 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/1020",
+    "Source: Instructions to install dev version don't work \u00b7 Issue #391 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/391",
+    "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+    "Source: Logging & other output concerns \u00b7 Issue #15 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/15",
+    "Source: Issue with Python 3.11, or type annotations: the inspect module changed \u00b7 Issue #833 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/833",
+    "Source: PyPI \u00b7 The Python Package Index \u2014 https://pypi.org"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 38.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 9 results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke/pyproject.toml at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/tree/main/pyproject.toml",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: neoxelox-invoke \u00b7 PyPI \u2014 https://pypi.org/project/neoxelox-invoke/",
+   "Source: Documentation for users of invoke based projects \u00b7 Issue #1020 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/1020",
+   "Source: Instructions to install dev version don't work \u00b7 Issue #391 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/391",
+   "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+   "Source: Logging & other output concerns \u00b7 Issue #15 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/15",
+   "Source: Issue with Python 3.11, or type annotations: the inspect module changed \u00b7 Issue #833 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/833",
+   "Source: PyPI \u00b7 The Python Package Index \u2014 https://pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.6, >=3.9",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "setup.py",
+   "tox.ini",
+   "README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.6, >=3.9",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.6, >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "chosen": {
+  "pr": 957,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "ee9d862540f0f9ffcd58382389c8b8995822db76",
+  "pr_sha": "967a6d11ae8710a671b49a88ba0d32490f249a80"
+ },
+ "tested": {
+  "main": "main @ ee9d862540f0 (merge-base with the PR head)",
+  "pr": "PR head 967a6d11ae87"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The default value of run.shell changes from /bin/bash to /bin/sh.",
+    "source_quote": "Default run.shell to /bin/sh",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C2",
+    "text": "\"/bin/bash is not available on some popular distributions, for example NixOS.\"",
+    "source_quote": "\"/bin/bash is not available on some popular distributions, for example NixOS.\"",
+    "testable": false,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "29ce3533c77670d0359603bc40ff95804caeaca2420679c98cb2dedb3e02cfb2",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:45:40.176923+00:00",
+    "inputs_sha256": "61ac2cd0f8516769f3ce585a39fc7e6cc92bd7e9e1d1663d73f5e82d56ff6fc4",
+    "inputs": {
+     "title_chars": 28,
+     "body_chars": 145,
+     "base_files": {
+      "invoke/config.py": "7cf2ddafe1c63652d316e5fc60ed9ecd9e3a4de04f2a3afae36259348064d790",
+      "invoke/runners.py": "e16247a23f14160803e9ef85d76845b138874c704ee5f1c465900876e14d58da"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-24T01:45:40.200091+00:00",
+ "test_targets": {
+  "main": [],
+  "pr": []
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "main_uuid": "dea11864-9f75-4b2f-b5a7-c690d350ad1d",
+  "pr_uuid": "4944d1a9-2234-4d0e-aa9f-a1131436a809",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.6"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "29ce3533c77670d0359603bc40ff95804caeaca2420679c98cb2dedb3e02cfb2",
+    "target": "pyinvoke/invoke#957",
+    "about": "Check the default value of run.shell.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The default value of run.shell changes from /bin/bash to /bin/sh.",
+      "covers": [
+       "default_run_shell"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.4,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "default_run_shell": "/bin/bash"
+      },
+      {
+       "default_run_shell": "/bin/bash"
+      },
+      {
+       "default_run_shell": "/bin/bash"
+      }
+     ],
+     "pr": [
+      {
+       "default_run_shell": "/bin/sh"
+      },
+      {
+       "default_run_shell": "/bin/sh"
+      },
+      {
+       "default_run_shell": "/bin/sh"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "default_run_shell",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "/bin/bash",
+      "pr": "/bin/sh",
+      "diffs": [
+       {
+        "field": "",
+        "main": "/bin/bash",
+        "pr": "/bin/sh"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"default_run_shell\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"default_run_shell\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "29ce3533c77670d0359603bc40ff95804caeaca2420679c98cb2dedb3e02cfb2",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-24T01:45:40.176923+00:00",
+     "inputs_sha256": "61ac2cd0f8516769f3ce585a39fc7e6cc92bd7e9e1d1663d73f5e82d56ff6fc4",
+     "inputs": {
+      "title_chars": 28,
+      "body_chars": 145,
+      "base_files": {
+       "invoke/config.py": "7cf2ddafe1c63652d316e5fc60ed9ecd9e3a4de04f2a3afae36259348064d790",
+       "invoke/runners.py": "e16247a23f14160803e9ef85d76845b138874c704ee5f1c465900876e14d58da"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-24T01:45:40.200091+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1"
+   ],
+   "reason": "probe: claim(s) C1 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pytest.ini"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "no tests could be mapped to the touched files; probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "no tests could be mapped to the touched files; probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. no tests could be mapped to the touched files; probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "unmentioned",
+      "reason": "The probe only requests checking the default value of run.shell without providing the actual value or surrounding context to evaluate."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Probe coverage needs local side; ensure test environment is configured.",
+     "No tests mapped to touched files; consider adding relevant test coverage.",
+     "Claim C1 proven but does not cover the change; verify claim scope.",
+     "Shell default change may require explicit test mapping for future verification.",
+     "Currently no ignored noise patterns; track coverage gaps for diff hygiene."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/config.py",
+   "invoke/runners.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/config.py",
+   "tests/runners.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 131.3,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 28301,
+  "output_tokens": 11143,
+  "thinking_tokens": 10667,
+  "cost_usd": 0.018519,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.018519,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 131.3,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.008753,
+  "total_cost_usd": 0.027272,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 220,
+   "output_tokens": 818,
+   "thinking_tokens": 805,
+   "cost_usd": 0.000802,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000802,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

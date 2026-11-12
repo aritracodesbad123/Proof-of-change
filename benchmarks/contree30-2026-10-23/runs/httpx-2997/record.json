@@ -1,0 +1,719 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-encode-httpx-2997-2b11bcddf78f-httpx-2997",
+ "date_ist": "2026-10-23 16:49 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "encode/httpx",
+ "library": "httpx",
+ "pr": {
+  "repo": "encode/httpx",
+  "number": 2997,
+  "url": "https://github.com/encode/httpx/pull/2997",
+  "title": "Fixing missed arguments for pools when init transports",
+  "base_sha": "3b9060ee1121b48669e0b30045c9344065f4f2ae",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "2b11bcddf78ffff89793981a012bc62ce28ca961",
+  "merge_commit": null,
+  "tested_main_sha": "3b9060ee1121b48669e0b30045c9344065f4f2ae",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "NewUserHa",
+ "base_ref": "master",
+ "updated_at_utc": "2023-12-14T22:22:54Z",
+ "updated_at_ist": "2023-12-15 03:52 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 16:49 IST",
+ "files": {
+  "all": [
+   "httpx/_transports/default.py"
+  ],
+  "package_py": [
+   "httpx/_transports/default.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: ",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "Contree could not prepare the main and PR sides (contree request failed: ContreeTransportError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "machine": "contree (not run)",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "httpx-2997/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "2b11bcddf78ffff89793981a012bc62ce28ca961",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes, helper); the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx",
+    "httpx python documentation install https://github.com/encode/httpx site:github.com/encode/httpx",
+    "httpx python install requirements https://pypi.org/project/httpx/ https://github.com/encode/httpx site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "GitHub - encode/httpx: A next generation HTTP client for Python. \ud83e\udd8b \u00b7 GitHub",
+     "url": "https://github.com/encode/httpx",
+     "query": "httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx"
+    },
+    {
+     "title": "Version 1.0 public call. \ud83d\udc4b\ud83c\udffc \u00b7 encode/httpx \u00b7 Discussion #3344 \u00b7 GitHub",
+     "url": "https://github.com/encode/httpx/discussions/3344",
+     "query": "httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx"
+    },
+    {
+     "title": "httpx/CHANGELOG.md at master \u00b7 encode/httpx \u00b7 GitHub",
+     "url": "https://github.com/encode/httpx/blob/master/CHANGELOG.md",
+     "query": "httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx"
+    },
+    {
+     "title": "httpx/docs/contributing.md at master \u00b7 encode/httpx \u00b7 GitHub",
+     "url": "https://github.com/encode/httpx/blob/master/docs/contributing.md",
+     "query": "httpx python documentation install https://github.com/encode/httpx site:github.com/encode/httpx"
+    }
+   ],
+   "text": "To install HTTPX, use pip with the command `$ pip install httpx`. For HTTP/2 support, use `$ pip install httpx[http2]`. HTTPX requires Python 3.9+. For version 1.0, it will be published under the single name httpx in pypi and installs two packages to site-packages of your environment, which is beneficial for python app bundlers like pyinstaller. For pre-release versions, use `pip install httpx --pre`.\nTo install HTTPX, use pip with the command `$ pip install httpx`. For HTTP/2 support, use `$ pip install httpx[http2]`. HTTPX requires Python 3.9+. For more advanced usage, refer to the documentation available on the project's GitHub page. The sources also mention that for version 1.0, two packages will be installed under the name httpx, which is beneficial for Python app bundlers.\nThe sources do not provide information about the installation requirements for httpx in Python. They mention browser support for the Chicago Bears website but do not discuss Python packages or their installation.\nHTTPX - A next-generation HTTP client for Python.\n\nHTTPX is a fully featured HTTP client library for Python 3. It includes an integrated command line client, has support for both HTTP/1.1 and HTTP/2, and provides both sync and async APIs.\n\nInstall HTTPX using pip:\n\n```\n$ pip install httpx\n```\n\nNow, let's get started:\n\n```\nimport =' ' ''content-type' ' '\n```\n\nOr, using the command-line client.\n\n```\n'httpx[cli]' ' '# The command line client is an optional dependency. #\n``` [...] International Doma\n`unasync`\n\nAlso, for installation experience, AFAICT, httpx-v1.0 will be published under single name httpx in pypi and installs two packages to site-packages of your environment. IMO, this is a win for python app bundlers (e.g. pyinstaller).\n\nThat would be new to me. According to the pre-release docs, you have to install them separately. At least separate `pip install` commands are currently listed:\n\n`pip install`\n`pip install --pre httpx\n# or\npip install --pre ahttpx` [...] be published under s\n## 0.13.0.dev0 (April 30th, 2020)\n\nThe 0.13.0.dev0 is a pre-release version. To install it, use `pip install httpx --pre`.\n\nThis release switches to `httpcore` for all the internal networking, which means:\n\n We're using the same codebase for both our sync and async clients.\n HTTP/2 support is now available with the sync client.\n We no longer have a `urllib3` dependency for our sync client, although there is still an optional `URLLib3Dispatcher` class. [...] ### Removed\n\n Dropped support for `Cli\n## Development\n\nTo start developing HTTPX create a fork of the HTTPX repository on GitHub.\n\nThen clone your fork with the following command replacing `YOUR-USERNAME` with your GitHub username:\n\n```\n$ git clone \n```\n\nYou can now install the project and its dependencies using:\n\n```\ncd\n```\n\n## Testing and Linting\n\nWe use custom shell scripts to automate testing, linting, and documentation building workflow.\n\nTo run the tests, use:\n\n```\n$ scripts/test\n``` [...] 1. `pip install trustme-cli`.\n2. `trus",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 4 results",
+    "Query: httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx",
+    "Query: httpx python documentation install https://github.com/encode/httpx site:github.com/encode/httpx",
+    "Query: httpx python install requirements https://pypi.org/project/httpx/ https://github.com/encode/httpx site:pypi.org",
+    "Source: GitHub - encode/httpx: A next generation HTTP client for Python. \ud83e\udd8b \u00b7 GitHub \u2014 https://github.com/encode/httpx",
+    "Source: Version 1.0 public call. \ud83d\udc4b\ud83c\udffc \u00b7 encode/httpx \u00b7 Discussion #3344 \u00b7 GitHub \u2014 https://github.com/encode/httpx/discussions/3344",
+    "Source: httpx/CHANGELOG.md at master \u00b7 encode/httpx \u00b7 GitHub \u2014 https://github.com/encode/httpx/blob/master/CHANGELOG.md",
+    "Source: httpx/docs/contributing.md at master \u00b7 encode/httpx \u00b7 GitHub \u2014 https://github.com/encode/httpx/blob/master/docs/contributing.md"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 4 results",
+   "Query: httpx python setup install instructions https://github.com/encode/httpx site:github.com/encode/httpx",
+   "Query: httpx python documentation install https://github.com/encode/httpx site:github.com/encode/httpx",
+   "Query: httpx python install requirements https://pypi.org/project/httpx/ https://github.com/encode/httpx site:pypi.org",
+   "Source: GitHub - encode/httpx: A next generation HTTP client for Python. \ud83e\udd8b \u00b7 GitHub \u2014 https://github.com/encode/httpx",
+   "Source: Version 1.0 public call. \ud83d\udc4b\ud83c\udffc \u00b7 encode/httpx \u00b7 Discussion #3344 \u00b7 GitHub \u2014 https://github.com/encode/httpx/discussions/3344",
+   "Source: httpx/CHANGELOG.md at master \u00b7 encode/httpx \u00b7 GitHub \u2014 https://github.com/encode/httpx/blob/master/CHANGELOG.md",
+   "Source: httpx/docs/contributing.md at master \u00b7 encode/httpx \u00b7 GitHub \u2014 https://github.com/encode/httpx/blob/master/docs/contributing.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: httpcore is noted, installed with the project.",
+   "Setup plan: anyio is noted, installed with the project.",
+   "Setup plan: idna is noted, installed with the project.",
+   "Setup plan: sniffio is noted, installed with the project.",
+   "Setup plan: install chardet==5.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install types-chardet==5.0.4.5 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mkdocs==1.5.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mkautodoc==0.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mkdocs-material==9.4.14 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install build==1.0.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install twine==4.0.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install coverage[toml]==7.3.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install cryptography==41.0.7 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mypy==1.5.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install types-certifi==2021.10.8.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest==7.4.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install ruff==0.1.6 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install trio==0.22.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install trio-typing==0.10.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install trustme==1.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install uvicorn==0.24.0.post1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.8",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
+   "Setup plan: refused be: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused published: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused under: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused s: its PyPI page does not link to this GitHub repository"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "docs/contributing.md",
+   "scripts/install",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/publish.yml",
+   ".github/workflows/test-suite.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "certifi",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "httpcore==1.*",
+     "name": "httpcore",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "anyio",
+     "name": "anyio",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "idna",
+     "name": "idna",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sniffio",
+     "name": "sniffio",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "chardet==5.2.0",
+     "name": "chardet",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-chardet==5.0.4.5",
+     "name": "types-chardet",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mkdocs==1.5.3",
+     "name": "mkdocs",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mkautodoc==0.2.0",
+     "name": "mkautodoc",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mkdocs-material==9.4.14",
+     "name": "mkdocs-material",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "build==1.0.3",
+     "name": "build",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twine==4.0.2",
+     "name": "twine",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coverage[toml]==7.3.0",
+     "name": "coverage",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cryptography==41.0.7",
+     "name": "cryptography",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==1.5.1",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-certifi==2021.10.8.2",
+     "name": "types-certifi",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==7.4.3",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff==0.1.6",
+     "name": "ruff",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trio==0.22.2",
+     "name": "trio",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trio-typing==0.10.0",
+     "name": "trio-typing",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trustme==1.1.0",
+     "name": "trustme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "uvicorn==0.24.0.post1",
+     "name": "uvicorn",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "chardet==5.2.0",
+    "types-chardet==5.0.4.5",
+    "mkdocs==1.5.3",
+    "mkautodoc==0.2.0",
+    "mkdocs-material==9.4.14",
+    "build==1.0.3",
+    "twine==4.0.2",
+    "coverage[toml]==7.3.0",
+    "cryptography==41.0.7",
+    "mypy==1.5.1",
+    "types-certifi==2021.10.8.2",
+    "pytest==7.4.3",
+    "ruff==0.1.6",
+    "trio==0.22.2",
+    "trio-typing==0.10.0",
+    "trustme==1.1.0",
+    "uvicorn==0.24.0.post1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.8",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "be",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "published",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "under",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "s",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 22 setup item(s) in the project's files and the web lookup. Refused: be (its PyPI page does not link to this GitHub repository), published (its PyPI page does not link to this GitHub repository), under (its PyPI page does not link to this GitHub repository), s (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.8",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: chardet==5.2.0, types-chardet==5.0.4.5, mkdocs==1.5.3, mkautodoc==0.2.0, mkdocs-material==9.4.14, build==1.0.3, twine==4.0.2, coverage[toml]==7.3.0, cryptography==41.0.7, mypy==1.5.1, types-certifi==2021.10.8.2, pytest==7.4.3. 5 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 17
+  }
+ },
+ "chosen": {
+  "pr": 2997,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "3b9060ee1121b48669e0b30045c9344065f4f2ae",
+  "pr_sha": "2b11bcddf78ffff89793981a012bc62ce28ca961"
+ },
+ "tested": {
+  "main": "master @ 3b9060ee1121 (merge-base with the PR head)",
+  "pr": "PR head 2b11bcddf78f"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius probes request failed: TimeoutError"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "In AsyncHTTPTransport, AsyncConnectionPool receives the retries argument during initialization, whereas AsyncHTTPProxy and AsyncSOCKSProxy do not receive the retries argument.",
+    "source_quote": "* in `AsyncHTTPTransport`, `AsyncConnectionPool` has the argument of retries passed in, but `AsyncHTTPProxy` and `AsyncSOCKSProxy` have not;",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "In HTTPTransport, ConnectionPool receives the retries argument during initialization, whereas HTTPProxy and SOCKSProxy do not receive the retries argument.",
+    "source_quote": "* in `HTTPTransport`, it has the same issue.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "pr_side_started_at": "2026-10-23T13:13:02.115473+00:00",
+ "test_targets": {
+  "main": [],
+  "pr": []
+ },
+ "contree_only": {
+  "note": "Contree mode: Contree did not run, so nothing from the pull request was run",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "failed": "contree request failed: ContreeTransportError",
+  "fallback": null,
+  "exit_code": null,
+  "stderr_tail": "",
+  "auth_error": false
+ },
+ "verdict": "could_not_verify",
+ "reason": "Contree could not prepare the main and PR sides (contree request failed: ContreeTransportError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "Contree could not prepare the main and PR sides (contree request failed: ContreeTransportError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. Contree could not prepare the main and PR sides (contree request failed: ContreeTransportError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+    "status": "ok",
+    "note": "fell back to Nano after ProviderError",
+    "notes": [
+     "Ignore 'ContreeTransportError' in future diffs as it is expected when PR runs in Contree mode",
+     "Do not treat missing local execution as a failure; it is by design",
+     "If similar errors appear, check for network/firewall blocks to Contree service",
+     "Consider adding a skip rule for 'ContreeTransportError' in CI pipelines",
+     "Document that Proof-of-Change will not run pull-request code in Contree mode"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "httpx/_transports/default.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 14257.3,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 1,
+  "input_tokens": 428,
+  "output_tokens": 505,
+  "thinking_tokens": 324,
+  "cost_usd": 0.000583,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.000583,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 14257.3,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.950487,
+  "total_cost_usd": 0.95107,
+  "swarm": {
+   "ai_calls": 4,
+   "failed_ai_calls": 1,
+   "input_tokens": 295,
+   "output_tokens": 920,
+   "thinking_tokens": 704,
+   "cost_usd": 0.000747,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000747,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

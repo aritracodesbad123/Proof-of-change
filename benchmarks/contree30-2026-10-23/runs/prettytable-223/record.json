@@ -1,0 +1,1274 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-prettytable-prettytable-223-b0a2362c2989-prettytable-223",
+ "date_ist": "2026-10-24 07:11 IST",
+ "run_date": "2026-10-24",
+ "who": "ops/daily_run.py",
+ "repo": "prettytable/prettytable",
+ "library": "prettytable",
+ "pr": {
+  "repo": "prettytable/prettytable",
+  "number": 223,
+  "url": "https://github.com/prettytable/prettytable/pull/223",
+  "title": "Refactor old %-formatting to use format() builtin",
+  "base_sha": "32e788f655c4de3f3d60dcba70fa51ec37eca5e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b0a2362c2989f1e9b94a478fcbbb508ac6cf5f81",
+  "merge_commit": null,
+  "tested_main_sha": "32e788f655c4de3f3d60dcba70fa51ec37eca5e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "mwtoews",
+ "base_ref": "main",
+ "updated_at_utc": "2023-01-16T12:04:32Z",
+ "updated_at_ist": "2023-01-16 17:34 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-24 07:11 IST",
+ "files": {
+  "all": [
+   "README.md",
+   "src/prettytable/prettytable.py",
+   "tests/test_prettytable.py"
+  ],
+  "package_py": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled": [],
+  "other": [
+   "README.md",
+   "tests/test_prettytable.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_prettytable.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 106,
+   "failed": 0,
+   "error": 5,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.9,
+   "pytest_summary": "/usr/local/lib/python3.12/site-packages/pytest_lazyfixture.py:105: i",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 82,
+   "failed": 0,
+   "error": 6,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.6,
+   "pytest_summary": "    return self._i",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 106,
+   "failed": 0,
+   "error": 5,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.5,
+   "pytest_summary": "/usr/local/lib/python3.12/site-packages/pytest_lazyfixture.py:105: i",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 82,
+   "failed": 0,
+   "error": 6,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "    return self._i",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 106,
+   "failed": 0,
+   "error": 5,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "/usr/local/lib/python3.12/site-packages/pytest_lazyfixture.py:105: i",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 82,
+   "failed": 0,
+   "error": 6,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.2,
+   "pytest_summary": "    return self._i",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "prettytable-223/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "b0a2362c2989f1e9b94a478fcbbb508ac6cf5f81",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+    "prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+    "prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "prettytable \u00b7 PyPI",
+     "url": "https://pypi.org/project/prettytable/",
+     "query": "prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org"
+    },
+    {
+     "title": "prettytable/CHANGELOG.md at main \u00b7 prettytable/prettytable \u00b7 GitHub",
+     "url": "https://github.com/prettytable/prettytable/blob/main/CHANGELOG.md",
+     "query": "prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable"
+    },
+    {
+     "title": "GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub",
+     "url": "https://github.com/prettytable/prettytable",
+     "query": "prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable"
+    },
+    {
+     "title": "prettytable/.gitignore at main",
+     "url": "https://github.com/prettytable/prettytable/blob/main/.gitignore",
+     "query": "prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable"
+    },
+    {
+     "title": "Wrap strings to newline when maximum width of column is reached \u00b7 Issue #130 \u00b7 prettytable/prettytable \u00b7 GitHub",
+     "url": "https://github.com/prettytable/prettytable/issues/130",
+     "query": "prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable"
+    }
+   ],
+   "text": "To install the prettytable Python package, you can use pip. The sources indicate that prettytable supports Python 3.5-3.9. To install, run `pip install prettytable`. The sources do not provide a definitive answer to the installation instructions for versions outside the specified range.\nTo install the PrettyTable library, use the command `python3 -m pip install -U prettytable` via pip. For the latest development version, use `python3 -m pip install -U git+https://github.com/prettytable/prettytable`. Alternatively, you can install it from `requirements.txt` with `-e git://github.com/prettytable/prettytable.git#egg=prettytable`. The library is used to display tabular data in a visually appealing ASCII table format.\nTo install PrettyTable version 0.7.2, use the command `pip install prettytable==0.7.2`. The sources indicate that newer versions are available, such as 3.17.0, but specify version 0.7.2 for installation. The sources do not provide a definitive answer for the latest version or other specific versions beyond 0.7.2.\n# prettytable 0.7.2. pip install prettytable==0.7.2. Newer version available (3.17.0). A simple Python library for easily displaying tabular data in a visually appealing ASCII table format. ### Navigation. ### Verified details. *These details have been verified by PyPI*. ###### Maintainers. ### Unverified details. *These details have **not** been verified by PyPI*. ###### Project links. ###### Meta. ###### Classifiers. ## Project description. PrettyTable is a simple Python library designed to ma\nDropped support for EOL Python 2.4-2.6 and 3.0-3.4.\n Added support for Python 3.5-3.9.\n Added `del_column(field_name)`.\n Added `get_csv_string` with `delimiter` option (comma or tab) and optional `header`.\n Use wcwidth for better wide char support.\n New `paginate` method can be used to produce strings suitable for piping to lp/lpr.\n `from_html` now handles HTML tables with colspan, rather than choking on them. [...] Code is now simultaneously compatible with Python 2 and 3\n Replaced all setter m\n## Installation\n\nInstall via pip:\n\n```\npython3 -m pip install -U prettytable \n```\n\nInstall latest development version:\n\n```\npython3 -m pip install -U git+ \n```\n\nOr from `requirements.txt`:\n\n```\n-e git://github.com/prettytable/prettytable.git#egg=prettytable \n```\n\n## Demo\n\nTo see demo output, run:\n\n```\npython3 -m prettytable\n```\n\n## Tutorial on how to use the PrettyTable API\n\n### Getting your data into (and out of) the table\n\nLet's suppose you have a shiny new PrettyTable: [...] | Name | Name | L\nDisplay tabular data in a visually appealing ASCII table format - prettytable/.gitignore. Usually these files are written by a python script \u2026 documentation\n\"<home>/PycharmProjects/VMG/jjj.py\" 6 print\"<home>/.pyenv/versions/3.9.16/lib/python3.9/site-packages/prettytable/prettytable.py\" 1798 get_string self\"<home>/.pyenv/versions/3.9.16/lib/python3.9/site-packages/prettytable/prettytable.py\" 1959 _stringify_row =\"<home>/.pyenv/versions/3.9.16/lib/python3.9/textwrap.py\" 391 fill return\"<home>/.pyenv/versions/3.9.16/lib/python3.9/textwrap.py\" 363 fill return \"\\n\" \" \\n \" [...] 1. sgrontflix\n\n   closed this as completed",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 5 results",
+    "Query: prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+    "Query: prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+    "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org",
+    "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+    "Source: prettytable/CHANGELOG.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/main/CHANGELOG.md",
+    "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable",
+    "Source: prettytable/.gitignore at main \u2014 https://github.com/prettytable/prettytable/blob/main/.gitignore",
+    "Source: Wrap strings to newline when maximum width of column is reached \u00b7 Issue #130 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/issues/130"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 38.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 5 results",
+   "Query: prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org",
+   "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: prettytable/CHANGELOG.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/main/CHANGELOG.md",
+   "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable",
+   "Source: prettytable/.gitignore at main \u2014 https://github.com/prettytable/prettytable/blob/main/.gitignore",
+   "Source: Wrap strings to newline when maximum width of column is reached \u00b7 Issue #130 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/issues/130",
+   "Setup plan: the PR changes install docs (README.md); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: importlib-metadata is noted, installed with the project.",
+   "Setup plan: wcwidth is noted, installed with the project.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-lazy-fixture (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7, >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "CONTRIBUTING.md",
+   "tox.ini",
+   ".github/workflows/labels.yml",
+   ".github/workflows/release.yml",
+   ".github/workflows/require-pr-label.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/test.yml",
+   ".github/workflows/release-drafter.yml"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "README.md"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "importlib-metadata; python_version < \"3.8\"",
+     "name": "importlib-metadata",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wcwidth",
+     "name": "wcwidth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-lazy-fixture",
+     "name": "pytest-lazy-fixture",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest",
+    "pytest-cov",
+    "pytest-lazy-fixture"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7, >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 5 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest, pytest-cov, pytest-lazy-fixture. 2 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 3
+  }
+ },
+ "chosen": {
+  "pr": 223,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "32e788f655c4de3f3d60dcba70fa51ec37eca5e5",
+  "pr_sha": "b0a2362c2989f1e9b94a478fcbbb508ac6cf5f81"
+ },
+ "tested": {
+  "main": "main @ 32e788f655c4 (merge-base with the PR head)",
+  "pr": "PR head b0a2362c2989"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The behaviour of int_format and float_format now allows them to optionally end with an alphabetic character (e.g., #08x or 8.3G), whereas previously only float_format could optionally end with 'f'.",
+    "source_quote": "One notable change is to the behaviour of `int_format` and `float_format`, which have been changed to optionally allowed to end with alpha char, e.g. `#08x` or `8.3G`. Previously, only `float_format` optionally ended with `f`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Replacing `%` formatting with the `format()` built-in preserves the original string formatting behavior.",
+    "source_quote": "This PR pivots away from the `%` operator when used for string operations.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "4a4c3cfdbc60a86c676985d1733bb26604509f71d9ed5b459e997fc6507fa374",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:42:30.231698+00:00",
+    "inputs_sha256": "71968c98a179d8a53757a65024505bce7f6e92b68cc6f604199c970d698ddf04",
+    "inputs": {
+     "title_chars": 49,
+     "body_chars": 583,
+     "base_files": {
+      "src/prettytable/prettytable.py": "cd90c7494c7e578dd6c24b01e3c11ba411868f076912df918780c851004dad10"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "cc7d78c163203b7ce6c671067335447656ad7628b3393e87937beb6ca8cc4c89",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:42:30.232242+00:00",
+    "inputs_sha256": "71968c98a179d8a53757a65024505bce7f6e92b68cc6f604199c970d698ddf04",
+    "inputs": {
+     "title_chars": 49,
+     "body_chars": 583,
+     "base_files": {
+      "src/prettytable/prettytable.py": "cd90c7494c7e578dd6c24b01e3c11ba411868f076912df918780c851004dad10"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-24T01:42:30.251063+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_prettytable.py"
+  ],
+  "pr": [
+   "tests/test_prettytable.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [
+   "pytest-lazy-fixture"
+  ],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 24,
+  "changed_lines_covered": 22,
+  "files": [
+   {
+    "file": "src/prettytable/prettytable.py",
+    "changed_lines_total": 24,
+    "changed_lines_covered": 22
+   }
+  ],
+  "seconds": 6.1,
+  "exit": 1,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "b4c485ff-628f-4d42-a57c-f489c722adda",
+  "pr_uuid": "e0105917-693e-485a-b34e-9a4c83ab2097",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.7"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-lazy-fixture"
+  ],
+  "installed": true,
+  "where": "contree"
+ },
+ "test_extras": [
+  "pytest-lazy-fixture"
+ ],
+ "comparison": {
+  "same": 87,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_failing": [
+   "tests.test_prettytable::TestBasic"
+  ],
+  "new_tests_skipped": [],
+  "removed_tests": [
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_from_csv",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_from_db",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_float_format",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_hrules_all",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_hrules_none",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_int_format",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_long_title",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_style_msword",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_with_title",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_without_border",
+   "tests.test_prettytable.TestBasic::test_all_lengths_equal_without_header",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_from_csv",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_from_db",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_float_format",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_hrules_all",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_hrules_none",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_int_format",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_style_msword",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_with_title",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_without_border",
+   "tests.test_prettytable.TestBasic::test_no_blank_lines_without_header",
+   "tests.test_prettytable.TestBasic::test_table_rows"
+  ],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.test_prettytable::TestBreakLine",
+   "tests.test_prettytable::TestBuildEquivalence",
+   "tests.test_prettytable::TestMinTableWidth",
+   "tests.test_prettytable::TestMultiPattern",
+   "tests.test_prettytable::TestStyle"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 111,
+   "pr": 88
+  },
+  "messages": {
+   "tests.test_prettytable::TestBasic": "collection failure"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 5 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "4a4c3cfdbc60a86c676985d1733bb26604509f71d9ed5b459e997fc6507fa374",
+    "target": "prettytable/prettytable#223",
+    "about": "Test int_format validation with trailing letter",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The behaviour of int_format and float_format now allows them to optionally end with an alphabetic character (e.g., #08x or 8.3G), whereas previously only float_format could optionally end with 'f'.",
+      "covers": [
+       "probe_c1_int_format_error"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.4,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.9,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.9,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      }
+     ],
+     "pr": [
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe_c1_float_format_error",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ValueError",
+      "pr": "ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe_c1_float_format_error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe_c1_float_format_error\""
+       }
+      }
+     },
+     {
+      "name": "probe_c1_int_format_error",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "ValueError",
+      "pr": "ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe_c1_int_format_error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe_c1_int_format_error\""
+       }
+      }
+     },
+     {
+      "name": "probe_c2_float_format_output",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ERROR: ValueError",
+      "pr": "ERROR: ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe_c2_float_format_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe_c2_float_format_output\""
+       }
+      }
+     },
+     {
+      "name": "probe_c2_int_format_output",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ERROR: ValueError",
+      "pr": "ERROR: ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"probe_c2_int_format_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"probe_c2_int_format_output\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "4a4c3cfdbc60a86c676985d1733bb26604509f71d9ed5b459e997fc6507fa374",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-24T01:42:30.231698+00:00",
+     "inputs_sha256": "71968c98a179d8a53757a65024505bce7f6e92b68cc6f604199c970d698ddf04",
+     "inputs": {
+      "title_chars": 49,
+      "body_chars": 583,
+      "base_files": {
+       "src/prettytable/prettytable.py": "cd90c7494c7e578dd6c24b01e3c11ba411868f076912df918780c851004dad10"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-24T01:42:30.251063+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "cc7d78c163203b7ce6c671067335447656ad7628b3393e87937beb6ca8cc4c89",
+    "target": "prettytable/prettytable#223",
+    "about": "Alternative probe using json module",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.6,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.5,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.5,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      }
+     ],
+     "pr": [
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      },
+      {
+       "probe_c1_int_format_error": "ValueError",
+       "probe_c1_float_format_error": "ValueError",
+       "probe_c2_int_format_output": "ERROR: ValueError",
+       "probe_c2_float_format_output": "ERROR: ValueError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe_c1_float_format_error",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ValueError",
+      "pr": "ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe_c1_float_format_error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe_c1_float_format_error\""
+       }
+      }
+     },
+     {
+      "name": "probe_c1_int_format_error",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ValueError",
+      "pr": "ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe_c1_int_format_error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe_c1_int_format_error\""
+       }
+      }
+     },
+     {
+      "name": "probe_c2_float_format_output",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ERROR: ValueError",
+      "pr": "ERROR: ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe_c2_float_format_output\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe_c2_float_format_output\""
+       }
+      }
+     },
+     {
+      "name": "probe_c2_int_format_output",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ERROR: ValueError",
+      "pr": "ERROR: ValueError",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"probe_c2_int_format_output\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"probe_c2_int_format_output\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "cc7d78c163203b7ce6c671067335447656ad7628b3393e87937beb6ca8cc4c89",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-24T01:42:30.232242+00:00",
+     "inputs_sha256": "71968c98a179d8a53757a65024505bce7f6e92b68cc6f604199c970d698ddf04",
+     "inputs": {
+      "title_chars": 49,
+      "body_chars": 583,
+      "base_files": {
+       "src/prettytable/prettytable.py": "cd90c7494c7e578dd6c24b01e3c11ba411868f076912df918780c851004dad10"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-24T01:42:30.251063+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "needs_human",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p1",
+     "name": "probe_c1_int_format_error",
+     "label": "needs_human",
+     "claim": "C1"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 1 observation(s) need attention: probe_c1_int_format_error does not differ although the claim says it does (C1); probe: 7 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "1 new test(s) fail on the PR; 24 test(s) removed on the PR side; 111 test(s) ran on main, 88 on the PR; 0 new test(s) pass, 82 unchanged; 5 test failure(s) pre-existing and identical on both sides; probe: 1 observation(s) need attention: probe_c1_int_format_error does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "1 new test(s) fail on the PR; 24 test(s) removed on the PR side; 111 test(s) ran on main, 88 on the PR; 0 new test(s) pass, 82 unchanged; 5 test failure(s) pre-existing and identical on both sides; probe: 1 observation(s) need attention: probe_c1_int_format_error does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "changed_lines_total": 24,
+ "changed_lines_covered": 22,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "22 of 24 changed executable line(s) ran (92%)",
+  "measurement": "measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: needs_attention. 1 new test(s) fail on the PR; 24 test(s) removed on the PR side; 111 test(s) ran on main, 88 on the PR; 0 new test(s) pass, 82 unchanged; 5 test failure(s) pre-existing and identical on both sides; probe: 1 observation(s) need attention: probe_c1_int_format_error does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "new_tests_failing-1",
+      "label": "proven",
+      "reason": "The test TestBasic is failing in the current pull request."
+     },
+     {
+      "id": "removed_tests-1",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-2",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-3",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-4",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-5",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-6",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-7",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "removed_tests-8",
+      "label": "needs_human",
+      "reason": "Test removal should be verified as intentional or accidental."
+     },
+     {
+      "id": "probe-model-p1",
+      "label": "needs_human",
+      "reason": "Probe for int_format validation with trailing letter requires human evaluation."
+     },
+     {
+      "id": "probe-model-p2",
+      "label": "needs_human",
+      "reason": "Alternative probe using json module requires human evaluation."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "5 pre-existing test failures identical on both main and PR; ignore in future diffs.",
+     "Probe model-p1 and model-p2 report no line coverage; Contree check requires local side.",
+     "probe_c1_int_format_error shows no difference despite claim C1; mark as noise.",
+     "24 tests removed on PR side; verify if intentional before flagging regression.",
+     "Install Contree locally for accurate probe coverage measurement on future PRs."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "README.md",
+   "tests/test_prettytable.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 170.6,
+  "tests": 19.2
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 14600,
+  "output_tokens": 8225,
+  "thinking_tokens": 6825,
+  "cost_usd": 0.011782,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.011782,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 170.6,
+   "tests": 19.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.011373,
+  "total_cost_usd": 0.023155,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 456,
+   "output_tokens": 724,
+   "thinking_tokens": 711,
+   "cost_usd": 0.000788,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000788,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
