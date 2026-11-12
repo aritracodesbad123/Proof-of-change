@@ -1,0 +1,600 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-5377-5ecd6516df38-2026-11-12",
+ "date_ist": "2026-11-12 11:30 IST",
+ "run_date": "2026-11-12",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 5377,
+  "url": "https://github.com/urllib3/urllib3/pull/5377",
+  "title": "Count bytes consumed by chunked response streaming",
+  "base_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+  "merge_commit": null,
+  "tested_main_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "anticipate218",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-11T19:32:39Z",
+ "updated_at_ist": "2026-11-12 01:02 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-12 11:30 IST",
+ "files": {
+  "all": [
+   "changelog/5377.bugfix.rst",
+   "src/urllib3/response.py",
+   "test/test_response.py"
+  ],
+  "package_py": [
+   "src/urllib3/response.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/5377.bugfix.rst",
+   "test/test_response.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: test/test_response.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 198,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.2,
+   "pytest_summary": "198 passed, 47 skipped in 3.71s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 211,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.5,
+   "pytest_summary": "211 passed, 47 skipped in 3.79s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 198,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.1,
+   "pytest_summary": "198 passed, 47 skipped in 3.54s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 211,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.0,
+   "pytest_summary": "211 passed, 47 skipped in 3.48s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 198,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.2,
+   "pytest_summary": "198 passed, 47 skipped in 3.39s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 211,
+   "failed": 0,
+   "error": 0,
+   "skipped": 47,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.0,
+   "pytest_summary": "211 passed, 47 skipped in 3.47s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-5377/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "src/urllib3/response.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 8.2,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "behind",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 8.7 GB (of 15.6 GB).",
+   "Setup check: free disk 91.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: urllib3 \u00b7 PyPI \u2014 https://pypi.org/project/urllib3/",
+   "Source: urllib3 installation requires setuptools >= 36.2.5 \u00b7 Issue #1753 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1753",
+   "Source: update of urllib3 makes kodi start up much slower \u00b7 Issue #1590 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1590",
+   "Source: urllib3/docs/advanced-usage.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/master/docs/advanced-usage.rst",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: urllib3/CHANGES.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/CHANGES.rst",
+   "Source: Installing urllib3 \u00b7 Issue #829 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/829",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install trustme>=1.2.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "noxfile.py",
+   "pyproject.toml",
+   "docs/Makefile",
+   "docs/contributing.rst",
+   ".github/workflows/lint.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/downstream.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/changelog.yml",
+   ".github/workflows/scorecards.yml",
+   ".github/workflows/ci.yml",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "trustme>=1.2.1",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "trustme>=1.2.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: trustme>=1.2.1."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "trustme",
+    "requirement": "trustme>=1.2.1",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 5377,
+  "head_sha": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+  "base_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+  "pr_sha": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "6da1f82193a6665544381002914aa82563386191",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 6ddeb83d0196 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 5ecd6516df38"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius probes request failed: TimeoutError"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Streaming a chunked response through `stream()` or `read_chunked()` leaves `tell()` at zero even after the body has been consumed.",
+    "source_quote": "Streaming a chunked response through `stream()` or `read_chunked()` leaves `tell()` at zero even after the body has been consumed.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "`InvalidChunkLength.partial` also reports zero if an invalid chunk follows valid body data.",
+    "source_quote": "`InvalidChunkLength.partial` also reports zero if an invalid chunk follows valid body data.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "These paths bypass `_raw_read()`, which normally updates the byte count.",
+    "source_quote": "These paths bypass `_raw_read()`, which normally updates the byte count.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Count each successfully read chunk before content decoding.",
+    "source_quote": "Count each successfully read chunk before content decoding.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Original implementation: all 13 new regression cases fail.",
+    "source_quote": "Original implementation: all 13 new regression cases fail.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "Fixed implementation: 258 response tests pass; the response, connection-pool, pool-manager and socket-level modules together pass 950 tests, with 9 skips and 37 existing deprecation warnings.",
+    "source_quote": "Fixed implementation: 258 response tests pass; the response, connection-pool, pool-manager and socket-level modules together pass 950 tests, with 9 skips and 37 existing deprecation warnings.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "A loopback HTTP/1.1 server verifies plain and gzip chunked downloads, raw-byte counts, monotonic progress, complete decoded data, and released connections.",
+    "source_quote": "A loopback HTTP/1.1 server verifies plain and gzip chunked downloads, raw-byte counts, monotonic progress, complete decoded data, and released connections.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest-socket>=0.7.0",
+  "pytest-timeout>=2.3.1",
+  "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+  "pytest-xdist>=3.8.0",
+  "pytest-pyodide>=0.58.4"
+ ],
+ "pr_side_started_at": "2026-11-12T06:08:45.865077+00:00",
+ "test_targets": {
+  "main": [
+   "test/test_response.py"
+  ],
+  "pr": [
+   "test/test_response.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "urllib3",
+   "expected": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+   "installed": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+   "ok": true
+  },
+  "pr": {
+   "dist": "urllib3",
+   "expected": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+   "installed": "5ecd6516df3803058af65315fdb5bbe39b0da33c",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-socket>=0.7.0",
+   "pytest-timeout>=2.3.1",
+   "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+   "pytest-xdist>=3.8.0",
+   "pytest-pyodide>=0.58.4"
+  ],
+  "installed": true
+ },
+ "pytest_plugins_off": [
+  "asyncio"
+ ],
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "worked",
+  "main_error": "",
+  "pr_error": ""
+ },
+ "collection_plugin_note": "Setup: pytest plugin asyncio was turned off. Pytest stopped at startup the same way on both sides, and the traceback pointed into that third-party plugin (AttributeError: module 'pytest' has no attribute 'pyodide_options_stack'). The tests were run again with the plugin turned off. This does not change how the verdict is chosen. Detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: worked.",
+ "base_head_sha": "6ddeb83d01964d2b043704fd73072c3de14ca251",
+ "comparison": {
+  "same": 245,
+  "same_skipped_both": 47,
+  "regressions": [],
+  "fixed": [
+   "test.test_response.TestResponse::test_chunked_streaming_tell[10-read_chunked]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[10-stream]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[2-read_chunked]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[2-stream]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[3-read_chunked]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[3-stream]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[None-read_chunked]",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[None-stream]",
+   "test.test_response.TestResponse::test_chunked_tell_across_stream_calls",
+   "test.test_response.TestResponse::test_chunked_tell_with_following_read[read1]",
+   "test.test_response.TestResponse::test_chunked_tell_with_following_read[read]",
+   "test.test_response.TestResponse::test_gzipped_chunked_streaming_tell",
+   "test.test_response.TestResponse::test_invalid_chunk_length_reports_bytes_read"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 211,
+   "pr": 211
+  },
+  "messages": {},
+  "base_messages": {
+   "test.test_response.TestResponse::test_chunked_streaming_tell[10-read_chunked]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[10-stream]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[2-read_chunked]": "AssertionError: assert 0 == 2",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[2-stream]": "AssertionError: assert 0 == 2",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[3-read_chunked]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[3-stream]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[None-read_chunked]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_streaming_tell[None-stream]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_tell_across_stream_calls": "AssertionError: assert 0 == 2",
+   "test.test_response.TestResponse::test_chunked_tell_with_following_read[read1]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_chunked_tell_with_following_read[read]": "AssertionError: assert 0 == 3",
+   "test.test_response.TestResponse::test_gzipped_chunked_streaming_tell": "AssertionError: assert 0 < 0",
+   "test.test_response.TestResponse::test_invalid_chunk_length_reports_bytes_read": "AssertionError: assert 0 == 3"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 13 test(s) fail on main and pass on the PR; 211 test(s) ran on main, 211 on the PR; 0 new test(s) pass, 245 unchanged (47 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "13 test(s) fail on main and pass on the PR; 211 test(s) ran on main, 211 on the PR; 0 new test(s) pass, 245 unchanged (47 of them skipped on both sides)",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/response.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/5377.bugfix.rst",
+   "test/test_response.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 595.0,
+  "tests": 31.0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 1,
+  "input_tokens": 726,
+  "output_tokens": 2145,
+  "thinking_tokens": 1599,
+  "cost_usd": 0.002148,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.002148,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 595.0,
+   "tests": 31.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.039667,
+  "total_cost_usd": 0.041815,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-12/ef12096/urllib3-5377"
+ }
+}
