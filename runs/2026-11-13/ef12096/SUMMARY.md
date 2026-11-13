@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-13 on ef12096
 
-9 report(s) in this folder: 1 need attention, 8 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+10 report(s) in this folder: 1 need attention, 8 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -27,3 +27,4 @@
 | COULD NOT VERIFY | prettytable/prettytable#545: Fix sliced tables sharing options with the original | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged | [PDF](prettytable-545/REPORT.pdf) |
 | COULD NOT VERIFY | lincolnloop/python-qrcode#425: Fix three error-handling correctness issues (mask_func, QRData write, best_fit) | Could not verify: claim(s) C1, C3 expect a difference but no observation matches (2 test(s) ran on main, 2 on the PR; 0 new test(s) pass, 2 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](python_qrcode-425/REPORT.pdf) |
 | COULD NOT VERIFY | pytoolz/toolz#648: Validate and normalize partition_all batch sizes | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 3 test(s) fail on main and pass on the PR; 81 test(s) ran on main, 81 on the PR; 0 new test(s) pass, 78 unchanged | [PDF](toolz-648/REPORT.pdf) |
+| VERIFIED | urllib3/urllib3#5371: Allow None as filename in multipart file tuple type annotations | 29 test(s) ran on main, 34 on the PR; 5 new test(s) pass, 29 unchanged; probe: claim(s) C1 proven; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count | [PDF](urllib3-5371/REPORT.pdf) |
