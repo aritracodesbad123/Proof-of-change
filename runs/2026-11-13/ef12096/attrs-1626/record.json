@@ -1,0 +1,782 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-python-attrs-attrs-1626-8b26d3ce53e4-2026-11-13",
+ "date_ist": "2026-11-13 11:24 IST",
+ "run_date": "2026-11-13",
+ "who": "ops/daily_run.py",
+ "repo": "python-attrs/attrs",
+ "library": "attrs",
+ "pr": {
+  "repo": "python-attrs/attrs",
+  "number": 1626,
+  "url": "https://github.com/python-attrs/attrs/pull/1626",
+  "title": "Fix inherited default method overrides (#1549)",
+  "base_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+  "merge_commit": null,
+  "tested_main_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "sb123sb123",
+ "base_ref": "main",
+ "updated_at_utc": "2026-09-21T22:56:20Z",
+ "updated_at_ist": "2026-09-22 04:26 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-13 11:24 IST",
+ "files": {
+  "all": [
+   "changelog.d/1549.change.md",
+   "src/attr/_make.py",
+   "tests/test_make.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "changelog.d/1549.change.md",
+   "src/attr/_make.py",
+   "tests/test_make.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_make.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.4,
+   "pytest_summary": "280 passed in 3.23s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.3,
+   "pytest_summary": "282 passed in 3.23s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.3,
+   "pytest_summary": "280 passed in 2.35s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "282 passed in 2.40s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.5,
+   "pytest_summary": "280 passed in 2.55s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.5,
+   "pytest_summary": "282 passed in 2.51s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "attrs-1626/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 15,
+  "changed_lines_covered": 12,
+  "files": [
+   {
+    "file": "src/attr/_make.py",
+    "changed_lines_total": 15,
+    "changed_lines_covered": 12
+   }
+  ],
+  "seconds": 5.2,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "blocked",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 4.5 GB (of 15.6 GB).",
+   "Setup check: free disk 91.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: attrs python setup install instructions https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python documentation install https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python install requirements https://pypi.org/project/attrs/ https://github.com/python-attrs/attrs site:pypi.org",
+   "Source: attrs \u2014 https://pypi.org/project/attrs/",
+   "Source: Simplify contributing guide \u00b7 python-attrs/attrs@f2571ea \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/commit/f2571ea1443b2ec992e9712eedd76faf786ad2a2",
+   "Source: Minor docs fixes \u00b7 python-attrs/attrs@307a646 \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/commit/307a6467d37308c22af32605f7e1e5e2b3e452f1",
+   "Source: Jython compatibility \u00b7 Issue #321 \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/issues/321",
+   "Source: attrs/.github/CONTRIBUTING.md at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/main/.github/CONTRIBUTING.md",
+   "Source: GitHub - python-attrs/attrs: Python Classes Without Boilerplate \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs",
+   "Source: [RFC] Add attrs package \u00b7 Issue #131 \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/issues/131",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install cloudpickle; platform_python_implementation == \"CPython\" (listed in the tests extra) on main and pr.",
+   "Setup plan: install hypothesis (listed in the tests extra) on main and pr.",
+   "Setup plan: install pympler (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest>9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-xdist[psutil] (listed in the tests extra) on main and pr.",
+   "Setup plan: install watchfiles (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install cogapp (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install doc2dash (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "Setup plan: refused dev.: no network or the package was not found",
+   "Installed cloudpickle 3.1.2 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed hypothesis 6.170.15 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pympler 1.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed watchfiles 1.3.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed cogapp 3.6.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed doc2dash 3.1.0 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/codspeed.yml",
+   ".github/workflows/pypi-package.yml",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/build-docset.yml",
+   ".github/workflows/ci.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "typing_tests/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+     "name": "cloudpickle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesis",
+     "name": "hypothesis",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pympler",
+     "name": "pympler",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist[psutil]",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "watchfiles",
+     "name": "watchfiles",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cogapp",
+     "name": "cogapp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "doc2dash",
+     "name": "doc2dash",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "cloudpickle; platform_python_implementation == \"CPython\"",
+    "hypothesis",
+    "pympler",
+    "pytest>9",
+    "pytest-xdist[psutil]",
+    "watchfiles",
+    "cogapp",
+    "doc2dash"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10, >=3.9"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "dev.",
+     "reason": "no network or the package was not found"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 8 setup item(s) in the project's files and the web lookup. Refused: dev. (no network or the package was not found).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: cloudpickle; platform_python_implementation == \"CPython\", hypothesis, pympler, pytest>9, pytest-xdist[psutil], watchfiles, cogapp, doc2dash."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 8
+  },
+  "installs": [
+   {
+    "package": "cloudpickle",
+    "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+    "version": "3.1.2",
+    "versions": {
+     "main": "3.1.2",
+     "pr": "3.1.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis",
+    "version": "6.170.15",
+    "versions": {
+     "main": "6.170.15",
+     "pr": "6.170.15"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pympler",
+    "requirement": "pympler",
+    "version": "1.1",
+    "versions": {
+     "main": "1.1",
+     "pr": "1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest>9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist[psutil]",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "watchfiles",
+    "requirement": "watchfiles",
+    "version": "1.3.0",
+    "versions": {
+     "main": "1.3.0",
+     "pr": "1.3.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "cogapp",
+    "requirement": "cogapp",
+    "version": "3.6.0",
+    "versions": {
+     "main": "3.6.0",
+     "pr": "3.6.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "doc2dash",
+    "requirement": "doc2dash",
+    "version": "3.1.0",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.1.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 1626,
+  "head_sha": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+  "base_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+  "pr_sha": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "9d9f94a043de7fc4012459853a4ed597a5577855",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 8f767776326f (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 8b26d3ce53e4"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p1' rejected: undefined name: deparator"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The fix rebinds inherited self-taking default factories when a subclass provides a different callable under the original factory name.",
+    "source_quote": "Rebind inherited self-taking default factories when the subclass resolves a different callable under the original factory name.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After the fix, the rebinding behavior applies to both MRO collection paths and works for both attr.s and attr.define.",
+    "source_quote": "The behavior is applied to both MRO collection paths and covered for attr.s and attr.define.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The two regression tests for inherited default method override now pass.",
+    "source_quote": "Focused regression: 2 passed (`tests/test_make.py -k inherited_default_method_override`)",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "probe1",
+    "error": {
+     "message": "unterminated string literal (detected at line 61)",
+     "line": 61,
+     "offset": 1,
+     "code_line": "\"}]}})]}}]}"
+    },
+    "outcome": "rejected: the repair stores under a key that cannot be read",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 2,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   },
+   {
+    "attempt": 2,
+    "probe": "probe1",
+    "error": {
+     "message": "unterminated string literal (detected at line 61)",
+     "line": 61,
+     "offset": 1,
+     "code_line": "\"}]}})]}}]}"
+    },
+    "outcome": "rejected: the repair stores under a key that cannot be read",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 2,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "code does not parse: unterminated string literal (detected at line 61) (line 61)"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest-xdist[psutil]"
+ ],
+ "pr_side_started_at": "2026-11-13T05:56:39.542001+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_make.py"
+  ],
+  "pr": [
+   "tests/test_make.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "attrs",
+   "expected": "8f767776326faaed11e6c2974798787f6e19b343",
+   "installed": "8f767776326faaed11e6c2974798787f6e19b343",
+   "ok": true
+  },
+  "pr": {
+   "dist": "attrs",
+   "expected": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+   "installed": "8b26d3ce53e4a54b7dbea4cc0db97cc05213742e",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-xdist[psutil]"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "8f767776326faaed11e6c2974798787f6e19b343",
+ "comparison": {
+  "same": 280,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_make.TestTransformAttrs::test_inherited_default_method_override[attrs]",
+   "tests.test_make.TestTransformAttrs::test_inherited_default_method_override[define]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 282,
+   "pr": 282
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_make.TestTransformAttrs::test_inherited_default_method_override[attrs]": "AssertionError: assert 'B' == 'A'",
+   "tests.test_make.TestTransformAttrs::test_inherited_default_method_override[define]": "AssertionError: assert 'B' == 'A'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "changed_lines_total": 15,
+ "changed_lines_covered": 12,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "12 of 15 changed executable line(s) ran (80%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "changelog.d/1549.change.md",
+   "src/attr/_make.py",
+   "tests/test_make.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 170.4,
+  "tests": 22.4
+ },
+ "cost": {
+  "ai_calls": 5,
+  "failed_ai_calls": 0,
+  "input_tokens": 65620,
+  "output_tokens": 20433,
+  "thinking_tokens": 17735,
+  "cost_usd": 0.038076,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.038076,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 170.4,
+   "tests": 22.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01136,
+  "total_cost_usd": 0.049436,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-13/ef12096/attrs-1626"
+ }
+}
