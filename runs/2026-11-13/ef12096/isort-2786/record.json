@@ -1,0 +1,562 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2786-fd7d50196c54-2026-11-13",
+ "date_ist": "2026-11-13 11:33 IST",
+ "run_date": "2026-11-13",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2786,
+  "url": "https://github.com/PyCQA/isort/pull/2786",
+  "title": "feat: remove redundant straight imports (opt-in, closes #2285)",
+  "base_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "fd7d50196c54ce9638c8c3dfc5229b9b057cc42a",
+  "merge_commit": "ea7ade899061d524d6833607e410d565b52296dc",
+  "tested_main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "benyoussefzinelabidin-star",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-13T06:02:29Z",
+ "updated_at_ist": "2026-11-13 11:32 IST",
+ "ci_state": "passing",
+ "ci_detail": "1 check runs completed without failure",
+ "tested_at_ist": "2026-11-13 11:33 IST",
+ "files": {
+  "all": [
+   "docs/configuration/options.md",
+   "isort/output.py",
+   "isort/settings.py",
+   "tests/unit/test_ticketed_features.py"
+  ],
+  "package_py": [
+   "isort/output.py",
+   "isort/settings.py"
+  ],
+  "compiled": [],
+  "other": [
+   "docs/configuration/options.md",
+   "tests/unit/test_ticketed_features.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_ticketed_features.py, tests/unit/test_output.py, tests/unit/test_settings.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 72,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.8,
+   "pytest_summary": "2 failed, 72 passed in 1.97s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 73,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.9,
+   "pytest_summary": "2 failed, 73 passed in 2.07s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 72,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "2 failed, 72 passed in 1.21s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 73,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "2 failed, 73 passed in 1.22s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 72,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "2 failed, 72 passed in 1.15s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 73,
+   "failed": 2,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "2 failed, 73 passed in 1.17s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2786/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 8,
+  "changed_lines_covered": 8,
+  "files": [
+   {
+    "file": "isort/output.py",
+    "changed_lines_total": 7,
+    "changed_lines_covered": 7
+   },
+   {
+    "file": "isort/settings.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 3.0,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "fd7d50196c54ce9638c8c3dfc5229b9b057cc42a",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.2 GB (of 15.6 GB).",
+   "Setup check: free disk 91.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort \u2014 https://pypi.org/project/isort/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: isort/docs/quick_start/0.-try.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/quick_start/0.-try.md",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: isort/docs/configuration/github_action.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/configuration/github_action.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Installed hypothesis 6.170.15 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: could_not_verify: not fully verified: the changed code's test module(s) tests.unit.test_output failed to load on both sides, so they did not run: 1 test(s) fail on main and pass on the PR; 74 test(s) ran on main, 74 on the PR; 0 new test(s) pass, 71 unchanged; 2 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_output), so their tests did not run",
+   "After rerun: verified: 1 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 72 unchanged; 2 test failure(s) pre-existing and identical on both sides"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis>=6.140.3",
+    "version": "6.170.15",
+    "versions": {
+     "main": "6.170.15",
+     "pr": "6.170.15"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: the changed code's test module(s) tests.unit.test_output failed to load on both sides, so they did not run: 1 test(s) fail on main and pass on the PR; 74 test(s) ran on main, 74 on the PR; 0 new test(s) pass, 71 unchanged; 2 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_output), so their tests did not run"
+    },
+    {
+     "round": 2,
+     "verdict": "verified",
+     "reason": "1 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 72 unchanged; 2 test failure(s) pre-existing and identical on both sides"
+    }
+   ],
+   "installed": [
+    {
+     "package": "hypothesis",
+     "requirement": "hypothesis>=6.140.3",
+     "version": "6.170.15",
+     "versions": {
+      "main": "6.170.15",
+      "pr": "6.170.15"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "pr_sha": "ea7ade899061d524d6833607e410d565b52296dc",
+  "merge_commit": "ea7ade899061d524d6833607e410d565b52296dc",
+  "merge_parents": [
+   "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "fd7d50196c54ce9638c8c3dfc5229b9b057cc42a"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 841e43126cd2 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit ea7ade899061 (refs/pull/2786/merge) of head fd7d50196c54"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind isort.settings.Config: Config() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When the flag `remove_redundant_straight_imports` is enabled, isort drops a shallow import like `import a` when a deeper unaliased import such as `import a.b` already binds the same name in the same block.",
+    "source_quote": "**What:** Opt-in flag `remove_redundant_straight_imports` drops `import a` when `import a.b` already binds `a` in the same block.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Aliased imports on either side of the redundant import pair are preserved (not removed) when the flag is active.",
+    "source_quote": "Aliased imports on either side are preserved.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_name_checks": [
+   {
+    "probe": "probe1",
+    "error": [
+     "isort.parse.parse_contents does not exist; isort.parse contains: Config, DEFAULT_CONFIG, Literal, MissingSection, NamedTuple, OrderedDict, ParsedContent, ParsedImports, TYPE_CHECKING, TypedDict, chain, collect_import_continuation (+11 more)"
+    ],
+    "outcome": "fixed"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-13T06:07:17.923937+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_ticketed_features.py",
+   "tests/unit/test_output.py",
+   "tests/unit/test_settings.py"
+  ],
+  "pr": [
+   "tests/unit/test_ticketed_features.py",
+   "tests/unit/test_output.py",
+   "tests/unit/test_settings.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "installed": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "ea7ade899061d524d6833607e410d565b52296dc",
+   "installed": "ea7ade899061d524d6833607e410d565b52296dc",
+   "ok": true
+  }
+ },
+ "base_head_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+ "comparison": {
+  "same": 74,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.unit.test_ticketed_features::test_isort_removes_redundant_straight_imports_issue_2285"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.unit.test_ticketed_features::test_isort_supports_shared_profiles_issue_970",
+   "tests.unit.test_ticketed_features::test_sort_configurable_sort_issue_1732"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.unit.test_ticketed_features::test_isort_supports_shared_profiles_issue_970": {
+    "same": false,
+    "outcome": "failed",
+    "exception": []
+   },
+   "tests.unit.test_ticketed_features::test_sort_configurable_sort_issue_1732": {
+    "same": false,
+    "outcome": "failed",
+    "exception": []
+   }
+  },
+  "executed": {
+   "main": 75,
+   "pr": 75
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.unit.test_ticketed_features::test_isort_removes_redundant_straight_imports_issue_2285": "See: https://github.com/PyCQA/isort/issues/2285"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 2 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 72 unchanged; 2 test failure(s) pre-existing and identical on both sides",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 72 unchanged; 2 test failure(s) pre-existing and identical on both sides",
+ "changed_lines_total": 8,
+ "changed_lines_covered": 8,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "8 of 8 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/output.py",
+   "isort/settings.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "docs/configuration/options.md",
+   "tests/unit/test_ticketed_features.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 254.4,
+  "tests": 13.7
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 31155,
+  "output_tokens": 21970,
+  "thinking_tokens": 16789,
+  "cost_usd": 0.029119,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.029119,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 254.4,
+   "tests": 13.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01696,
+  "total_cost_usd": 0.046079,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-13/ef12096/isort-2786"
+ }
+}
