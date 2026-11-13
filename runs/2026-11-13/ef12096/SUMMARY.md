@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-13 on ef12096
 
-6 report(s) in this folder: 0 need attention, 6 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+7 report(s) in this folder: 0 need attention, 7 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -10,6 +10,7 @@
 - **COULD NOT VERIFY**: prettytable/prettytable#543: fix: escape LaTeX special characters in table output. Unverified behaviour claim: "No existing output changed for plain text (`& `.join structure and `\r\n` line joins untouched)."; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged)
 - **COULD NOT VERIFY**: prettytable/prettytable#544: fix: escape MediaWiki markup characters in table output. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 3 test(s) fail on main and pass on the PR; 227 test(s) ran on main, 227 on the PR; 0 new test(s) pass, 224 unchanged
 - **COULD NOT VERIFY**: prettytable/prettytable#545: Fix sliced tables sharing options with the original. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged
+- **COULD NOT VERIFY**: lincolnloop/python-qrcode#425: Fix three error-handling correctness issues (mask_func, QRData write, best_fit). Could not verify: claim(s) C1, C3 expect a difference but no observation matches (2 test(s) ran on main, 2 on the PR; 0 new test(s) pass, 2 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
 
 ## All reports
 
@@ -21,3 +22,4 @@
 | COULD NOT VERIFY | prettytable/prettytable#543: fix: escape LaTeX special characters in table output | Unverified behaviour claim: "No existing output changed for plain text (`& `.join structure and `\r\n` line joins untouched)."; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged) | [PDF](prettytable-543/REPORT.pdf) |
 | COULD NOT VERIFY | prettytable/prettytable#544: fix: escape MediaWiki markup characters in table output | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 3 test(s) fail on main and pass on the PR; 227 test(s) ran on main, 227 on the PR; 0 new test(s) pass, 224 unchanged | [PDF](prettytable-544/REPORT.pdf) |
 | COULD NOT VERIFY | prettytable/prettytable#545: Fix sliced tables sharing options with the original | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged | [PDF](prettytable-545/REPORT.pdf) |
+| COULD NOT VERIFY | lincolnloop/python-qrcode#425: Fix three error-handling correctness issues (mask_func, QRData write, best_fit) | Could not verify: claim(s) C1, C3 expect a difference but no observation matches (2 test(s) ran on main, 2 on the PR; 0 new test(s) pass, 2 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](python_qrcode-425/REPORT.pdf) |
