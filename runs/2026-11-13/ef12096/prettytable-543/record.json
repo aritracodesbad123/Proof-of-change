@@ -1,0 +1,773 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-prettytable-prettytable-543-8f3625a012f9-2026-11-13",
+ "date_ist": "2026-11-13 12:08 IST",
+ "run_date": "2026-11-13",
+ "who": "ops/daily_run.py",
+ "repo": "prettytable/prettytable",
+ "library": "prettytable",
+ "pr": {
+  "repo": "prettytable/prettytable",
+  "number": 543,
+  "url": "https://github.com/prettytable/prettytable/pull/543",
+  "title": "fix: escape LaTeX special characters in table output",
+  "base_sha": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "8f3625a012f96b001a00eb0caa68df31f619be70",
+  "merge_commit": "464bc478e3de6eb892a21717a4448029283c337d",
+  "tested_main_sha": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "rahul05ranjan",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-09T01:33:40Z",
+ "updated_at_ist": "2026-11-09 07:03 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-13 12:08 IST",
+ "files": {
+  "all": [
+   "src/prettytable/prettytable.py",
+   "tests/test_latex.py"
+  ],
+  "package_py": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_latex.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_latex.py, tests/test_prettytable.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "218 passed in 0.72s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "221 passed in 0.73s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "218 passed in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "221 passed in 0.75s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "218 passed in 0.72s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "221 passed in 0.72s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "prettytable-543/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 9,
+  "changed_lines_covered": 9,
+  "files": [
+   {
+    "file": "src/prettytable/prettytable.py",
+    "changed_lines_total": 9,
+    "changed_lines_covered": 9
+   }
+  ],
+  "seconds": 2.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "8f3625a012f96b001a00eb0caa68df31f619be70",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.3 GB (of 15.6 GB).",
+   "Setup check: free disk 91.6 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org",
+   "Source: prettytable/README.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/master/README.md",
+   "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: Unable to import prettytable \u00b7 Issue #120 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/issues/120",
+   "Source: prettytable/.gitignore at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/main/.gitignore",
+   "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: wcwidth is noted, installed with the project.",
+   "Setup plan: install pytest>=9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-lazy-fixtures (listed in the tests extra) on main and pr.",
+   "Setup plan: install mypy==2.4.0 (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install types-colorama (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install prek (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11, >=3.10",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-lazy-fixtures 1.4.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed mypy 2.4.0 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed types-colorama 0.4.15.20260508 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed prek 0.5.10 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   ".github/workflows/lint.yml",
+   ".github/workflows/require-pr-label.yml",
+   ".github/workflows/release-drafter.yml",
+   ".github/workflows/release.yml",
+   ".github/workflows/labels.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "wcwidth>=0.3.5",
+     "name": "wcwidth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-lazy-fixtures",
+     "name": "pytest-lazy-fixtures",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.4.0",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-colorama",
+     "name": "types-colorama",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "prek",
+     "name": "prek",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest>=9",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "mypy==2.4.0",
+    "types-colorama",
+    "prek"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11, >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 7 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest>=9, pytest-cov, pytest-lazy-fixtures, mypy==2.4.0, types-colorama, prek. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 6
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest>=9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-lazy-fixtures",
+    "requirement": "pytest-lazy-fixtures",
+    "version": "1.4.1",
+    "versions": {
+     "main": "1.4.1",
+     "pr": "1.4.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==2.4.0",
+    "version": "2.4.0",
+    "versions": {
+     "main": "2.4.0",
+     "pr": "2.4.0"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-colorama",
+    "requirement": "types-colorama",
+    "version": "0.4.15.20260508",
+    "versions": {
+     "main": "0.4.15.20260508",
+     "pr": "0.4.15.20260508"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "prek",
+    "requirement": "prek",
+    "version": "0.5.10",
+    "versions": {
+     "main": "0.5.10",
+     "pr": "0.5.10"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+  "pr_sha": "464bc478e3de6eb892a21717a4448029283c337d",
+  "merge_commit": "464bc478e3de6eb892a21717a4448029283c337d",
+  "merge_parents": [
+   "d0f528b05769519fa7b86d190c30bb5a457ea344",
+   "8f3625a012f96b001a00eb0caa68df31f619be70"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ d0f528b05769 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 464bc478e3de (refs/pull/543/merge) of head 8f3625a012f9"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p1' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'p2' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The fix escapes LaTeX special characters in table output.",
+    "source_quote": "fix: escape LaTeX special characters in table output",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "A raw '&' in the data splits the LaTeX table cell into extra columns.",
+    "source_quote": "- a raw `&` splits the cell into extra columns,",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "An '_' character in headers or cells causes a \"Missing $ inserted\" LaTeX error.",
+    "source_quote": "- `_` in headers/cells raises \"Missing $ inserted\",",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The fix escapes the ten LaTeX special characters in headers and data cells using a single-pass re.sub lookup table, mapping backslash to \\textbackslash{} without double-escaping.",
+    "source_quote": "Escape the ten LaTeX specials (`\\ & % $ # _ { } ~ ^`) in headers and data cells of both emitters, via a single-pass `re.sub` with a lookup table \u2014 backslash maps to `\\textbackslash{}` and is handled in the same pass, so escapes inserted by the substitution are never re-escaped.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "On the current main branch, the new tests fail due to unescaped output, but after applying the patch they pass.",
+    "source_quote": "On current `main` (d0f528b) the new tests fail with the un-escaped output; with this patch:",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "The fix does not alter existing plain-text output; the & .join structure and \\r\\n line joins remain unchanged.",
+    "source_quote": "No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C3",
+    "text": "A '%' character comments out the LaTeX row terminator, causing the row to disappear.",
+    "source_quote": "- `%` comments out the `\\` row terminator (the row disappears),",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C5",
+    "text": "The characters #, $, {, }, ~, ^, and \\ cause misbehavior similar to the other specials.",
+    "source_quote": "- `#`, `$`, `{`, `}`, `~`, `^`, `\\) all misbehave the same way.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p1",
+    "error": {
+     "message": "expected 'except' or 'finally' block",
+     "line": 9,
+     "offset": 0,
+     "code_line": "except ImportError as e:"
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 10,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 10,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   },
+   {
+    "attempt": 1,
+    "probe": "p2",
+    "error": {
+     "message": "expected 'except' or 'finally' block",
+     "line": 9,
+     "offset": 0,
+     "code_line": "except ImportError as e:"
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 2,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 2,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest",
+  "pytest-cov",
+  "pytest-lazy-fixtures"
+ ],
+ "pr_side_started_at": "2026-11-13T06:44:49.484660+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_latex.py",
+   "tests/test_prettytable.py"
+  ],
+  "pr": [
+   "tests/test_latex.py",
+   "tests/test_prettytable.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "prettytable",
+   "expected": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+   "installed": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+   "ok": true
+  },
+  "pr": {
+   "dist": "prettytable",
+   "expected": "464bc478e3de6eb892a21717a4448029283c337d",
+   "installed": "464bc478e3de6eb892a21717a4448029283c337d",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-lazy-fixtures"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+ "comparison": {
+  "same": 218,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_latex.TestLatexOutput::test_latex_escapes_backslash_tilde_caret",
+   "tests.test_latex.TestLatexOutput::test_latex_escapes_special_characters",
+   "tests.test_latex.TestLatexOutput::test_latex_formatted_escapes_special_characters"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 221,
+   "pr": 221
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_latex.TestLatexOutput::test_latex_escapes_backslash_tilde_caret": "AssertionError: assert '\\\\begin{tabu...\\end{tabular}' == '\\\\begin{tabu...\\end{tabular}'",
+   "tests.test_latex.TestLatexOutput::test_latex_escapes_special_characters": "AssertionError: assert '\\\\begin{tabu...\\end{tabular}' == '\\\\begin{tabu...\\end{tabular}'",
+   "tests.test_latex.TestLatexOutput::test_latex_formatted_escapes_special_characters": "AssertionError: assert '\\\\begin{tabu...\\end{tabular}' == '\\\\begin{tabu...\\end{tabular}'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "unverified behaviour claim: \"No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).\"; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "unverified behaviour claim: \"No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).\"; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged)",
+ "changed_lines_total": 9,
+ "changed_lines_covered": 9,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "9 of 9 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_latex.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 391.4,
+  "tests": 7.6
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 0,
+  "input_tokens": 47241,
+  "output_tokens": 44661,
+  "thinking_tokens": 41753,
+  "cost_usd": 0.054367,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.054367,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 391.4,
+   "tests": 7.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.026093,
+  "total_cost_usd": 0.08046,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-13/ef12096/prettytable-543"
+ }
+}
