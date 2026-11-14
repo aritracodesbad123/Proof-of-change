@@ -1,0 +1,1268 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2789-b430e5e8548c-2026-11-14",
+ "date_ist": "2026-11-14 11:57 IST",
+ "run_date": "2026-11-14",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2789,
+  "url": "https://github.com/PyCQA/isort/pull/2789",
+  "title": "Respect comment_prefix for section headings and footers",
+  "base_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b430e5e8548c15f9eed772764e9dae4a44c74e77",
+  "merge_commit": "f87da8f247abeb36320149764da398cf51c2308f",
+  "tested_main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "ychampion",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-14T04:12:11Z",
+ "updated_at_ist": "2026-11-14 09:42 IST",
+ "ci_state": "passing",
+ "ci_detail": "1 check runs completed without failure",
+ "tested_at_ist": "2026-11-14 11:57 IST",
+ "files": {
+  "all": [
+   "isort/output.py",
+   "isort/settings.py",
+   "tests/unit/test_isort.py",
+   "tests/unit/test_settings.py"
+  ],
+  "package_py": [
+   "isort/output.py",
+   "isort/settings.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_isort.py",
+   "tests/unit/test_settings.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_isort.py, tests/unit/test_settings.py, tests/unit/test_output.py, tests/integration/test_hypothesmith.py, tests/integration/test_literal.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 284,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 9.9,
+   "pytest_summary": "2 failed, 284 passed, 1 skipped in 8.88s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 299,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 10.0,
+   "pytest_summary": "2 failed, 299 passed, 1 skipped in 8.96s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 284,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 9.0,
+   "pytest_summary": "2 failed, 284 passed, 1 skipped in 7.96s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 299,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 9.1,
+   "pytest_summary": "2 failed, 299 passed, 1 skipped in 8.05s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 284,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 9.1,
+   "pytest_summary": "2 failed, 284 passed, 1 skipped in 8.08s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 299,
+   "failed": 2,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 9.6,
+   "pytest_summary": "2 failed, 299 passed, 1 skipped in 8.54s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Strips leading inline-comment spacing (`comment_prefix.lstrip()`) for standalone section comment lines, preserving backwards compatibility with the default `comment_prefix = \" #\"` (`\"# <heading>\"`).",
+   "pattern": "backwards compatible"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2789/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 12,
+  "changed_lines_covered": 12,
+  "files": [
+   {
+    "file": "isort/output.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   },
+   {
+    "file": "isort/settings.py",
+    "changed_lines_total": 9,
+    "changed_lines_covered": 9
+   }
+  ],
+  "seconds": 16.3,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "b430e5e8548c15f9eed772764e9dae4a44c74e77",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 92.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort - PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: isort/docs/quick_start/0.-try.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/quick_start/0.-try.md",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: isort/docs/configuration/github_action.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/configuration/github_action.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Before rerun: could_not_verify: unverified behaviour claim: \"Strips leading inline-comment spacing (`comment_prefix.lstrip()`) for standalone section comment lines, preserving backwards compatibility with the default `comment_prefix = \" #\"` (`\"# <heading>\"`).\"; needs a probe (4 test(s) fail on main and pass on the PR; 290 test(s) ran on main, 301 on the PR; 11 new test(s) pass, 285 unchanged (1 of them skipped on both sides); 2 test failure(s) pre-existing and identical on both sides)",
+   "After rerun: not rerun. could not verify: setup gap missing fixture isort"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "gap_retry": {
+   "reran": false,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "unverified behaviour claim: \"Strips leading inline-comment spacing (`comment_prefix.lstrip()`) for standalone section comment lines, preserving backwards compatibility with the default `comment_prefix = \" #\"` (`\"# <heading>\"`).\"; needs a probe (4 test(s) fail on main and pass on the PR; 290 test(s) ran on main, 301 on the PR; 11 new test(s) pass, 285 unchanged (1 of them skipped on both sides); 2 test failure(s) pre-existing and identical on both sides)"
+    }
+   ],
+   "installed": []
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "pr_sha": "f87da8f247abeb36320149764da398cf51c2308f",
+  "merge_commit": "f87da8f247abeb36320149764da398cf51c2308f",
+  "merge_parents": [
+   "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "b430e5e8548c15f9eed772764e9dae4a44c74e77"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 841e43126cd2 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit f87da8f247ab (refs/pull/2789/merge) of head b430e5e8548c"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe-c2' rejected: cannot check isort.parse.ParsedContent: its parameters are not in this file (an inherited constructor or method we cannot read); the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C2",
+    "text": "When comment_prefix is empty or whitespace\u2011only, no extra prefix is added to section headings/footers, allowing markers like #region Standard Library to be emitted unchanged.",
+    "source_quote": "Returns comment unchanged when comment_prefix is empty or whitespace-only (\"\"), allowing markers such as #region Standard Library / #endregion Standard Library.",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C1",
+    "text": "With a custom non\u2011empty comment_prefix (e.g. \"##\"), section headings and footers now use that prefix instead of the hardcoded \"# \" prefix.",
+    "source_quote": "Add format_section_comment(comment_prefix, comment) in isort/settings:",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C2",
+    "source_quote": "Returns comment unchanged when comment_prefix is empty or whitespace-only (\"\"), allowing markers such as #region Standard Library / #endregion Standard Library."
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "isort.output.sorted_imports"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "654f30020c1cc0e1693ebced595ac80e9f42e0612fd30f853e5cdc38f776ce24",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-14T06:28:44.225921+00:00",
+    "inputs_sha256": "93db59dfda69f4a877d687a540a4db66bd6a247cf677fa5ee9aa43694035e463",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "isort/output.py": "4631a7f238742004ed2e072b395cc53b60a482f4ea79b76719cc1dd57afd5439",
+      "isort/settings.py": "0e63a3c92d9b9b75e1aef2c1383250133f90c7656556dc7730f344dcf417c0ec"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "hypothesmith>=0.3.3"
+ ],
+ "pr_side_started_at": "2026-11-14T06:28:44.437416+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_isort.py",
+   "tests/unit/test_settings.py",
+   "tests/unit/test_output.py",
+   "tests/integration/test_hypothesmith.py",
+   "tests/integration/test_literal.py"
+  ],
+  "pr": [
+   "tests/unit/test_isort.py",
+   "tests/unit/test_settings.py",
+   "tests/unit/test_output.py",
+   "tests/integration/test_hypothesmith.py",
+   "tests/integration/test_literal.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "installed": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "f87da8f247abeb36320149764da398cf51c2308f",
+   "installed": "f87da8f247abeb36320149764da398cf51c2308f",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "hypothesmith>=0.3.3"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+ "comparison": {
+  "same": 287,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [
+   "tests.unit.test_isort::test_region_folding_comment_prefix_issue_1922",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[##-Standard Library-Standard Library End-## Standard Library-## Standard Library End]",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[-#region Standard Library-#endregion Standard Library-#region Standard Library-#endregion Standard Library]",
+   "tests.unit.test_settings::test_section_comments_respect_comment_prefix"
+  ],
+  "new_tests_passing": 11,
+  "new_tests_passing_ids": [
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[  #-Standard Library-Standard Library End-# Standard Library-# Standard Library End]",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[ #-Standard Library-Standard Library End-# Standard Library-# Standard Library End]",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[# -Standard Library-Standard Library End-# Standard Library-# Standard Library End]",
+   "tests.unit.test_settings::test_format_section_comment[   -#region Standard Library-#region Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[  #-Standard Library-# Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[ #-Standard Library-# Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[# -Standard Library-# Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[## -Standard Library-## Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[##-Standard Library-## Standard Library]",
+   "tests.unit.test_settings::test_format_section_comment[#\\t-Standard Library-#\\tStandard Library]",
+   "tests.unit.test_settings::test_format_section_comment[-#region Standard Library-#region Standard Library]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.unit.test_isort::test_settings_path_skip_issue_909",
+   "tests.unit.test_isort::test_skip_paths_issue_938"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.unit.test_isort::test_settings_path_skip_issue_909": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "FileNotFoundError"
+    ]
+   },
+   "tests.unit.test_isort::test_skip_paths_issue_938": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "FileNotFoundError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 290,
+   "pr": 301
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.unit.test_isort::test_region_folding_comment_prefix_issue_1922": "AssertionError: assert '# #region St...Third Party\\n' == '#region Stan...Third Party\\n'",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[##-Standard Library-Standard Library End-## Standard Library-## Standard Library End]": "AssertionError: assert '# top commen...Library End\\n' == '# top commen...Library End\\n'",
+   "tests.unit.test_isort::test_titled_and_footered_imports_with_comment_prefix_issue_1922[-#region Standard Library-#endregion Standard Library-#region Standard Library-#endregion Standard Library]": "AssertionError: assert '# top commen...ard Library\\n' == '# top commen...ard Library\\n'",
+   "tests.unit.test_settings::test_section_comments_respect_comment_prefix": "AssertionError: assert ('# #region S...ibrary', '# ') == ('#region Standard Library',)"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 2 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "uninformative",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "654f30020c1cc0e1693ebced595ac80e9f42e0612fd30f853e5cdc38f776ce24",
+    "target": "PyCQA/isort#2789",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.output.sorted_imports.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.output.sorted_imports.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "isort.output.sorted_imports.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.output.sorted_imports.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.output.sorted_imports.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "654f30020c1cc0e1693ebced595ac80e9f42e0612fd30f853e5cdc38f776ce24",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-14T06:28:44.225921+00:00",
+     "inputs_sha256": "93db59dfda69f4a877d687a540a4db66bd6a247cf677fa5ee9aa43694035e463",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "isort/output.py": "4631a7f238742004ed2e072b395cc53b60a482f4ea79b76719cc1dd57afd5439",
+       "isort/settings.py": "0e63a3c92d9b9b75e1aef2c1383250133f90c7656556dc7730f344dcf417c0ec"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-14T06:28:44.437416+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "isort/output.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 1
+      },
+      {
+       "file": "isort/settings.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json",
+     "changed_lines_touched": 2
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 7,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: setup gap missing fixture isort",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: setup gap missing fixture isort",
+ "changed_lines_total": 12,
+ "changed_lines_covered": 12,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "12 of 12 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/output.py",
+   "isort/settings.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/unit/test_isort.py",
+   "tests/unit/test_settings.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 188.2,
+  "tests": 56.7
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 28982,
+  "output_tokens": 15436,
+  "thinking_tokens": 13347,
+  "cost_usd": 0.022587,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.022587,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 188.2,
+   "tests": 56.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.012547,
+  "total_cost_usd": 0.035134,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-14/ef12096/isort-2789"
+ }
+}
