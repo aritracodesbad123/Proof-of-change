@@ -1,0 +1,537 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2690-c04689e4acd4-2026-11-14",
+ "date_ist": "2026-11-14 12:05 IST",
+ "run_date": "2026-11-14",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2690,
+  "url": "https://github.com/PyCQA/isort/pull/2690",
+  "title": "Fix skip path matching on Windows",
+  "base_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "c04689e4acd479b7bf35fc430d332a0f95c5f59f",
+  "merge_commit": "cf5d604478721bdb40faae5987d692b2b68051c5",
+  "tested_main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "hansu650",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-13T08:55:12Z",
+ "updated_at_ist": "2026-11-13 14:25 IST",
+ "ci_state": "passing",
+ "ci_detail": "26 check runs completed without failure",
+ "tested_at_ist": "2026-11-14 12:05 IST",
+ "files": {
+  "all": [
+   "isort/settings.py",
+   "tests/unit/test_settings.py"
+  ],
+  "package_py": [
+   "isort/settings.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_settings.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_settings.py, tests/integration/test_hypothesmith.py, tests/integration/test_literal.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 43,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 8.8,
+   "pytest_summary": "43 passed in 7.74s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 54,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 8.6,
+   "pytest_summary": "54 passed, 1 skipped in 7.55s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 43,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 7.5,
+   "pytest_summary": "43 passed in 6.39s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 54,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 7.2,
+   "pytest_summary": "54 passed, 1 skipped in 6.14s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 43,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 7.3,
+   "pytest_summary": "43 passed in 6.30s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 54,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 7.3,
+   "pytest_summary": "54 passed, 1 skipped in 6.23s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2690/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 21,
+  "changed_lines_covered": 13,
+  "files": [
+   {
+    "file": "isort/settings.py",
+    "changed_lines_total": 21,
+    "changed_lines_covered": 13
+   }
+  ],
+  "seconds": 12.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "c04689e4acd479b7bf35fc430d332a0f95c5f59f",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort - PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: isort/docs/quick_start/0.-try.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/quick_start/0.-try.md",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: isort/docs/configuration/github_action.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/configuration/github_action.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "pr_sha": "cf5d604478721bdb40faae5987d692b2b68051c5",
+  "merge_commit": "cf5d604478721bdb40faae5987d692b2b68051c5",
+  "merge_parents": [
+   "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "c04689e4acd479b7bf35fc430d332a0f95c5f59f"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 841e43126cd2 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit cf5d60447872 (refs/pull/2690/merge) of head c04689e4acd4"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'c1' rejected: cannot bind isort.settings.Config: Config() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Skip path matching on Windows is fixed so that configured path skips are respected.",
+    "source_quote": "Fix skip path matching on Windows",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After the fix, candidate paths and cached skip paths both use native absolute paths and retain drive identity.",
+    "source_quote": "Both now use native absolute paths and retain drive identity.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The cache retains both native and separator-translated spellings of paths, including the literal-backslash POSIX fix.",
+    "source_quote": "The cache keeps native and separator-translated spellings, including the literal-backslash POSIX fix contributed by DanielNoord.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The Git\u2011ignore enable flag is now checked inside its helper function.",
+    "source_quote": "Following the October 31 review, the Git-ignore enable flag is checked inside its helper,",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "C1",
+    "error": {
+     "message": "unterminated string literal (detected at line 27)",
+     "line": 27,
+     "offset": 38,
+     "code_line": "print({\"observations\": observations})\"}, {"
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 1,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "some \"covers\" name no observation the probe code records (C1:c1.skip_test); each cover must be an observation name the code prints, or an fnmatch pattern that matches some of them"
+   ],
+   "kept_first_answer": "the retry linked fewer claims"
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "hypothesmith>=0.3.3"
+ ],
+ "pr_side_started_at": "2026-11-14T06:41:26.794216+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_settings.py",
+   "tests/integration/test_hypothesmith.py",
+   "tests/integration/test_literal.py"
+  ],
+  "pr": [
+   "tests/unit/test_settings.py",
+   "tests/integration/test_hypothesmith.py",
+   "tests/integration/test_literal.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "installed": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "cf5d604478721bdb40faae5987d692b2b68051c5",
+   "installed": "cf5d604478721bdb40faae5987d692b2b68051c5",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "hypothesmith>=0.3.3"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+ "comparison": {
+  "same": 43,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 11,
+  "new_tests_passing_ids": [
+   "tests.unit.test_settings.TestConfig::test_skip_absolute_existing_directory_path[/]",
+   "tests.unit.test_settings.TestConfig::test_skip_absolute_existing_directory_path[\\\\]",
+   "tests.unit.test_settings.TestConfig::test_skip_absolute_existing_file_path[/]",
+   "tests.unit.test_settings.TestConfig::test_skip_absolute_existing_file_path[\\\\]",
+   "tests.unit.test_settings.TestConfig::test_skip_path_components[resources.py]",
+   "tests.unit.test_settings.TestConfig::test_skip_path_components[src]",
+   "tests.unit.test_settings.TestConfig::test_skip_path_preserves_literal_backslash",
+   "tests.unit.test_settings.TestConfig::test_skip_relative_existing_directory_path[src/generated]",
+   "tests.unit.test_settings.TestConfig::test_skip_relative_existing_directory_path[src\\\\generated]",
+   "tests.unit.test_settings.TestConfig::test_skip_relative_existing_file_path[src/resources.py]",
+   "tests.unit.test_settings.TestConfig::test_skip_relative_existing_file_path[src\\\\resources.py]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [
+   "tests.unit.test_settings.TestConfig::test_skip_path_preserves_drive"
+  ],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 43,
+   "pr": 54
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 43 test(s) ran on main, 54 on the PR; 11 new test(s) pass, 43 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 43 test(s) ran on main, 54 on the PR; 11 new test(s) pass, 43 unchanged",
+ "changed_lines_total": 21,
+ "changed_lines_covered": 13,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "13 of 21 changed executable line(s) ran (62%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/settings.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/unit/test_settings.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 411.2,
+  "tests": 46.7
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 0,
+  "input_tokens": 29438,
+  "output_tokens": 36905,
+  "thinking_tokens": 33922,
+  "cost_usd": 0.042046,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.042046,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 411.2,
+   "tests": 46.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.027413,
+  "total_cost_usd": 0.069459,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-14/ef12096/isort-2690"
+ }
+}
