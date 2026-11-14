@@ -1,0 +1,968 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2788-c9c319e6f946-2026-11-14",
+ "date_ist": "2026-11-14 12:00 IST",
+ "run_date": "2026-11-14",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2788,
+  "url": "https://github.com/PyCQA/isort/pull/2788",
+  "title": "Reuse the config of an indented import section",
+  "base_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "c9c319e6f9467ccf9b96eec134fbf85b94b170cf",
+  "merge_commit": "2242d1e772ef6c19f133779b355e7e2259474cc7",
+  "tested_main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "g4lb",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-13T14:48:01Z",
+ "updated_at_ist": "2026-11-13 20:18 IST",
+ "ci_state": "passing",
+ "ci_detail": "1 check runs completed without failure",
+ "tested_at_ist": "2026-11-14 12:00 IST",
+ "files": {
+  "all": [
+   "isort/core.py"
+  ],
+  "package_py": [
+   "isort/core.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_main.py, tests/unit/test_regressions.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.2,
+   "pytest_summary": "175 passed in 3.07s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.7,
+   "pytest_summary": "175 passed in 2.61s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "175 passed in 2.31s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "175 passed in 2.28s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.5,
+   "pytest_summary": "175 passed in 2.41s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "175 passed in 2.66s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "The output does not change.",
+   "pattern": "does not change"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2788/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "isort/core.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 5.4,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "c9c319e6f9467ccf9b96eec134fbf85b94b170cf",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); some AI probes were rejected",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 92.6 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort - PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: isort/docs/quick_start/0.-try.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/quick_start/0.-try.md",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: isort/docs/configuration/github_action.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/configuration/github_action.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Installed hypothesis 6.170.15 from project (named by the error and listed in the project) on main and pr.",
+   "Installed black 26.10.1 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: verified: 140 test(s) ran on main, 140 on the PR; 0 new test(s) pass, 139 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_main), so their tests did not run; probe: claim(s) C10, C11, C4, C9 proven",
+   "After rerun: could_not_verify: unverified behaviour claim: \"The output does not change.\"; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change)"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis>=6.140.3",
+    "version": "6.170.15",
+    "versions": {
+     "main": "6.170.15",
+     "pr": "6.170.15"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "black",
+    "requirement": "black>=25.9.0",
+    "version": "26.10.1",
+    "versions": {
+     "main": "26.10.1",
+     "pr": "26.10.1"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "verified",
+     "reason": "140 test(s) ran on main, 140 on the PR; 0 new test(s) pass, 139 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_main), so their tests did not run; probe: claim(s) C10, C11, C4, C9 proven"
+    },
+    {
+     "round": 2,
+     "verdict": "could_not_verify",
+     "reason": "unverified behaviour claim: \"The output does not change.\"; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change)"
+    }
+   ],
+   "installed": [
+    {
+     "package": "hypothesis",
+     "requirement": "hypothesis>=6.140.3",
+     "version": "6.170.15",
+     "versions": {
+      "main": "6.170.15",
+      "pr": "6.170.15"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "package": "black",
+     "requirement": "black>=25.9.0",
+     "version": "26.10.1",
+     "versions": {
+      "main": "26.10.1",
+      "pr": "26.10.1"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "pr_sha": "2242d1e772ef6c19f133779b355e7e2259474cc7",
+  "merge_commit": "2242d1e772ef6c19f133779b355e7e2259474cc7",
+  "merge_parents": [
+   "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "c9c319e6f9467ccf9b96eec134fbf85b94b170cf"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 841e43126cd2 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 2242d1e772ef (refs/pull/2788/merge) of head c9c319e6f946"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind isort.settings.Config: Config() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'probe3' rejected: cannot bind isort.settings.Config: Config() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "_indented_config() makes a new `Config` for each indented import section.",
+    "source_quote": "_indented_config()` makes a new `Config` for each indented import section.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Each new `Config` builds its known patterns again, and the `place.module()` cache has no entries for it.",
+    "source_quote": "Each new `Config` builds its known patterns again, and the `place.module()` cache has no entries for it.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "This change keeps the indented `Config` in a small `lru_cache`.",
+    "source_quote": "This change keeps the indented `Config` in a small `lru_cache`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The output does not change.",
+    "source_quote": "The output does not change.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "For argparse.py of the stdlib, profile=black, the change yields -37% speedup on CPython 3.11, -33% on CPython 3.15, -54% on CPython 3.14 mypyc.",
+    "source_quote": "`argparse.py` of the stdlib, `profile=black` | -37% | -33% | -54%",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "For typing.py of the stdlib, with add_imports, the change yields -8% speedup on CPython 3.11, -41% on CPython 3.15, -58% on CPython 3.14 mypyc.",
+    "source_quote": "`typing.py` of the stdlib, with `add_imports` | -8% | -41% | -58%",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "For 150 functions with imports, the change yields -84% speedup on CPython 3.11, -76% on CPython 3.15, -84% on CPython 3.14 mypyc.",
+    "source_quote": "150 functions with imports | -84% | -76% | -84%",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "For 60 try/except ImportError blocks, the change yields -91% speedup on CPython 3.11, -85% on CPython 3.15, -89% on CPython 3.14 mypyc.",
+    "source_quote": "60 `try`/`except ImportError` blocks | -91% | -85% | -89%",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "I measured no slowdown on files with only top-level imports and on a new `Config` for each call.",
+    "source_quote": "I measured no slowdown on files with only top-level imports and on a new `Config` for each call.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C10",
+    "text": "Import time did not change (40 rounds).",
+    "source_quote": "Import time did not change (40 rounds).",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C11",
+    "text": "Old and new outputs matched on 1,000,000 inputs.",
+    "source_quote": "Old and new outputs matched on 1,000,000 inputs.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "P4",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nfrom isort.core import process\\nfrom io import StringIO\\n\\ninputs = [\\n    '',\\n    'import os\\n',\\n    'def f():\\n    import os\\n',\\n    'try:\\n    import os\\n    \\\\nexcept ImportError:\\n    pass\\n',\\n    '# isort: skip\\nimport os\\n',\\n]\\noutputs = []\\nfor input_str in inputs:\\n    inp"
+    },
+    "outcome": "provider error: nebius probes request failed: HTTPError"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "c563a749783bef58f132be5b9324523d4e5fa237e66ddf2a373b0beb87bdd888",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-14T06:34:46.761441+00:00",
+    "inputs_sha256": "8099c661055fc936f692b81f9c07d7c207b4116062d594aeb4146040104e8518",
+    "inputs": {
+     "title_chars": 46,
+     "body_chars": 1032,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-14T06:34:47.013484+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_main.py",
+   "tests/unit/test_regressions.py"
+  ],
+  "pr": [
+   "tests/unit/test_main.py",
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "installed": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "2242d1e772ef6c19f133779b355e7e2259474cc7",
+   "installed": "2242d1e772ef6c19f133779b355e7e2259474cc7",
+   "ok": true
+  }
+ },
+ "base_head_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+ "comparison": {
+  "same": 175,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 175,
+   "pr": 175
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "c563a749783bef58f132be5b9324523d4e5fa237e66ddf2a373b0beb87bdd888",
+    "target": "PyCQA/isort#2788",
+    "about": "Test output of process function for correctness and stability",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The output does not change.",
+      "covers": [
+       "c4.output_hash"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C9",
+      "source": "PR description",
+      "text": "I measured no slowdown on files with only top-level imports and on a new `Config` for each call.",
+      "covers": [
+       "c9.output_hash"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C10",
+      "source": "PR description",
+      "text": "Import time did not change (40 rounds).",
+      "covers": [
+       "c10.first_output_hash",
+       "c10.all_same"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C11",
+      "source": "PR description",
+      "text": "Old and new outputs matched on 1,000,000 inputs.",
+      "covers": [
+       "c11.combined_output_hash"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      },
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      },
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      }
+     ],
+     "pr": [
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      },
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      },
+      {
+       "c4.output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c9.output_hash": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+       "c10.first_output_hash": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+       "c10.all_same": true,
+       "c11.combined_output_hash": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c10.all_same",
+      "state": "same",
+      "label": "proven",
+      "claim": "C10",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c10.all_same\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c10.all_same\""
+       }
+      }
+     },
+     {
+      "name": "c10.first_output_hash",
+      "state": "same",
+      "label": "proven",
+      "claim": "C10",
+      "main": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "pr": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c10.first_output_hash\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c10.first_output_hash\""
+       }
+      }
+     },
+     {
+      "name": "c11.combined_output_hash",
+      "state": "same",
+      "label": "proven",
+      "claim": "C11",
+      "main": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3",
+      "pr": "0b91fe21d31a4799ca9b3ad54b969092d7a5166b894ccd2b9b069c5c3b0c50a3",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c11.combined_output_hash\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c11.combined_output_hash\""
+       }
+      }
+     },
+     {
+      "name": "c4.output_hash",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "pr": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.output_hash\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.output_hash\""
+       }
+      }
+     },
+     {
+      "name": "c9.output_hash",
+      "state": "same",
+      "label": "proven",
+      "claim": "C9",
+      "main": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+      "pr": "f3741fac2beb18228f36dd593f95a39c406e262bc98f19e9a503bcab095e5bda",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c9.output_hash\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c9.output_hash\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "c563a749783bef58f132be5b9324523d4e5fa237e66ddf2a373b0beb87bdd888",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-14T06:34:46.761441+00:00",
+     "inputs_sha256": "8099c661055fc936f692b81f9c07d7c207b4116062d594aeb4146040104e8518",
+     "inputs": {
+      "title_chars": 46,
+      "body_chars": 1032,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-14T06:34:47.013484+00:00"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C10",
+    "C11",
+    "C4",
+    "C9"
+   ],
+   "reason": "probe: claim(s) C10, C11, C4, C9 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe2": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "unverified behaviour claim: \"The output does not change.\"; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "unverified behaviour claim: \"The output does not change.\"; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change)",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/core.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 321.0,
+  "tests": 22.1
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 1,
+  "input_tokens": 15633,
+  "output_tokens": 26420,
+  "thinking_tokens": 23152,
+  "cost_usd": 0.028468,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.028468,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 321.0,
+   "tests": 22.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0214,
+  "total_cost_usd": 0.049868,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-14/ef12096/isort-2788"
+ }
+}
