@@ -1,12 +1,13 @@
 # Proof-of-Change go/no-go: 2026-11-14 on ef12096
 
-7 report(s) in this folder: 0 need attention, 3 could not be verified, 4 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+8 report(s) in this folder: 0 need attention, 4 could not be verified, 4 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
 - **COULD NOT VERIFY**: PyCQA/isort#2690: Fix skip path matching on Windows. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 43 test(s) ran on main, 54 on the PR; 11 new test(s) pass, 43 unchanged
 - **COULD NOT VERIFY**: PyCQA/isort#2788: Reuse the config of an indented import section. Unverified behaviour claim: "The output does not change."; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change)
 - **COULD NOT VERIFY**: PyCQA/isort#2789: Respect comment_prefix for section headings and footers. Could not verify: setup gap missing fixture isort
+- **COULD NOT VERIFY**: psf/requests#7415: Fix: retain stream read error on subsequent response.content access. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 337 test(s) ran on main, 337 on the PR; 0 new test(s) pass, 330 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides
 
 ## All reports
 
@@ -15,6 +16,7 @@
 | COULD NOT VERIFY | PyCQA/isort#2690: Fix skip path matching on Windows | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 43 test(s) ran on main, 54 on the PR; 11 new test(s) pass, 43 unchanged | [PDF](isort-2690/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2788: Reuse the config of an indented import section | Unverified behaviour claim: "The output does not change."; needs a probe (175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 175 unchanged; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change) | [PDF](isort-2788/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2789: Respect comment_prefix for section headings and footers | Could not verify: setup gap missing fixture isort | [PDF](isort-2789/REPORT.pdf) |
+| COULD NOT VERIFY | psf/requests#7415: Fix: retain stream read error on subsequent response.content access | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 337 test(s) ran on main, 337 on the PR; 0 new test(s) pass, 330 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides | [PDF](requests-7415/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#767: Fix: `urlutils.find_all_links` raises a bare `ValueError` on a URL whose host contains a NUL byte | 3 test(s) fail on main and pass on the PR; 135 test(s) ran on main, 137 on the PR; 2 new test(s) pass, 132 unchanged; probe: claim(s) C1 proven | [PDF](boltons-767/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#779: Handle empty histogram counts when formatting | 1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides | [PDF](boltons-779/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#780: Fix statsutils convenience functions for iterable inputs | 1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C5 proven | [PDF](boltons-780/REPORT.pdf) |
