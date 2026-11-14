@@ -1,0 +1,730 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-780-022a64a964f7-2026-11-14",
+ "date_ist": "2026-11-14 12:13 IST",
+ "run_date": "2026-11-14",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 780,
+  "url": "https://github.com/mahmoud/boltons/pull/780",
+  "title": "Fix statsutils convenience functions for iterable inputs",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "022a64a964f769e155f0a4b530a6b8d325e50a20",
+  "merge_commit": "86aae79051d3315eb39116d777e36f01bbf23185",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "jaesungkr",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-14T01:09:55Z",
+ "updated_at_ist": "2026-11-14 06:39 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-14 12:13 IST",
+ "files": {
+  "all": [
+   "boltons/statsutils.py",
+   "tests/test_statsutils.py"
+  ],
+  "package_py": [
+   "boltons/statsutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_statsutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_statsutils.py, tests/test_statsutils_histogram.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "10 passed in 0.98s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "11 passed in 0.95s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "10 passed in 0.95s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "11 passed in 1.39s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "10 passed in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "11 passed in 0.98s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Explicit Stats(use_copy=False) behavior is unchanged.",
+   "pattern": "unchanged"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-780/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "boltons/statsutils.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 2.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "022a64a964f769e155f0a4b530a6b8d325e50a20",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); some AI probes were rejected",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.0 GB (of 15.6 GB).",
+   "Setup check: free disk 92.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "86aae79051d3315eb39116d777e36f01bbf23185",
+  "merge_commit": "86aae79051d3315eb39116d777e36f01bbf23185",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "022a64a964f769e155f0a4b530a6b8d325e50a20"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 86aae79051d3 (refs/pull/780/merge) of head 022a64a964f7"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "retry: nebius probes request failed: TimeoutError",
+   "probe 'p1' rejected: boltons.statsutils.mean does not exist; boltons.statsutils contains: Counter, Stats, bisect, ceil, describe, floor, format_histogram_counts",
+   "probe 'p2' rejected: boltons.statsutils.variance does not exist; boltons.statsutils contains: Counter, Stats, bisect, ceil, describe, floor, format_histogram_counts",
+   "probe 'p3' rejected: boltons.statsutils.mean does not exist; boltons.statsutils contains: Counter, Stats, bisect, ceil, describe, floor, format_histogram_counts"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Mean of a one\u2011shot iterator now returns 2.0 instead of raising TypeError.",
+    "source_quote": "Before this change, mean(iter([1, 2, 3])) raises TypeError; it now returns 2.0.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Derived statistics that need to revisit the input are now handled correctly.",
+    "source_quote": "The shared fix also handles derived statistics that revisit the input",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Empty iterators now return the configured default value.",
+    "source_quote": "and restores the configured default for empty iterators.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Sized, reusable inputs (lists, tuples, ranges, sets) continue to use the existing no\u2011copy path.",
+    "source_quote": "Sized, reusable inputs such as lists, tuples, ranges and sets retain the existing no-copy path.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "Using Stats with use_copy=False behaves exactly as before.",
+    "source_quote": "Explicit Stats(use_copy=False) behavior is unchanged.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "The baseline test suite (unchanged code) yields 775 passed tests and 22 subtests passed.",
+    "source_quote": "- Unchanged baseline: 775 passed, 22 subtests passed.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "A regression test against the unchanged code shows 1 failure and 8 passes.",
+    "source_quote": "- New regression against unchanged code: 1 failed, 8 passed.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "After the fix, the full test suite (including doctests) passes with 776 passed tests and 22 subtests passed.",
+    "source_quote": "- Fixed full suite, including doctests: 776 passed, 22 subtests passed.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "model_claims_filled": [
+   {
+    "id": "p4",
+    "claims": [
+     "C5"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p4.py",
+    "source": "model",
+    "sha256": "d1d64ca15ba765614524400d1f04b4a6bbf48411e461f258de5ccf4385f8ca0a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-14T07:11:07.942322+00:00",
+    "inputs_sha256": "ca7372ccfe331ff4423db1e3aca1d0f84e3733d47c47f29e861e1b27b6c2833c",
+    "inputs": {
+     "title_chars": 56,
+     "body_chars": 1524,
+     "base_files": {
+      "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-14T07:11:08.421265+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_statsutils.py",
+   "tests/test_statsutils_histogram.py"
+  ],
+  "pr": [
+   "tests/test_statsutils.py",
+   "tests/test_statsutils_histogram.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "86aae79051d3315eb39116d777e36f01bbf23185",
+   "installed": "86aae79051d3315eb39116d777e36f01bbf23185",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 10,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_statsutils::test_convenience_functions_accept_iterables"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 11,
+   "pr": 11
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_statsutils::test_convenience_functions_accept_iterables": "TypeError: object of type 'list_iterator' has no len()"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p4",
+    "source": "model",
+    "path": "model-probes/model-p4.py",
+    "sha256": "d1d64ca15ba765614524400d1f04b4a6bbf48411e461f258de5ccf4385f8ca0a",
+    "target": "mahmoud/boltons#780",
+    "about": "C5",
+    "claims": [
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "Using Stats with use_copy=False behaves exactly as before.",
+      "covers": [
+       "c5.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p4-main-1.jsonl",
+      "probe-model-p4-main-2.jsonl",
+      "probe-model-p4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p4-pr-1.jsonl",
+      "probe-model-p4-pr-2.jsonl",
+      "probe-model-p4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c5.stats_use_copy_false": 2.0
+      },
+      {
+       "c5.stats_use_copy_false": 2.0
+      },
+      {
+       "c5.stats_use_copy_false": 2.0
+      }
+     ],
+     "pr": [
+      {
+       "c5.stats_use_copy_false": 2.0
+      },
+      {
+       "c5.stats_use_copy_false": 2.0
+      },
+      {
+       "c5.stats_use_copy_false": 2.0
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c5.stats_use_copy_false",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": 2.0,
+      "pr": 2.0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.stats_use_copy_false\""
+       },
+       "pr": {
+        "file": "probe-model-p4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.stats_use_copy_false\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "d1d64ca15ba765614524400d1f04b4a6bbf48411e461f258de5ccf4385f8ca0a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-14T07:11:07.942322+00:00",
+     "inputs_sha256": "ca7372ccfe331ff4423db1e3aca1d0f84e3733d47c47f29e861e1b27b6c2833c",
+     "inputs": {
+      "title_chars": 56,
+      "body_chars": 1524,
+      "base_files": {
+       "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-14T07:11:08.421265+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/statsutils.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p4.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C5"
+   ],
+   "reason": "probe: claim(s) C5 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p4": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C5 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C5 proven",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/statsutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_statsutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 1709.1,
+  "tests": 10.4
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 1,
+  "input_tokens": 9986,
+  "output_tokens": 20068,
+  "thinking_tokens": 18802,
+  "cost_usd": 0.021057,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.021057,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 1709.1,
+   "tests": 10.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.11394,
+  "total_cost_usd": 0.134997,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-14/ef12096/boltons-780"
+ }
+}
