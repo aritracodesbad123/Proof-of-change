@@ -1,0 +1,1453 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-779-095c8f1e362b-2026-11-14",
+ "date_ist": "2026-11-14 12:41 IST",
+ "run_date": "2026-11-14",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 779,
+  "url": "https://github.com/mahmoud/boltons/pull/779",
+  "title": "Handle empty histogram counts when formatting",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "095c8f1e362b1eddb61056cf20f64d1fc04a5f77",
+  "merge_commit": "11ae6b611064bc4aae24fde1fbb9cd6d91d7a611",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-14T00:07:16Z",
+ "updated_at_ist": "2026-11-14 05:37 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-14 12:41 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/statsutils.py",
+   "tests/test_statsutils.py"
+  ],
+  "package_py": [
+   "boltons/statsutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_statsutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_statsutils.py, tests/test_statsutils_histogram.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "10 passed in 0.94s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "11 passed in 1.01s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "10 passed in 1.00s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "11 passed in 1.00s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "10 passed in 1.01s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 11,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "11 passed in 0.96s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-779/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "boltons/statsutils.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 2.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "095c8f1e362b1eddb61056cf20f64d1fc04a5f77",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.4 GB (of 15.6 GB).",
+   "Setup check: free disk 92.6 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "11ae6b611064bc4aae24fde1fbb9cd6d91d7a611",
+  "merge_commit": "11ae6b611064bc4aae24fde1fbb9cd6d91d7a611",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "095c8f1e362b1eddb61056cf20f64d1fc04a5f77"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 11ae6b611064 (refs/pull/779/merge) of head 095c8f1e362b"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When all rows are filtered out (i.e., the input counts list is empty), `format_histogram_counts` returns an empty string.",
+    "source_quote": "Return an empty string when filtering removes every row from the counts passed to `format_histogram_counts`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Previously, calling `format_histogram_counts` with an empty list caused a `ValueError` because `max()` was invoked on an empty list.",
+    "source_quote": "The previous code called `max()` on an empty list and raised `ValueError`.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "diff_targets": [
+   "boltons.statsutils.format_histogram_counts"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "38715d9735dcef6a3a593e6b7459140fe11fd3ef5a2a6fb254b7691c268b4054",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-14T07:12:13.827174+00:00",
+    "inputs_sha256": "d76cab32b5c5ed77d908828a98fd2b54e5be9c90b81f72497777756ec42926fa",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 888,
+     "base_files": {
+      "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "311af5c892f21ba2ad3dbc988e09bcf37aa76ea4303f56f3d095ca9e53469df0",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-14T07:12:13.829659+00:00",
+    "inputs_sha256": "2b657b3e7d4b5dfd8817d54d35bfb90bddbe13161ef3e46744e45356c2fa9384",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-14T07:12:14.039955+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_statsutils.py",
+   "tests/test_statsutils_histogram.py"
+  ],
+  "pr": [
+   "tests/test_statsutils.py",
+   "tests/test_statsutils_histogram.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "11ae6b611064bc4aae24fde1fbb9cd6d91d7a611",
+   "installed": "11ae6b611064bc4aae24fde1fbb9cd6d91d7a611",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 10,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_statsutils::test_format_histogram_counts_after_filtering_out_all_bins"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 11,
+   "pr": 11
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_statsutils::test_format_histogram_counts_after_filtering_out_all_bins": "ValueError: max() iterable argument is empty"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "38715d9735dcef6a3a593e6b7459140fe11fd3ef5a2a6fb254b7691c268b4054",
+    "target": "mahmoud/boltons#779",
+    "about": "Test format_histogram_counts with empty and non-empty inputs.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When all rows are filtered out (i.e., the input counts list is empty), `format_histogram_counts` returns an empty string.",
+      "covers": [
+       "c1.empty_out"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Previously, calling `format_histogram_counts` with an empty list caused a `ValueError` because `max()` was invoked on an empty list.",
+      "covers": [
+       "c2.empty_err"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.empty_out": null,
+       "c2.empty_err": "ValueError",
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      },
+      {
+       "c1.empty_out": null,
+       "c2.empty_err": "ValueError",
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      },
+      {
+       "c1.empty_out": null,
+       "c2.empty_err": "ValueError",
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      }
+     ],
+     "pr": [
+      {
+       "c1.empty_out": "",
+       "c2.empty_err": null,
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      },
+      {
+       "c1.empty_out": "",
+       "c2.empty_err": null,
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      },
+      {
+       "c1.empty_out": "",
+       "c2.empty_err": null,
+       "c1.nonempty": " 0: 5 #########################################################################\n10: 3 ############################################"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.empty_out",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": "",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": ""
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.empty_out\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.empty_out\""
+       }
+      }
+     },
+     {
+      "name": "c1.nonempty",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": " 0: 5 #########################################################################\n10: 3 ############################################",
+      "pr": " 0: 5 #########################################################################\n10: 3 ############################################",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.nonempty\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.nonempty\""
+       }
+      }
+     },
+     {
+      "name": "c2.empty_err",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "ValueError",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "ValueError",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.empty_err\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.empty_err\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "38715d9735dcef6a3a593e6b7459140fe11fd3ef5a2a6fb254b7691c268b4054",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-14T07:12:13.827174+00:00",
+     "inputs_sha256": "d76cab32b5c5ed77d908828a98fd2b54e5be9c90b81f72497777756ec42926fa",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 888,
+      "base_files": {
+       "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-14T07:12:14.039955+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/statsutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "311af5c892f21ba2ad3dbc988e09bcf37aa76ea4303f56f3d095ca9e53469df0",
+    "target": "mahmoud/boltons#779",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input11": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input11": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input11": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": {
+        "raises": "ValueError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": "",
+       "boltons.statsutils.format_histogram_counts.input11": "",
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": ""
+      },
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": "",
+       "boltons.statsutils.format_histogram_counts.input11": "",
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": ""
+      },
+      {
+       "boltons.statsutils.format_histogram_counts.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input10": "",
+       "boltons.statsutils.format_histogram_counts.input11": "",
+       "boltons.statsutils.format_histogram_counts.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.statsutils.format_histogram_counts.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.statsutils.format_histogram_counts.input9": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input10",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": "",
+      "diffs": [
+       {
+        "field": "",
+        "main": {
+         "raises": "ValueError"
+        },
+        "pr": ""
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input11",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": "",
+      "diffs": [
+       {
+        "field": "",
+        "main": {
+         "raises": "ValueError"
+        },
+        "pr": ""
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": {
+       "raises": "ValueError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.statsutils.format_histogram_counts.input9",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": "",
+      "diffs": [
+       {
+        "field": "",
+        "main": {
+         "raises": "ValueError"
+        },
+        "pr": ""
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.statsutils.format_histogram_counts.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "311af5c892f21ba2ad3dbc988e09bcf37aa76ea4303f56f3d095ca9e53469df0",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-14T07:12:13.829659+00:00",
+     "inputs_sha256": "2b657b3e7d4b5dfd8817d54d35bfb90bddbe13161ef3e46744e45356c2fa9384",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/statsutils.py": "374e390e77eadbe15c1fecba3883e2e1e94cda5d50f1cdc1acd47ae3a553cc64"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-14T07:12:14.039955+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/statsutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "no_difference",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "unmentioned",
+    "unmentioned",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "unmentioned"
+   ],
+   "flagged": [
+    {
+     "probe": "diff-api",
+     "name": "boltons.statsutils.format_histogram_counts.input10",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "diff-api",
+     "name": "boltons.statsutils.format_histogram_counts.input11",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "diff-api",
+     "name": "boltons.statsutils.format_histogram_counts.input9",
+     "label": "unmentioned",
+     "claim": null
+    }
+   ],
+   "proven_claims": [
+    "C1",
+    "C2"
+   ],
+   "reason": "probe: 3 observation(s) need attention: boltons.statsutils.format_histogram_counts.input10 differs and no claim covers it; boltons.statsutils.format_histogram_counts.input11 differs and no claim covers it; boltons.statsutils.format_histogram_counts.input9 differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; probe: 9 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 10 unchanged; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/statsutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_statsutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 65.9,
+  "tests": 10.0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 18466,
+  "output_tokens": 3772,
+  "thinking_tokens": 3296,
+  "cost_usd": 0.008935,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.008935,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 65.9,
+   "tests": 10.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.004393,
+  "total_cost_usd": 0.013328,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-14/ef12096/boltons-779"
+ }
+}
