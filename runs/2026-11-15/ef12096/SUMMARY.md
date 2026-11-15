@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-15 on ef12096
 
-4 report(s) in this folder: 1 need attention, 3 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+5 report(s) in this folder: 1 need attention, 4 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -8,6 +8,7 @@
 - **COULD NOT VERIFY**: pallets/click#3921: Python 3.11 cleanups. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1425 test(s) ran on main, 1427 on the PR; 2 new test(s) pass, 1448 unchanged (23 of them skipped on both sides)
 - **COULD NOT VERIFY**: PyCQA/isort#2791: Fix add_imports relocating a leading isort: skip import below the sorted block. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 179 test(s) ran on main, 179 on the PR; 0 new test(s) pass, 178 unchanged
 - **COULD NOT VERIFY**: prettytable/prettytable#546: Escape LaTeX special characters in get_latex_string(). Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 281 test(s) ran on main, 281 on the PR; 0 new test(s) pass, 280 unchanged
+- **COULD NOT VERIFY**: andialbrecht/sqlparse#884: identifier_case: keep the case of backtick-, acute- and bracket-quoted identifiers. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides)
 
 ## All reports
 
@@ -17,3 +18,4 @@
 | COULD NOT VERIFY | pallets/click#3921: Python 3.11 cleanups | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1425 test(s) ran on main, 1427 on the PR; 2 new test(s) pass, 1448 unchanged (23 of them skipped on both sides) | [PDF](click-3921/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2791: Fix add_imports relocating a leading isort: skip import below the sorted block | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 179 test(s) ran on main, 179 on the PR; 0 new test(s) pass, 178 unchanged | [PDF](isort-2791/REPORT.pdf) |
 | COULD NOT VERIFY | prettytable/prettytable#546: Escape LaTeX special characters in get_latex_string() | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 281 test(s) ran on main, 281 on the PR; 0 new test(s) pass, 280 unchanged | [PDF](prettytable-546/REPORT.pdf) |
+| COULD NOT VERIFY | andialbrecht/sqlparse#884: identifier_case: keep the case of backtick-, acute- and bracket-quoted identifiers | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides) | [PDF](sqlparse-884/REPORT.pdf) |

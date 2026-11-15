@@ -1,0 +1,550 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-884-51d5063be131-2026-11-15",
+ "date_ist": "2026-11-15 11:30 IST",
+ "run_date": "2026-11-15",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 884,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/884",
+  "title": "identifier_case: keep the case of backtick-, acute- and bracket-quoted identifiers",
+  "base_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+  "merge_commit": null,
+  "tested_main_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "dylanpulver",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-01T12:30:51Z",
+ "updated_at_ist": "2026-11-01 18:00 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-15 11:30 IST",
+ "files": {
+  "all": [
+   "CHANGELOG",
+   "sqlparse/filters/tokens.py",
+   "tests/test_format.py"
+  ],
+  "package_py": [
+   "sqlparse/filters/tokens.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG",
+   "tests/test_format.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_format.py, tests/test_dos_prevention.py, tests/test_grouping.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.9,
+   "pytest_summary": "172 passed, 2 xfailed in 1.31s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "181 passed, 2 xfailed in 1.32s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "172 passed, 2 xfailed in 1.25s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "181 passed, 2 xfailed in 1.33s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "172 passed, 2 xfailed in 1.25s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "181 passed, 2 xfailed in 1.25s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-884/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "sqlparse/filters/tokens.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 2.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "unstable",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.2 GB (of 15.6 GB).",
+   "Setup check: free disk 92.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse/pyproject.toml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/pyproject.toml",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+   "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install build (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/python-app.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "benchmarks/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "build",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "build"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: build."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "build",
+    "requirement": "build",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 884,
+  "head_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+  "base_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "pr_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "master @ 20caed831605 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 51d5063be131"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius probes request failed: TimeoutError"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "IdentifierCaseFilter will preserve the original case of backtick-quoted identifiers when identifier_case is set.",
+    "source_quote": "`test_identifiercase_quotes` already pins the intended behaviour for `\"...\"`; this extends it to the other three.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "IdentifierCaseFilter will preserve the original case of acute-accent-quoted identifiers when identifier_case is set.",
+    "source_quote": "`test_identifiercase_quotes` already pins the intended behaviour for `\"...\"`; this extends it to the other three.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "IdentifierCaseFilter will preserve the original case of bracket-quoted identifiers when identifier_case is set.",
+    "source_quote": "`test_identifiercase_quotes` already pins the intended behaviour for `\"...\"`; this extends it to the other three.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "After applying the PR, the test suite yields 515 passed tests on Python 3.10-3.14, compared to 506 passed on the unmodified master.",
+    "source_quote": "**Ran:** `make test` \u2192 **515 passed** on 3.10/3.11/3.12/3.13/3.14 (unmodified master in the same session: **506 passed**; the 9 extra are the new parametrized cases).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Reverting only filters/tokens.py causes the 9 new test cases to fail.",
+    "source_quote": "**Two mutants, same command and env:** reverting only `filters/tokens.py` fails 9/9 of the new cases;",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "A naive fix that exempts just the backtick still fails 6/9 of the new cases.",
+    "source_quote": "a naive fix that exempts just the backtick still fails 6/9.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "build"
+ ],
+ "pr_side_started_at": "2026-11-15T06:04:34.497841+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_format.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_grouping.py"
+  ],
+  "pr": [
+   "tests/test_format.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_grouping.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sqlparse",
+   "expected": "20caed831605ec341ed670302f6b0f17685f156d",
+   "installed": "20caed831605ec341ed670302f6b0f17685f156d",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sqlparse",
+   "expected": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+   "installed": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+   "ok": true
+  }
+ },
+ "base_head_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+ "comparison": {
+  "same": 174,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from `myS`.`Tbl`]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from `myS`.`Tbl`]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from `myS`.`Tbl`]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 181,
+   "pr": 181
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [mys].[tbl]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4mys\u00b4.\u00b4tbl\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `mys`.`tbl`' == 'select * from `myS`.`Tbl`'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [mys].[tbl]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4mys\u00b4.\u00b4tbl\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `mys`.`tbl`' == 'select * from `myS`.`Tbl`'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [MYS].[TBL]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4MYS\u00b4.\u00b4TBL\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `MYS`.`TBL`' == 'select * from `myS`.`Tbl`'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides)",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/filters/tokens.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG",
+   "tests/test_format.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 269.5,
+  "tests": 10.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 1,
+  "input_tokens": 746,
+  "output_tokens": 1874,
+  "thinking_tokens": 1353,
+  "cost_usd": 0.00191,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.00191,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 269.5,
+   "tests": 10.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.017967,
+  "total_cost_usd": 0.019877,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-15/ef12096/sqlparse-884"
+ }
+}
