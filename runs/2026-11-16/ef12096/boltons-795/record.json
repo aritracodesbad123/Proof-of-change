@@ -1,0 +1,555 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-795-3c566a0842db-2026-11-16",
+ "date_ist": "2026-11-16 11:42 IST",
+ "run_date": "2026-11-16",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 795,
+  "url": "https://github.com/mahmoud/boltons/pull/795",
+  "title": "Preserve text after variable-width SpooledStringIO overwrites",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3c566a0842db15493c0ffce66f7cc644d467e210",
+  "merge_commit": "9cc56bfc00b946c61ab34417ad3b55414e3fb680",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "anticipate218",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-16T01:16:26Z",
+ "updated_at_ist": "2026-11-16 06:46 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-16 11:42 IST",
+ "files": {
+  "all": [
+   "boltons/ioutils.py",
+   "tests/test_ioutils_overwrite.py"
+  ],
+  "package_py": [
+   "boltons/ioutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_ioutils_overwrite.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_ioutils_overwrite.py, tests/test_ioutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 96,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "96 passed, 22 subtests passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 133,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "133 passed, 22 subtests passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 96,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "96 passed, 22 subtests passed in 0.51s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 133,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "133 passed, 22 subtests passed in 0.55s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 96,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "96 passed, 22 subtests passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 133,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "133 passed, 22 subtests passed in 0.54s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Measure the encoded span of the characters being replaced, then move the untouched suffix in bounded chunks before writing.",
+   "pattern": "untouched"
+  },
+  {
+   "source": "PR description",
+   "quote": "This change is focused on character replacement and preserving the untouched suffix.",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-795/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 33,
+  "changed_lines_covered": 33,
+  "files": [
+   {
+    "file": "boltons/ioutils.py",
+    "changed_lines_total": 33,
+    "changed_lines_covered": 33
+   }
+  ],
+  "seconds": 1.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "3c566a0842db15493c0ffce66f7cc644d467e210",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.4 GB (of 15.6 GB).",
+   "Setup check: free disk 92.6 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.github/workflows/tests.yaml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/.github/workflows/tests.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "9cc56bfc00b946c61ab34417ad3b55414e3fb680",
+  "merge_commit": "9cc56bfc00b946c61ab34417ad3b55414e3fb680",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "3c566a0842db15493c0ffce66f7cc644d467e210"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 9cc56bfc00b9 (refs/pull/795/merge) of head 3c566a0842db"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe-all' rejected: cannot bind boltons.ioutils.SpooledStringIO: SpooledStringIO() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After the fix, SpooledStringIO preserves text after variable-width overwrites.",
+    "source_quote": "Preserve text after variable-width SpooledStringIO overwrites",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The fix prevents stray continuation bytes when replacing a multi-byte UTF-8 character with a single-byte one.",
+    "source_quote": "Replacing \"\u00e9\" with \"a\" can leave a stray continuation byte; replacing \"a\" with \"\u00e9\" can consume the following character.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The fix prevents consumption of the following character when replacing a single-byte UTF-8 character with a multi-byte one.",
+    "source_quote": "Replacing \"\u00e9\" with \"a\" can leave a stray continuation byte; replacing \"a\" with \"\u00e9\" can consume the following character.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "After the fix, SpooledStringIO behaves identically to io.StringIO for valid-position read/write/seek operations.",
+    "source_quote": "A deterministic comparison against io.StringIO passed 30,000 valid-position read/write/seek operations.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "After the fix, all regression tests for SpooledStringIO pass (previously some failed).",
+    "source_quote": "Final new tests on unchanged upstream: 28 failed, 9 passed; fixed: all 37 passed.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-16T06:14:26.124634+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_ioutils.py"
+  ],
+  "pr": [
+   "tests/test_ioutils_overwrite.py",
+   "tests/test_ioutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "9cc56bfc00b946c61ab34417ad3b55414e3fb680",
+   "installed": "9cc56bfc00b946c61ab34417ad3b55414e3fb680",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 96,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[automatic-read]",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[automatic-readline]",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[memory-read]",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[memory-readline]",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[rolled-read]",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[rolled-readline]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[automatic-\\U0001f642-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[automatic-a-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[memory-\\U0001f642-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[memory-a-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[rolled-\\U0001f642-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[rolled-a-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_rolls_when_the_tail_pushes_size_over_the_limit",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-A\\U0001f642\\u4e2dZ-1-\\xe9]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-A\\xe9\\u4e2dZ-1-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-\\u4e2dtail-0-\\U0001f642\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-\\xe9\\xe9-0-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-ab-0-\\xe9]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-A\\U0001f642\\u4e2dZ-1-\\xe9]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-A\\xe9\\u4e2dZ-1-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-\\u4e2dtail-0-\\U0001f642\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-\\xe9\\xe9-0-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-ab-0-\\xe9]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-A\\U0001f642\\u4e2dZ-1-\\xe9]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-A\\xe9\\u4e2dZ-1-\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-\\u4e2dtail-0-\\U0001f642\\U0001f642]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-\\xe9\\xe9-0-a]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-ab-0-\\xe9]"
+  ],
+  "new_tests_passing": 9,
+  "new_tests_passing_ids": [
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-\\xe9\\u4e2d\\U0001f642-1-\\u754c]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-a\\U0001f642-1-\\u754cmore]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-abcd-1-XY]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-\\xe9\\u4e2d\\U0001f642-1-\\u754c]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-a\\U0001f642-1-\\u754cmore]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-abcd-1-XY]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-\\xe9\\u4e2d\\U0001f642-1-\\u754c]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-a\\U0001f642-1-\\u754cmore]",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-abcd-1-XY]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 124,
+   "pr": 133
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[automatic-read]": "AssertionError: assert '\u00e9\ud83d\ude42st\\nsecond\\nthird' == '\u00e9\ud83d\ude42first\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[automatic-readline]": "AssertionError: assert '\u00e9\\nfirst\\nsecond\\nthird\ud83d\ude42' == '\u00e9\\n\ud83d\ude42irst\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[memory-read]": "AssertionError: assert '\u00e9\ud83d\ude42st\\nsecond\\nthird' == '\u00e9\ud83d\ude42first\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[memory-readline]": "AssertionError: assert '\u00e9\\nfirst\\nsecond\\nthird\ud83d\ude42' == '\u00e9\\n\ud83d\ude42irst\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[rolled-read]": "AssertionError: assert '\u00e9\ud83d\ude42st\\nsecond\\nthird' == '\u00e9\ud83d\ude42first\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_after_read[rolled-readline]": "AssertionError: assert '\u00e9\\nfirst\\nsecond\\nthird\ud83d\ude42' == '\u00e9\\n\ud83d\ude42irst\\nsecond\\nthird'",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[automatic-\\U0001f642-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9f in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[automatic-a-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb8 in position 4: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[memory-\\U0001f642-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9f in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[memory-a-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb8 in position 4: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[rolled-\\U0001f642-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9f in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_preserves_a_large_tail[rolled-a-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb8 in position 4: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_rolls_when_the_tail_pushes_size_over_the_limit": "AssertionError: assert False",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-A\\U0001f642\\u4e2dZ-1-\\xe9]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x99 in position 3: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-A\\xe9\\u4e2dZ-1-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xad in position 5: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-\\u4e2dtail-0-\\U0001f642\\U0001f642]": "AssertionError: assert '\ud83d\ude42\ud83d\ude42' == '\ud83d\ude42\ud83d\ude42ail'",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-\\xe9\\xe9-0-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa9 in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[automatic-ab-0-\\xe9]": "AssertionError: assert '\u00e9' == '\u00e9b'",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-A\\U0001f642\\u4e2dZ-1-\\xe9]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x99 in position 3: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-A\\xe9\\u4e2dZ-1-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xad in position 5: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-\\u4e2dtail-0-\\U0001f642\\U0001f642]": "AssertionError: assert '\ud83d\ude42\ud83d\ude42' == '\ud83d\ude42\ud83d\ude42ail'",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-\\xe9\\xe9-0-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa9 in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[memory-ab-0-\\xe9]": "AssertionError: assert '\u00e9' == '\u00e9b'",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-A\\U0001f642\\u4e2dZ-1-\\xe9]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x99 in position 3: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-A\\xe9\\u4e2dZ-1-\\U0001f642]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xad in position 5: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-\\u4e2dtail-0-\\U0001f642\\U0001f642]": "AssertionError: assert '\ud83d\ude42\ud83d\ude42' == '\ud83d\ude42\ud83d\ude42ail'",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-\\xe9\\xe9-0-a]": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa9 in position 1: invalid start byte",
+   "tests.test_ioutils_overwrite::test_overwrite_unicode_characters[rolled-ab-0-\\xe9]": "AssertionError: assert '\u00e9' == '\u00e9b'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "unverified behaviour claim: \"Measure the encoded span of the characters being replaced, then move the untouched suffix in bounded chunks before writing.\" (+1 more); needs a probe (28 test(s) fail on main and pass on the PR; 124 test(s) ran on main, 133 on the PR; 9 new test(s) pass, 96 unchanged)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "unverified behaviour claim: \"Measure the encoded span of the characters being replaced, then move the untouched suffix in bounded chunks before writing.\" (+1 more); needs a probe (28 test(s) fail on main and pass on the PR; 124 test(s) ran on main, 133 on the PR; 9 new test(s) pass, 96 unchanged)",
+ "changed_lines_total": 33,
+ "changed_lines_covered": 33,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "33 of 33 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/ioutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_ioutils_overwrite.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 147.6,
+  "tests": 5.8
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 12925,
+  "output_tokens": 15188,
+  "thinking_tokens": 12155,
+  "cost_usd": 0.017547,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017547,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 147.6,
+   "tests": 5.8
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00984,
+  "total_cost_usd": 0.027387,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-16/ef12096/boltons-795"
+ }
+}
