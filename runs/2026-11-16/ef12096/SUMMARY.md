@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-16 on ef12096
 
-4 report(s) in this folder: 1 need attention, 2 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+5 report(s) in this folder: 1 need attention, 2 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -16,3 +16,4 @@
 | COULD NOT VERIFY | mahmoud/boltons#794: Preserve hidden basenames in augpath multidot mode | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 4 test(s) fail on main and pass on the PR; 9 test(s) ran on main, 9 on the PR; 0 new test(s) pass, 5 unchanged | [PDF](boltons-794/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#795: Preserve text after variable-width SpooledStringIO overwrites | Unverified behaviour claim: "Measure the encoded span of the characters being replaced, then move the untouched suffix in bounded chunks before writing." (+1 more); needs a probe (28 test(s) fail on main and pass on the PR; 124 test(s) ran on main, 133 on the PR; 9 new test(s) pass, 96 unchanged) | [PDF](boltons-795/REPORT.pdf) |
 | VERIFIED | pyinvoke/invoke#1086: Fix #462: load_source returns empty dict if file does not exist | 1 test(s) fail on main and pass on the PR; 209 test(s) ran on main, 209 on the PR; 0 new test(s) pass, 210 unchanged (2 of them skipped on both sides); probe: claim(s) C1, C2, C3, C4, C5 proven | [PDF](invoke-1086/REPORT.pdf) |
+| VERIFIED | PyCQA/isort#2664: Emit semicolon-introducing continuations unchanged | Cross-run settled differs claim(s) C1 as proven (8 new or changed test(s) fail on the base and pass on the PR: tests.unit.test_regressions::test_semicolon_continuation_does_not_shift_later_imports_issue_1918, tests.unit.test_regressions::test_semicolon_continuation_keeps_hash_inside_string_issue_1918, tests.unit.test_regressions::test_semicolon_continuation_slice_covers_comment_lines_issue_1918 (+5 more)); 8 test(s) fail on main and pass on the PR; 175 test(s) ran on main, 175 on the PR; 0 new test(s) pass, 167 unchanged | [PDF](isort-2664/REPORT.pdf) |
