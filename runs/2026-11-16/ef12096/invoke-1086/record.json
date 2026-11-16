@@ -1,0 +1,1916 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-1086-b1587ff925f6-2026-11-16",
+ "date_ist": "2026-11-16 11:33 IST",
+ "run_date": "2026-11-16",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 1086,
+  "url": "https://github.com/pyinvoke/invoke/pull/1086",
+  "title": "Fix #462: load_source returns empty dict if file does not exist",
+  "base_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b1587ff925f68966e9ec530290286c563bfebbba",
+  "merge_commit": "79ac39af09b4a484a29ce1580e2e7ce8218035fc",
+  "tested_main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "aoright",
+ "base_ref": "main",
+ "updated_at_utc": "2026-09-11T08:19:08Z",
+ "updated_at_ist": "2026-09-11 13:49 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-16 11:33 IST",
+ "files": {
+  "all": [
+   "invoke/config.py",
+   "tests/config.py"
+  ],
+  "package_py": [
+   "invoke/config.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/config.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/config.py, tests/context.py, tests/merge_dicts.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 208,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "208 passed, 2 skipped, 5 warnings in 1.06s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 209,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "209 passed, 2 skipped, 5 warnings in 1.11s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 208,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "208 passed, 2 skipped, 5 warnings in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 209,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "209 passed, 2 skipped, 5 warnings in 1.05s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 208,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "208 passed, 2 skipped, 5 warnings in 1.12s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 209,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "209 passed, 2 skipped, 5 warnings in 1.06s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-1086/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "invoke/config.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 3.3,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "b1587ff925f68966e9ec530290286c563bfebbba",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "unstable",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.8 GB (of 15.6 GB).",
+   "Setup check: free disk 92.6 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
+   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+   "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: could_not_verify: tests produced no results on both sides (collection failed; see pytest logs); probe: claim(s) C1, C2, C3, C4, C5 proven",
+   "After rerun: verified: 1 test(s) fail on main and pass on the PR; 209 test(s) ran on main, 209 on the PR; 0 new test(s) pass, 210 unchanged (2 of them skipped on both sides); probe: claim(s) C1, C2, C3, C4, C5 proven"
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "icecream",
+    "requirement": "icecream>=2.1",
+    "version": "2.2.0",
+    "versions": {
+     "main": "2.2.0",
+     "pr": "2.2.0"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "tests produced no results on both sides (collection failed; see pytest logs); probe: claim(s) C1, C2, C3, C4, C5 proven"
+    },
+    {
+     "round": 2,
+     "verdict": "verified",
+     "reason": "1 test(s) fail on main and pass on the PR; 209 test(s) ran on main, 209 on the PR; 0 new test(s) pass, 210 unchanged (2 of them skipped on both sides); probe: claim(s) C1, C2, C3, C4, C5 proven"
+    }
+   ],
+   "installed": [
+    {
+     "package": "icecream",
+     "requirement": "icecream>=2.1",
+     "version": "2.2.0",
+     "versions": {
+      "main": "2.2.0",
+      "pr": "2.2.0"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "chosen": {
+  "pr": 1086,
+  "head_sha": "b1587ff925f68966e9ec530290286c563bfebbba",
+  "base_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "pr_sha": "79ac39af09b4a484a29ce1580e2e7ce8218035fc",
+  "merge_commit": "79ac39af09b4a484a29ce1580e2e7ce8218035fc",
+  "merge_parents": [
+   "6a71e680c535ba6520e935c497099fbca011d03c",
+   "b1587ff925f68966e9ec530290286c563bfebbba"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 6a71e680c535 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 79ac39af09b4 (refs/pull/1086/merge) of head b1587ff925f6"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "load_source returns an empty dict when the .py config file does not exist.",
+    "source_quote": "load_source was returning an empty `{}` instead of raising `IOError` when the `.py` config file is missing.",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C2",
+    "text": "load_source raises an IOError when the .py config file does not exist.",
+    "source_quote": "This PR fixes `load_source` to raise an `IOError` when the file does not exist",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Config._load_file treats a missing .py config file as an empty successful config and incorrectly sets `_found` to `True`.",
+    "source_quote": "This led to `Config._load_file` treating it as an empty successful config and incorrectly setting `_found` to `True` even when the file wasn't there.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "After the fix, Config._load_file correctly catches the IOError and marks `_found` as `False` for a missing .py config file.",
+    "source_quote": "This PR fixes `load_source` to raise an `IOError` when the file does not exist, allowing `_load_file` to correctly catch the exception and mark the file as not found.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "A test has been added to ensure `load_project()` marks `_project_found` as `False` when the file doesn't exist.",
+    "source_quote": "A test has been added to ensure `load_project()` marks `_project_found` as `False` when the file doesn't exist.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C1",
+    "source_quote": "load_source was returning an empty `{}` instead of raising `IOError` when the `.py` config file is missing."
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "invoke.config.load_source"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "8e36c05ab9d8f9f7d398fec3440719d73c8c73b8aa5b12de72d77e0415acd559",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-16T06:07:22.056519+00:00",
+    "inputs_sha256": "1a67d850e844a5a7001788e7562cf28910691c00325d74b31499570c0bf0a675",
+    "inputs": {
+     "title_chars": 63,
+     "body_chars": 707,
+     "base_files": {
+      "invoke/config.py": "97f2c5ab9bab1bc26466b35ef32b7647faabd96cfa72ea9eb891b3f8ae6af70e"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "61919d30c2153c127827150027362dd5b1a3dc26e4ff46d2e5a9d92bd9cc8a3f",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-16T06:07:22.060112+00:00",
+    "inputs_sha256": "486d3f82cba5d39f81c39b111d9df4b9263b188a15c87bc1105211f63836ce67",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "invoke/config.py": "97f2c5ab9bab1bc26466b35ef32b7647faabd96cfa72ea9eb891b3f8ae6af70e"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-relaxed>=2"
+ ],
+ "pr_side_started_at": "2026-11-16T06:07:22.210631+00:00",
+ "test_targets": {
+  "main": [
+   "tests/config.py",
+   "tests/context.py",
+   "tests/merge_dicts.py"
+  ],
+  "pr": [
+   "tests/config.py",
+   "tests/context.py",
+   "tests/merge_dicts.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "invoke",
+   "expected": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "installed": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "ok": true
+  },
+  "pr": {
+   "dist": "invoke",
+   "expected": "79ac39af09b4a484a29ce1580e2e7ce8218035fc",
+   "installed": "79ac39af09b4a484a29ce1580e2e7ce8218035fc",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-relaxed>=2"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+ "base_new_tests": {
+  "ids": [
+   "tests/config.py::Config_::config_file_loading::missing_file_marks_found_false"
+  ],
+  "passed_on_base": [],
+  "failed_on_base": [
+   "tests/config.py::Config_::config_file_loading::missing_file_marks_found_false"
+  ],
+  "not_collected": [],
+  "collection_failed": [],
+  "discovery_empty": [],
+  "shared_ids": [
+   "tests/config.py::Config_::class_attrs::prefix::defaults_to_invoke",
+   "tests/config.py::Config_::class_attrs::prefix::informs_config_filenames",
+   "tests/config.py::Config_::class_attrs::prefix::informs_env_var_prefix",
+   "tests/config.py::Config_::class_attrs::file_prefix::defaults_to_None",
+   "tests/config.py::Config_::class_attrs::file_prefix::informs_config_filenames",
+   "tests/config.py::Config_::class_attrs::env_prefix::defaults_to_None",
+   "tests/config.py::Config_::class_attrs::env_prefix::informs_env_vars_loaded",
+   "tests/config.py::Config_::global_defaults::basic_settings",
+   "tests/config.py::Config_::init::can_be_empty",
+   "tests/config.py::Config_::init::configure_global_location_prefix",
+   "tests/config.py::Config_::init::default_system_prefix_is_etc",
+   "tests/config.py::Config_::init::configure_user_location_prefix",
+   "tests/config.py::Config_::init::default_user_prefix_is_homedir_plus_dot",
+   "tests/config.py::Config_::init::configure_project_location",
+   "tests/config.py::Config_::init::configure_runtime_path",
+   "tests/config.py::Config_::init::accepts_defaults_dict_kwarg",
+   "tests/config.py::Config_::init::overrides_dict_is_first_posarg",
+   "tests/config.py::Config_::init::overrides_dict_is_also_a_kwarg",
+   "tests/config.py::Config_::init::system_and_user_files_loaded_automatically",
+   "tests/config.py::Config_::init::can_defer_loading_system_and_user_files",
+   "tests/config.py::Config_::basic_API::can_be_used_directly_after_init",
+   "tests/config.py::Config_::basic_API::allows_dict_and_attr_access",
+   "tests/config.py::Config_::basic_API::nested_dict_values_also_allow_dual_access",
+   "tests/config.py::Config_::basic_API::attr_access_has_useful_error_msg",
+   "tests/config.py::Config_::basic_API::subkeys_get_merged_not_overwritten",
+   "tests/config.py::Config_::basic_API::is_iterable_like_dict",
+   "tests/config.py::Config_::basic_API::supports_readonly_dict_protocols",
+   "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::defaults_can_be_given_via_method",
+   "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::defaults_can_skip_merging",
+   "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::overrides_can_be_given_via_method",
+   "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::overrides_can_skip_merging",
+   "tests/config.py::Config_::basic_API::deletion_methods::pop",
+   "tests/config.py::Config_::basic_API::deletion_methods::delitem",
+   "tests/config.py::Config_::basic_API::deletion_methods::delattr",
+   "tests/config.py::Config_::basic_API::deletion_methods::clear",
+   "tests/config.py::Config_::basic_API::deletion_methods::popitem",
+   "tests/config.py::Config_::basic_API::modification_methods::setitem",
+   "tests/config.py::Config_::basic_API::modification_methods::setdefault",
+   "tests/config.py::Config_::basic_API::modification_methods::update",
+   "tests/config.py::Config_::basic_API::reinstatement_of_deleted_values_works_ok",
+   "tests/config.py::Config_::basic_API::deleting_parent_keys_of_deleted_keys_subsumes_them",
+   "tests/config.py::Config_::basic_API::supports_mutation_via_attribute_access",
+   "tests/config.py::Config_::basic_API::supports_nested_mutation_via_attribute_access",
+   "tests/config.py::Config_::basic_API::real_attrs_and_methods_win_over_attr_proxying",
+   "tests/config.py::Config_::basic_API::config_itself_stored_as_private_name",
+   "tests/config.py::Config_::basic_API::inherited_real_attrs_also_win_over_config_keys",
+   "tests/config.py::Config_::basic_API::nonexistent_attrs_can_be_set_to_create_new_top_level_configs",
+   "tests/config.py::Config_::basic_API::nonexistent_attr_setting_works_nested_too",
+   "tests/config.py::Config_::basic_API::string_display",
+   "tests/config.py::Config_::basic_API::merging_does_not_wipe_user_modifications_or_deletions",
+   "tests/config.py::Config_::config_file_loading::system_global",
+   "tests/config.py::Config_::config_file_loading::system_can_skip_merging",
+   "tests/config.py::Config_::config_file_loading::user_specific",
+   "tests/config.py::Config_::config_file_loading::user_can_skip_merging",
+   "tests/config.py::Config_::config_file_loading::project_specific",
+   "tests/config.py::Config_::config_file_loading::project_can_skip_merging",
+   "tests/config.py::Config_::config_file_loading::loads_no_project_specific_file_if_no_project_location_given",
+   "tests/config.py::Config_::config_file_loading::project_location_can_be_set_after_init",
+   "tests/config.py::Config_::config_file_loading::runtime_conf_via_cli_flag",
+   "tests/config.py::Config_::config_file_loading::runtime_can_skip_merging",
+   "tests/config.py::Config_::config_file_loading::unknown_suffix_in_runtime_path_raises_useful_error",
+   "tests/config.py::Config_::config_file_loading::python_modules_dont_load_special_vars",
+   "tests/config.py::Config_::config_file_loading::python_modules_except_usefully_on_unpicklable_modules",
+   "tests/config.py::Config_::config_file_loading::nonexistent_files_are_skipped_and_logged",
+   "tests/config.py::Config_::config_file_loading::non_missing_file_IOErrors_are_raised",
+   "tests/config.py::Config_::collection_level_config_loading::performed_explicitly_and_directly",
+   "tests/config.py::Config_::collection_level_config_loading::merging_can_be_deferred",
+   "tests/config.py::Config_::comparison_and_hashing::comparison_looks_at_merged_config",
+   "tests/config.py::Config_::comparison_and_hashing::allows_comparison_with_real_dicts",
+   "tests/config.py::Config_::comparison_and_hashing::is_explicitly_not_hashable",
+   "tests/config.py::Config_::env_vars::base_case_defaults_to_INVOKE_prefix",
+   "tests/config.py::Config_::env_vars::non_predeclared_settings_do_not_get_consumed",
+   "tests/config.py::Config_::env_vars::underscores_top_level",
+   "tests/config.py::Config_::env_vars::underscores_nested",
+   "tests/config.py::Config_::env_vars::both_types_of_underscores_mixed",
+   "tests/config.py::Config_::env_vars::ambiguous_underscores_dont_guess",
+   "tests/config.py::Config_::env_vars::type_casting::strings_replaced_with_env_value",
+   "tests/config.py::Config_::env_vars::type_casting::None_replaced",
+   "tests/config.py::Config_::env_vars::type_casting::booleans",
+   "tests/config.py::Config_::env_vars::type_casting::boolean_type_inputs_with_non_boolean_defaults",
+   "tests/config.py::Config_::env_vars::type_casting::numeric_types_become_casted",
+   "tests/config.py::Config_::env_vars::type_casting::arbitrary_types_work_too",
+   "tests/config.py::Config_::env_vars::type_casting::uncastable_types::lists",
+   "tests/config.py::Config_::env_vars::type_casting::uncastable_types::tuples",
+   "tests/config.py::Config_::hierarchy::collection_overrides_defaults",
+   "tests/config.py::Config_::hierarchy::systemwide_overrides_collection",
+   "tests/config.py::Config_::hierarchy::user_overrides_systemwide",
+   "tests/config.py::Config_::hierarchy::user_overrides_collection",
+   "tests/config.py::Config_::hierarchy::project_overrides_user",
+   "tests/config.py::Config_::hierarchy::project_overrides_systemwide",
+   "tests/config.py::Config_::hierarchy::project_overrides_collection",
+   "tests/config.py::Config_::hierarchy::env_vars_override_project",
+   "tests/config.py::Config_::hierarchy::env_vars_override_user",
+   "tests/config.py::Config_::hierarchy::env_vars_override_systemwide",
+   "tests/config.py::Config_::hierarchy::env_vars_override_collection",
+   "tests/config.py::Config_::hierarchy::runtime_overrides_env_vars",
+   "tests/config.py::Config_::hierarchy::runtime_overrides_project",
+   "tests/config.py::Config_::hierarchy::runtime_overrides_user",
+   "tests/config.py::Config_::hierarchy::runtime_overrides_systemwide",
+   "tests/config.py::Config_::hierarchy::runtime_overrides_collection",
+   "tests/config.py::Config_::hierarchy::cli_overrides_override_all",
+   "tests/config.py::Config_::hierarchy::yaml_prevents_yml_json_or_python",
+   "tests/config.py::Config_::hierarchy::yml_prevents_json_or_python",
+   "tests/config.py::Config_::hierarchy::json_prevents_python",
+   "tests/config.py::Config_::clone::preserves_basic_members",
+   "tests/config.py::Config_::clone::preserves_merged_config",
+   "tests/config.py::Config_::clone::preserves_file_data",
+   "tests/config.py::Config_::clone::does_not_reload_file_data",
+   "tests/config.py::Config_::clone::preserves_env_data",
+   "tests/config.py::Config_::clone::works_correctly_when_subclassed",
+   "tests/config.py::Config_::clone::into_kwarg::is_not_required",
+   "tests/config.py::Config_::clone::into_kwarg::resulting_clones_are_typed_as_new_class",
+   "tests/config.py::Config_::clone::into_kwarg::non_conflicting_values_are_merged",
+   "tests/config.py::Config_::clone::does_not_deepcopy",
+   "tests/config.py::Config_::can_be_pickled"
+  ],
+  "not_executed": [],
+  "reproduced": true,
+  "environment_limits": []
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "8e36c05ab9d8f9f7d398fec3440719d73c8c73b8aa5b12de72d77e0415acd559",
+    "target": "pyinvoke/invoke#1086",
+    "about": "Test load_source and Config.load_project for missing .py config file",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "load_source returns an empty dict when the .py config file does not exist.",
+      "covers": [
+       "c1.load_source_return"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "load_source raises an IOError when the .py config file does not exist.",
+      "covers": [
+       "c2.load_source_exception"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Config._load_file treats a missing .py config file as an empty successful config and incorrectly sets `_found` to `True`.",
+      "covers": [
+       "c3.project_found"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "After the fix, Config._load_file correctly catches the IOError and marks `_found` as `False` for a missing .py config file.",
+      "covers": [
+       "c4.project_found_is_false"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "A test has been added to ensure `load_project()` marks `_project_found` as `False` when the file doesn't exist.",
+      "covers": [
+       "c5.test_would_fail"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.load_source_return": {},
+       "c2.load_source_exception": null,
+       "c3.project_found": true,
+       "c4.project_found_is_false": false,
+       "c5.test_would_fail": true
+      },
+      {
+       "c1.load_source_return": {},
+       "c2.load_source_exception": null,
+       "c3.project_found": true,
+       "c4.project_found_is_false": false,
+       "c5.test_would_fail": true
+      },
+      {
+       "c1.load_source_return": {},
+       "c2.load_source_exception": null,
+       "c3.project_found": true,
+       "c4.project_found_is_false": false,
+       "c5.test_would_fail": true
+      }
+     ],
+     "pr": [
+      {
+       "c1.load_source_return": null,
+       "c2.load_source_exception": "FileNotFoundError",
+       "c3.project_found": false,
+       "c4.project_found_is_false": true,
+       "c5.test_would_fail": false
+      },
+      {
+       "c1.load_source_return": null,
+       "c2.load_source_exception": "FileNotFoundError",
+       "c3.project_found": false,
+       "c4.project_found_is_false": true,
+       "c5.test_would_fail": false
+      },
+      {
+       "c1.load_source_return": null,
+       "c2.load_source_exception": "FileNotFoundError",
+       "c3.project_found": false,
+       "c4.project_found_is_false": true,
+       "c5.test_would_fail": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.load_source_return",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": {},
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": {},
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.load_source_return\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.load_source_return\""
+       }
+      }
+     },
+     {
+      "name": "c2.load_source_exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": null,
+      "pr": "FileNotFoundError",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "FileNotFoundError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.load_source_exception\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.load_source_exception\""
+       }
+      }
+     },
+     {
+      "name": "c3.project_found",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": true,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.project_found\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.project_found\""
+       }
+      }
+     },
+     {
+      "name": "c4.project_found_is_false",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.project_found_is_false\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.project_found_is_false\""
+       }
+      }
+     },
+     {
+      "name": "c5.test_would_fail",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C5",
+      "main": true,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c5.test_would_fail\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c5.test_would_fail\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8e36c05ab9d8f9f7d398fec3440719d73c8c73b8aa5b12de72d77e0415acd559",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-16T06:07:22.056519+00:00",
+     "inputs_sha256": "1a67d850e844a5a7001788e7562cf28910691c00325d74b31499570c0bf0a675",
+     "inputs": {
+      "title_chars": 63,
+      "body_chars": 707,
+      "base_files": {
+       "invoke/config.py": "97f2c5ab9bab1bc26466b35ef32b7647faabd96cfa72ea9eb891b3f8ae6af70e"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-16T06:07:22.210631+00:00"
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "invoke/config.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    }
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "61919d30c2153c127827150027362dd5b1a3dc26e4ff46d2e5a9d92bd9cc8a3f",
+    "target": "pyinvoke/invoke#1086",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {},
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {},
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {}
+      },
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {},
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {},
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {}
+      },
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {},
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {},
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {}
+      }
+     ],
+     "pr": [
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {
+        "raises": "FileNotFoundError"
+       }
+      },
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {
+        "raises": "FileNotFoundError"
+       }
+      },
+      {
+       "invoke.config.load_source.input0": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input1": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input10": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input11": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input2": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input3": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input4": {
+        "raises": "FileNotFoundError"
+       },
+       "invoke.config.load_source.input5": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input6": {
+        "raises": "TypeError"
+       },
+       "invoke.config.load_source.input7": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input8": {
+        "raises": "AttributeError"
+       },
+       "invoke.config.load_source.input9": {
+        "raises": "FileNotFoundError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "invoke.config.load_source.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"invoke.config.load_source.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"invoke.config.load_source.input0\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"invoke.config.load_source.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"invoke.config.load_source.input1\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"invoke.config.load_source.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"invoke.config.load_source.input10\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"invoke.config.load_source.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"invoke.config.load_source.input11\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input2",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {},
+      "pr": {
+       "raises": "FileNotFoundError"
+      },
+      "diffs": [
+       {
+        "field": "raises",
+        "main": "<absent>",
+        "pr": "FileNotFoundError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"invoke.config.load_source.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"invoke.config.load_source.input2\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"invoke.config.load_source.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"invoke.config.load_source.input3\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input4",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {},
+      "pr": {
+       "raises": "FileNotFoundError"
+      },
+      "diffs": [
+       {
+        "field": "raises",
+        "main": "<absent>",
+        "pr": "FileNotFoundError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"invoke.config.load_source.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"invoke.config.load_source.input4\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"invoke.config.load_source.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"invoke.config.load_source.input5\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"invoke.config.load_source.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"invoke.config.load_source.input6\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"invoke.config.load_source.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"invoke.config.load_source.input7\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"invoke.config.load_source.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"invoke.config.load_source.input8\""
+       }
+      }
+     },
+     {
+      "name": "invoke.config.load_source.input9",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {},
+      "pr": {
+       "raises": "FileNotFoundError"
+      },
+      "diffs": [
+       {
+        "field": "raises",
+        "main": "<absent>",
+        "pr": "FileNotFoundError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"invoke.config.load_source.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"invoke.config.load_source.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "61919d30c2153c127827150027362dd5b1a3dc26e4ff46d2e5a9d92bd9cc8a3f",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-16T06:07:22.060112+00:00",
+     "inputs_sha256": "486d3f82cba5d39f81c39b111d9df4b9263b188a15c87bc1105211f63836ce67",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "invoke/config.py": "97f2c5ab9bab1bc26466b35ef32b7647faabd96cfa72ea9eb891b3f8ae6af70e"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-16T06:07:22.210631+00:00"
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "invoke/config.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    }
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "unmentioned",
+    "not_testable",
+    "unmentioned",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "unmentioned"
+   ],
+   "flagged": [
+    {
+     "probe": "diff-api",
+     "name": "invoke.config.load_source.input2",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "diff-api",
+     "name": "invoke.config.load_source.input4",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "diff-api",
+     "name": "invoke.config.load_source.input9",
+     "label": "unmentioned",
+     "claim": null
+    }
+   ],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+   ],
+   "reason": "probe: 3 observation(s) need attention: invoke.config.load_source.input2 differs and no claim covers it; invoke.config.load_source.input4 differs and no claim covers it; invoke.config.load_source.input9 differs and no claim covers it; probe: claim(s) C1, C2, C3, C4, C5 proven; probe: 9 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "1 test(s) fail on main and pass on the PR; 209 test(s) ran on main, 209 on the PR; 0 new test(s) pass, 210 unchanged (2 of them skipped on both sides); probe: claim(s) C1, C2, C3, C4, C5 proven",
+ "cross_run_collected_files": [
+  "tests/config.py"
+ ],
+ "comparison": {
+  "same": 210,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.config.Config_.config_file_loading::missing_file_marks_found_false"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 209,
+   "pr": 209
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.config.Config_.config_file_loading::missing_file_marks_found_false": "AssertionError: assert True is False"
+  },
+  "collected_test_files": [
+   "tests/config.py"
+  ],
+  "base_new_tests": {
+   "ids": [
+    "tests/config.py::Config_::config_file_loading::missing_file_marks_found_false"
+   ],
+   "passed_on_base": [],
+   "failed_on_base": [
+    "tests/config.py::Config_::config_file_loading::missing_file_marks_found_false"
+   ],
+   "not_collected": [],
+   "collection_failed": [],
+   "discovery_empty": [],
+   "shared_ids": [
+    "tests/config.py::Config_::class_attrs::prefix::defaults_to_invoke",
+    "tests/config.py::Config_::class_attrs::prefix::informs_config_filenames",
+    "tests/config.py::Config_::class_attrs::prefix::informs_env_var_prefix",
+    "tests/config.py::Config_::class_attrs::file_prefix::defaults_to_None",
+    "tests/config.py::Config_::class_attrs::file_prefix::informs_config_filenames",
+    "tests/config.py::Config_::class_attrs::env_prefix::defaults_to_None",
+    "tests/config.py::Config_::class_attrs::env_prefix::informs_env_vars_loaded",
+    "tests/config.py::Config_::global_defaults::basic_settings",
+    "tests/config.py::Config_::init::can_be_empty",
+    "tests/config.py::Config_::init::configure_global_location_prefix",
+    "tests/config.py::Config_::init::default_system_prefix_is_etc",
+    "tests/config.py::Config_::init::configure_user_location_prefix",
+    "tests/config.py::Config_::init::default_user_prefix_is_homedir_plus_dot",
+    "tests/config.py::Config_::init::configure_project_location",
+    "tests/config.py::Config_::init::configure_runtime_path",
+    "tests/config.py::Config_::init::accepts_defaults_dict_kwarg",
+    "tests/config.py::Config_::init::overrides_dict_is_first_posarg",
+    "tests/config.py::Config_::init::overrides_dict_is_also_a_kwarg",
+    "tests/config.py::Config_::init::system_and_user_files_loaded_automatically",
+    "tests/config.py::Config_::init::can_defer_loading_system_and_user_files",
+    "tests/config.py::Config_::basic_API::can_be_used_directly_after_init",
+    "tests/config.py::Config_::basic_API::allows_dict_and_attr_access",
+    "tests/config.py::Config_::basic_API::nested_dict_values_also_allow_dual_access",
+    "tests/config.py::Config_::basic_API::attr_access_has_useful_error_msg",
+    "tests/config.py::Config_::basic_API::subkeys_get_merged_not_overwritten",
+    "tests/config.py::Config_::basic_API::is_iterable_like_dict",
+    "tests/config.py::Config_::basic_API::supports_readonly_dict_protocols",
+    "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::defaults_can_be_given_via_method",
+    "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::defaults_can_skip_merging",
+    "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::overrides_can_be_given_via_method",
+    "tests/config.py::Config_::basic_API::runtime_loading_of_defaults_and_overrides::overrides_can_skip_merging",
+    "tests/config.py::Config_::basic_API::deletion_methods::pop",
+    "tests/config.py::Config_::basic_API::deletion_methods::delitem",
+    "tests/config.py::Config_::basic_API::deletion_methods::delattr",
+    "tests/config.py::Config_::basic_API::deletion_methods::clear",
+    "tests/config.py::Config_::basic_API::deletion_methods::popitem",
+    "tests/config.py::Config_::basic_API::modification_methods::setitem",
+    "tests/config.py::Config_::basic_API::modification_methods::setdefault",
+    "tests/config.py::Config_::basic_API::modification_methods::update",
+    "tests/config.py::Config_::basic_API::reinstatement_of_deleted_values_works_ok",
+    "tests/config.py::Config_::basic_API::deleting_parent_keys_of_deleted_keys_subsumes_them",
+    "tests/config.py::Config_::basic_API::supports_mutation_via_attribute_access",
+    "tests/config.py::Config_::basic_API::supports_nested_mutation_via_attribute_access",
+    "tests/config.py::Config_::basic_API::real_attrs_and_methods_win_over_attr_proxying",
+    "tests/config.py::Config_::basic_API::config_itself_stored_as_private_name",
+    "tests/config.py::Config_::basic_API::inherited_real_attrs_also_win_over_config_keys",
+    "tests/config.py::Config_::basic_API::nonexistent_attrs_can_be_set_to_create_new_top_level_configs",
+    "tests/config.py::Config_::basic_API::nonexistent_attr_setting_works_nested_too",
+    "tests/config.py::Config_::basic_API::string_display",
+    "tests/config.py::Config_::basic_API::merging_does_not_wipe_user_modifications_or_deletions",
+    "tests/config.py::Config_::config_file_loading::system_global",
+    "tests/config.py::Config_::config_file_loading::system_can_skip_merging",
+    "tests/config.py::Config_::config_file_loading::user_specific",
+    "tests/config.py::Config_::config_file_loading::user_can_skip_merging",
+    "tests/config.py::Config_::config_file_loading::project_specific",
+    "tests/config.py::Config_::config_file_loading::project_can_skip_merging",
+    "tests/config.py::Config_::config_file_loading::loads_no_project_specific_file_if_no_project_location_given",
+    "tests/config.py::Config_::config_file_loading::project_location_can_be_set_after_init",
+    "tests/config.py::Config_::config_file_loading::runtime_conf_via_cli_flag",
+    "tests/config.py::Config_::config_file_loading::runtime_can_skip_merging",
+    "tests/config.py::Config_::config_file_loading::unknown_suffix_in_runtime_path_raises_useful_error",
+    "tests/config.py::Config_::config_file_loading::python_modules_dont_load_special_vars",
+    "tests/config.py::Config_::config_file_loading::python_modules_except_usefully_on_unpicklable_modules",
+    "tests/config.py::Config_::config_file_loading::nonexistent_files_are_skipped_and_logged",
+    "tests/config.py::Config_::config_file_loading::non_missing_file_IOErrors_are_raised",
+    "tests/config.py::Config_::collection_level_config_loading::performed_explicitly_and_directly",
+    "tests/config.py::Config_::collection_level_config_loading::merging_can_be_deferred",
+    "tests/config.py::Config_::comparison_and_hashing::comparison_looks_at_merged_config",
+    "tests/config.py::Config_::comparison_and_hashing::allows_comparison_with_real_dicts",
+    "tests/config.py::Config_::comparison_and_hashing::is_explicitly_not_hashable",
+    "tests/config.py::Config_::env_vars::base_case_defaults_to_INVOKE_prefix",
+    "tests/config.py::Config_::env_vars::non_predeclared_settings_do_not_get_consumed",
+    "tests/config.py::Config_::env_vars::underscores_top_level",
+    "tests/config.py::Config_::env_vars::underscores_nested",
+    "tests/config.py::Config_::env_vars::both_types_of_underscores_mixed",
+    "tests/config.py::Config_::env_vars::ambiguous_underscores_dont_guess",
+    "tests/config.py::Config_::env_vars::type_casting::strings_replaced_with_env_value",
+    "tests/config.py::Config_::env_vars::type_casting::None_replaced",
+    "tests/config.py::Config_::env_vars::type_casting::booleans",
+    "tests/config.py::Config_::env_vars::type_casting::boolean_type_inputs_with_non_boolean_defaults",
+    "tests/config.py::Config_::env_vars::type_casting::numeric_types_become_casted",
+    "tests/config.py::Config_::env_vars::type_casting::arbitrary_types_work_too",
+    "tests/config.py::Config_::env_vars::type_casting::uncastable_types::lists",
+    "tests/config.py::Config_::env_vars::type_casting::uncastable_types::tuples",
+    "tests/config.py::Config_::hierarchy::collection_overrides_defaults",
+    "tests/config.py::Config_::hierarchy::systemwide_overrides_collection",
+    "tests/config.py::Config_::hierarchy::user_overrides_systemwide",
+    "tests/config.py::Config_::hierarchy::user_overrides_collection",
+    "tests/config.py::Config_::hierarchy::project_overrides_user",
+    "tests/config.py::Config_::hierarchy::project_overrides_systemwide",
+    "tests/config.py::Config_::hierarchy::project_overrides_collection",
+    "tests/config.py::Config_::hierarchy::env_vars_override_project",
+    "tests/config.py::Config_::hierarchy::env_vars_override_user",
+    "tests/config.py::Config_::hierarchy::env_vars_override_systemwide",
+    "tests/config.py::Config_::hierarchy::env_vars_override_collection",
+    "tests/config.py::Config_::hierarchy::runtime_overrides_env_vars",
+    "tests/config.py::Config_::hierarchy::runtime_overrides_project",
+    "tests/config.py::Config_::hierarchy::runtime_overrides_user",
+    "tests/config.py::Config_::hierarchy::runtime_overrides_systemwide",
+    "tests/config.py::Config_::hierarchy::runtime_overrides_collection",
+    "tests/config.py::Config_::hierarchy::cli_overrides_override_all",
+    "tests/config.py::Config_::hierarchy::yaml_prevents_yml_json_or_python",
+    "tests/config.py::Config_::hierarchy::yml_prevents_json_or_python",
+    "tests/config.py::Config_::hierarchy::json_prevents_python",
+    "tests/config.py::Config_::clone::preserves_basic_members",
+    "tests/config.py::Config_::clone::preserves_merged_config",
+    "tests/config.py::Config_::clone::preserves_file_data",
+    "tests/config.py::Config_::clone::does_not_reload_file_data",
+    "tests/config.py::Config_::clone::preserves_env_data",
+    "tests/config.py::Config_::clone::works_correctly_when_subclassed",
+    "tests/config.py::Config_::clone::into_kwarg::is_not_required",
+    "tests/config.py::Config_::clone::into_kwarg::resulting_clones_are_typed_as_new_class",
+    "tests/config.py::Config_::clone::into_kwarg::non_conflicting_values_are_merged",
+    "tests/config.py::Config_::clone::does_not_deepcopy",
+    "tests/config.py::Config_::can_be_pickled"
+   ],
+   "not_executed": [],
+   "reproduced": true,
+   "environment_limits": []
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 209 test(s) ran on main, 209 on the PR; 0 new test(s) pass, 210 unchanged (2 of them skipped on both sides); probe: claim(s) C1, C2, C3, C4, C5 proven",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/config.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/config.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 308.8,
+  "tests": 10.4
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 25298,
+  "output_tokens": 25797,
+  "thinking_tokens": 24556,
+  "cost_usd": 0.030807,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.030807,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 308.8,
+   "tests": 10.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.020587,
+  "total_cost_usd": 0.051394,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-16/ef12096/invoke-1086"
+ }
+}
