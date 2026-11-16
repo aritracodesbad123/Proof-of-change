@@ -1,0 +1,2341 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-792-6706dd763076-2026-11-16",
+ "date_ist": "2026-11-16 11:45 IST",
+ "run_date": "2026-11-16",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 792,
+  "url": "https://github.com/mahmoud/boltons/pull/792",
+  "title": "fix: preserve UTF-16/32 reverse line boundaries",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6706dd76307605005afe80142b3c13ccad0a6fd2",
+  "merge_commit": "a8bf2f132a6af6271049890a6bf942437b687623",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "sogav21",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-15T07:48:32Z",
+ "updated_at_ist": "2026-11-15 13:18 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-16 11:45 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/jsonutils.py",
+   "tests/test_jsonutils_wide.py"
+  ],
+  "package_py": [
+   "boltons/jsonutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_jsonutils_wide.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_jsonutils_wide.py, tests/test_jsonutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 12,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "12 passed in 0.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 421,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "421 passed in 0.70s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 12,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "12 passed in 0.51s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 421,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "421 passed in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 12,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "12 passed in 0.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 421,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "421 passed in 0.70s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Implement exact774boundedwidecodecpath on d31d821 ownbranch; preserve CR/LF/CRLF binarydelimitersemantics, BOM/endian/surrogatealignedblock, no wholefile reads, existingnonwidepaths untouched; keep...",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-792/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 40,
+  "changed_lines_covered": 40,
+  "files": [
+   {
+    "file": "boltons/jsonutils.py",
+    "changed_lines_total": 40,
+    "changed_lines_covered": 40
+   }
+  ],
+  "seconds": 2.1,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "6706dd76307605005afe80142b3c13ccad0a6fd2",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.4 GB (of 15.6 GB).",
+   "Setup check: free disk 92.5 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.github/workflows/tests.yaml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/.github/workflows/tests.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "a8bf2f132a6af6271049890a6bf942437b687623",
+  "merge_commit": "a8bf2f132a6af6271049890a6bf942437b687623",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "6706dd76307605005afe80142b3c13ccad0a6fd2"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit a8bf2f132a6a (refs/pull/792/merge) of head 6706dd763076"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The fix preserves UTF-16/32 reverse line boundaries.",
+    "source_quote": "fix: preserve UTF-16/32 reverse line boundaries",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Before the fix, `reverse_iter_lines` splits encoded bytes before decoding, so valid UTF-16/32 lines can raise `UnicodeDecodeError` or split inside a code unit.",
+    "source_quote": "`reverse_iter_lines` splits encoded bytes before decoding, so valid UTF-16/32 lines can raise `UnicodeDecodeError` or split inside a code unit.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "The fix decodes complete UTF-16/32 chunks before separating CR/LF lines, keeping surrogate pairs together at block boundaries.",
+    "source_quote": "Decode complete UTF-16/32 chunks before separating CR/LF lines, keeping surrogate pairs together at block boundaries.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Generic codecs honor and consume the leading BOM or use native byte order without one, matching `bytes.decode`; explicit endian codecs retain U+FEFF.",
+    "source_quote": "Generic codecs honor and consume the leading BOM or use native byte order without one, matching `bytes.decode`; explicit endian codecs retain U+FEFF.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Reads remain bounded by the requested block size rounded to a code unit, plus a two-byte UTF-16 lookbehind.",
+    "source_quote": "Reads remain bounded by the requested block size rounded to a code unit, plus a two-byte UTF-16 lookbehind.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Existing byte, UTF-8, Latin-1 and StringIO paths retain their delimiter behavior.",
+    "source_quote": "Existing byte, UTF-8, Latin-1 and StringIO paths retain their delimiter behavior.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "boltons.jsonutils.reverse_iter_lines"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "0e508b0ed4f73c44bd5121bf9b50bba62af684d2d7b0b1cca026802ab4413b5a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-16T06:17:17.483306+00:00",
+    "inputs_sha256": "e5c561604b23396390e884aa81240003814d1765abd47f8080a532d9cebf95cf",
+    "inputs": {
+     "title_chars": 47,
+     "body_chars": 3638,
+     "base_files": {
+      "boltons/jsonutils.py": "b5916907775951cd6e4f96faf1d945c892f8a7540920e0b9abdc198842c20ddc"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "0438f1874cfc5cdf7066edf73875ab855ebec8e004c402b614c901235e83e63d",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-16T06:17:17.484709+00:00",
+    "inputs_sha256": "80c6c9a0b1a088ed71b93afd9dc9012a505ce9843f4b1a200cf802e5d23fc8e7",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/jsonutils.py": "b5916907775951cd6e4f96faf1d945c892f8a7540920e0b9abdc198842c20ddc"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-16T06:17:17.633343+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_jsonutils.py"
+  ],
+  "pr": [
+   "tests/test_jsonutils_wide.py",
+   "tests/test_jsonutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "a8bf2f132a6af6271049890a6bf942437b687623",
+   "installed": "a8bf2f132a6af6271049890a6bf942437b687623",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 12,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-16-utf-16-be-\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-16-utf-16-le-\\xff\\xfe]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-16-utf-16-be-\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-16-utf-16-le-\\xff\\xfe]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-16-utf-16-be-\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-16-utf-16-le-\\xff\\xfe]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-16-utf-16-be-\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-16-utf-16-le-\\xff\\xfe]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-16]",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-32]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-16]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_native_endian_without_bom[utf-16]",
+   "tests.test_jsonutils_wide::test_wide_native_endian_without_bom[utf-32]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-32]"
+  ],
+  "new_tests_passing": 297,
+  "new_tests_passing_ids": [
+   "tests.test_jsonutils_wide::test_empty_input_does_not_resolve_unused_codec",
+   "tests.test_jsonutils_wide::test_nonwide_and_nonseekable_controls",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_codec_aliases[UTF_16_LE]",
+   "tests.test_jsonutils_wide::test_wide_codec_aliases[UTF_32_LE]",
+   "tests.test_jsonutils_wide::test_wide_codec_aliases[utf_16be]",
+   "tests.test_jsonutils_wide::test_wide_codec_aliases[utf_32be]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-16]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_empty_and_explicit_bom[utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-False-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-1-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-16-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-2-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-3-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-4096-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-16]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[a\\x85b\\u2028c\\u2029d\\x0be\\x0cf\\x1cg\\x1dh\\x1ei-True-7-utf-32]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-16-be-\\xd8\\x00]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-16-le-\\x00\\xdc]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-16-le-a]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-32-be-\\x00\\x11\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-32-le-\\x00\\xd8\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_malformed_input[utf-32-le-a\\x00\\x00]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-16]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_partial_code_unit_prefix[utf-32]",
+   "tests.test_jsonutils_wide::test_wide_partial_codepoint_prefix",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-32-le]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-16-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-16-le]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-32-be]",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-32-le]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 124,
+   "pr": 421
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-16-utf-16-be-\\xfe\\xff]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-16-utf-16-le-\\xff\\xfe]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[1-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-16-utf-16-be-\\xfe\\xff]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-16-utf-16-le-\\xff\\xfe]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[3-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-16-utf-16-be-\\xfe\\xff]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-16-utf-16-le-\\xff\\xfe]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[4096-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-16-utf-16-be-\\xfe\\xff]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-16-utf-16-le-\\xff\\xfe]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-32-utf-32-be-\\x00\\x00\\xfe\\xff]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_bom_endianness[8-utf-32-utf-32-le-\\xff\\xfe\\x00\\x00]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_bounded_reads_and_long_line[utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_disk_and_reuse[utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-False-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 0: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[\\n\\n\\u010a\\u0a00\\u010d\\u0d00\\n\\U0001f642\\xe9\\n\\n-True-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-2: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-False-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[first\\nlast-True-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-False-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-16-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-2-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-3-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_encoded_lines[one\\r\\ntwo\\rthree\\nlast-True-7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_native_endian_without_bom[utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x00 in position 8: truncated data",
+   "tests.test_jsonutils_wide::test_wide_native_endian_without_bom[utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0xde in position 4: truncated data",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[1-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0xde in position 4: truncated data",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[4096-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-16]": "UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0xde in position 4: truncated data",
+   "tests.test_jsonutils_wide::test_wide_preseek_prefix[7-utf-32]": "UnicodeDecodeError: 'utf-32-le' codec can't decode bytes in position 0-3: code point not in range(0x110000)"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "0e508b0ed4f73c44bd5121bf9b50bba62af684d2d7b0b1cca026802ab4413b5a",
+    "target": "mahmoud/boltons#792",
+    "about": "Tests for C1, C2, C3: UTF-16 surrogate pair with newline, blocksize=1",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The fix preserves UTF-16/32 reverse line boundaries.",
+      "covers": [
+       "c1.exception"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Before the fix, `reverse_iter_lines` splits encoded bytes before decoding, so valid UTF-16/32 lines can raise `UnicodeDecodeError` or split inside a code unit.",
+      "covers": [
+       "c2.unicode_decode_error"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The fix decodes complete UTF-16/32 chunks before separating CR/LF lines, keeping surrogate pairs together at block boundaries.",
+      "covers": [
+       "c3.exception"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.exception": "UnicodeDecodeError",
+       "c2.unicode_decode_error": true,
+       "c3.exception": "UnicodeDecodeError",
+       "c4.generic.line0": null,
+       "c4.generic.line1": null,
+       "c4.explicit.line0": null,
+       "c4.explicit.line1": null,
+       "c5.max_read_size": 17,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      },
+      {
+       "c1.exception": "UnicodeDecodeError",
+       "c2.unicode_decode_error": true,
+       "c3.exception": "UnicodeDecodeError",
+       "c4.generic.line0": null,
+       "c4.generic.line1": null,
+       "c4.explicit.line0": null,
+       "c4.explicit.line1": null,
+       "c5.max_read_size": 17,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      },
+      {
+       "c1.exception": "UnicodeDecodeError",
+       "c2.unicode_decode_error": true,
+       "c3.exception": "UnicodeDecodeError",
+       "c4.generic.line0": null,
+       "c4.generic.line1": null,
+       "c4.explicit.line0": null,
+       "c4.explicit.line1": null,
+       "c5.max_read_size": 17,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c1.exception": null,
+       "c2.unicode_decode_error": false,
+       "c3.exception": null,
+       "c4.generic.line0": "world",
+       "c4.generic.line1": "hello",
+       "c4.explicit.line0": "world",
+       "c4.explicit.line1": "\ufeffhello",
+       "c5.max_read_size": 18,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      },
+      {
+       "c1.exception": null,
+       "c2.unicode_decode_error": false,
+       "c3.exception": null,
+       "c4.generic.line0": "world",
+       "c4.generic.line1": "hello",
+       "c4.explicit.line0": "world",
+       "c4.explicit.line1": "\ufeffhello",
+       "c5.max_read_size": 18,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      },
+      {
+       "c1.exception": null,
+       "c2.unicode_decode_error": false,
+       "c3.exception": null,
+       "c4.generic.line0": "world",
+       "c4.generic.line1": "hello",
+       "c4.explicit.line0": "world",
+       "c4.explicit.line1": "\ufeffhello",
+       "c5.max_read_size": 18,
+       "c6.lines": [
+        "world",
+        "hello"
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "UnicodeDecodeError",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "UnicodeDecodeError",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.exception\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.exception\""
+       }
+      }
+     },
+     {
+      "name": "c2.unicode_decode_error",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": true,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.unicode_decode_error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.unicode_decode_error\""
+       }
+      }
+     },
+     {
+      "name": "c3.exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": "UnicodeDecodeError",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "UnicodeDecodeError",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.exception\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.exception\""
+       }
+      }
+     },
+     {
+      "name": "c4.explicit.line0",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": null,
+      "pr": "world",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "world"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.explicit.line0\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.explicit.line0\""
+       }
+      }
+     },
+     {
+      "name": "c4.explicit.line1",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": null,
+      "pr": "\ufeffhello",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "\ufeffhello"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.explicit.line1\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.explicit.line1\""
+       }
+      }
+     },
+     {
+      "name": "c4.generic.line0",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": null,
+      "pr": "world",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "world"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.generic.line0\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.generic.line0\""
+       }
+      }
+     },
+     {
+      "name": "c4.generic.line1",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": null,
+      "pr": "hello",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "hello"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c4.generic.line1\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c4.generic.line1\""
+       }
+      }
+     },
+     {
+      "name": "c5.max_read_size",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": 17,
+      "pr": 18,
+      "diffs": [
+       {
+        "field": "",
+        "main": 17,
+        "pr": 18
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c5.max_read_size\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c5.max_read_size\""
+       }
+      }
+     },
+     {
+      "name": "c6.lines",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       "world",
+       "hello"
+      ],
+      "pr": [
+       "world",
+       "hello"
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c6.lines\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c6.lines\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "0e508b0ed4f73c44bd5121bf9b50bba62af684d2d7b0b1cca026802ab4413b5a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-16T06:17:17.483306+00:00",
+     "inputs_sha256": "e5c561604b23396390e884aa81240003814d1765abd47f8080a532d9cebf95cf",
+     "inputs": {
+      "title_chars": 47,
+      "body_chars": 3638,
+      "base_files": {
+       "boltons/jsonutils.py": "b5916907775951cd6e4f96faf1d945c892f8a7540920e0b9abdc198842c20ddc"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-16T06:17:17.633343+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 13,
+     "changed_lines_covered": 13,
+     "files": [
+      {
+       "file": "boltons/jsonutils.py",
+       "changed_lines_total": 13,
+       "changed_lines_covered": 13
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 13 of 13 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "0438f1874cfc5cdf7066edf73875ab855ebec8e004c402b614c901235e83e63d",
+    "target": "mahmoud/boltons#792",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      },
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      },
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      },
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      },
+      {
+       "boltons.jsonutils.reverse_iter_lines.input0": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input1": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input10": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input11": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input2": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input3": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input4": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input5": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input6": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input7": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input8": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       },
+       "boltons.jsonutils.reverse_iter_lines.input9": {
+        "repr": "<generator object reverse_iter_lines>",
+        "type": "generator"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.jsonutils.reverse_iter_lines.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object reverse_iter_lines>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.jsonutils.reverse_iter_lines.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "0438f1874cfc5cdf7066edf73875ab855ebec8e004c402b614c901235e83e63d",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-16T06:17:17.484709+00:00",
+     "inputs_sha256": "80c6c9a0b1a088ed71b93afd9dc9012a505ce9843f4b1a200cf802e5d23fc8e7",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/jsonutils.py": "b5916907775951cd6e4f96faf1d945c892f8a7540920e0b9abdc198842c20ddc"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-16T06:17:17.633343+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 13,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/jsonutils.py",
+       "changed_lines_total": 13,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 13 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "false_claim",
+    "proven",
+    "unmentioned",
+    "unmentioned",
+    "unmentioned",
+    "unmentioned",
+    "unmentioned",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1",
+     "name": "c2.unicode_decode_error",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c4.explicit.line0",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c4.explicit.line1",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c4.generic.line0",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c4.generic.line1",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c5.max_read_size",
+     "label": "unmentioned",
+     "claim": null
+    }
+   ],
+   "proven_claims": [
+    "C1",
+    "C3"
+   ],
+   "reason": "probe: 6 observation(s) need attention: c2.unicode_decode_error differs although the claim says it does not (C2); c4.explicit.line0 differs and no claim covers it; c4.explicit.line1 differs and no claim covers it; c4.generic.line0 differs and no claim covers it; probe: claim(s) C1, C3 proven; probe: 13 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 13,
+    "changed_lines_total": 13,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 13,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 6 observation(s) need attention: c2.unicode_decode_error differs although the claim says it does not (C2); c4.explicit.line0 differs and no claim covers it; c4.explicit.line1 differs and no claim covers it; c4.generic.line0 differs and no claim covers it; probe: claim(s) C1, C3 proven; probe: 1 other observation(s) identical on both sides; tests: 112 test(s) fail on main and pass on the PR; 124 test(s) ran on main, 421 on the PR; 297 new test(s) pass, 12 unchanged",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 6 observation(s) need attention: c2.unicode_decode_error differs although the claim says it does not (C2); c4.explicit.line0 differs and no claim covers it; c4.explicit.line1 differs and no claim covers it; c4.generic.line0 differs and no claim covers it; probe: claim(s) C1, C3 proven; probe: 1 other observation(s) identical on both sides; tests: 112 test(s) fail on main and pass on the PR; 124 test(s) ran on main, 421 on the PR; 297 new test(s) pass, 12 unchanged",
+ "changed_lines_total": 40,
+ "changed_lines_covered": 40,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "40 of 40 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/jsonutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_jsonutils_wide.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 119.4,
+  "tests": 6.0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 5539,
+  "output_tokens": 23282,
+  "thinking_tokens": 21423,
+  "cost_usd": 0.022616,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.022616,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 119.4,
+   "tests": 6.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00796,
+  "total_cost_usd": 0.030576,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-16/ef12096/boltons-792"
+ }
+}
