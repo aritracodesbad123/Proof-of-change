@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-17 on ef12096
 
-8 report(s) in this folder: 1 need attention, 6 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+9 report(s) in this folder: 1 need attention, 7 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -11,6 +11,7 @@
 - **COULD NOT VERIFY**: Delgan/loguru#1545: Fix file sink stuck on closed file after close error during rotation. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 152 on the PR; 0 new test(s) pass, 154 unchanged (3 of them skipped on both sides)
 - **COULD NOT VERIFY**: prettytable/prettytable#549: Fix `copy()` failing when a format option is set. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 4 test(s) fail on main and pass on the PR; 284 test(s) ran on main, 284 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count
 - **COULD NOT VERIFY**: pytest-dev/pytest#15098: Fix `WarningsRecorder.pop()` returning the last match for unrelated categories. Tests produced no results on both sides (collection failed; see pytest logs); probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count
+- **COULD NOT VERIFY**: psf/requests#5220: Fix connection pool managers not taking varying TLS parameters into account. Could not verify: setup gap urllib3
 
 ## All reports
 
@@ -23,4 +24,5 @@
 | COULD NOT VERIFY | Delgan/loguru#1545: Fix file sink stuck on closed file after close error during rotation | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 152 on the PR; 0 new test(s) pass, 154 unchanged (3 of them skipped on both sides) | [PDF](loguru-1545/REPORT.pdf) |
 | COULD NOT VERIFY | prettytable/prettytable#549: Fix `copy()` failing when a format option is set | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 4 test(s) fail on main and pass on the PR; 284 test(s) ran on main, 284 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count | [PDF](prettytable-549/REPORT.pdf) |
 | COULD NOT VERIFY | pytest-dev/pytest#15098: Fix `WarningsRecorder.pop()` returning the last match for unrelated categories | Tests produced no results on both sides (collection failed; see pytest logs); probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count | [PDF](pytest-15098/REPORT.pdf) |
+| COULD NOT VERIFY | psf/requests#5220: Fix connection pool managers not taking varying TLS parameters into account | Could not verify: setup gap urllib3 | [PDF](requests-5220/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#797: dictutils: apply update_extend's keyword arguments | 2 test(s) fail on main and pass on the PR; 100 test(s) ran on main, 100 on the PR; 0 new test(s) pass, 98 unchanged; probe: claim(s) C1, C2 proven | [PDF](boltons-797/REPORT.pdf) |
