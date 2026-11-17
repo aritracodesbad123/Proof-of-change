@@ -1,0 +1,1606 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-python-attrs-attrs-1659-d6aa8bbc2eec-2026-11-17",
+ "date_ist": "2026-11-17 11:26 IST",
+ "run_date": "2026-11-17",
+ "who": "ops/daily_run.py",
+ "repo": "python-attrs/attrs",
+ "library": "attrs",
+ "pr": {
+  "repo": "python-attrs/attrs",
+  "number": 1659,
+  "url": "https://github.com/python-attrs/attrs/pull/1659",
+  "title": "Fix initializer metadata shadowing by valid parameter names",
+  "base_sha": "2a1fb86d44816afcc60e86d57956ce3604820326",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "d6aa8bbc2eec9019135e5dd50016015e2c50489e",
+  "merge_commit": "11065f7c2af527749bbbd423f65e51e48f2994aa",
+  "tested_main_sha": "2a1fb86d44816afcc60e86d57956ce3604820326",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "boyfeiyu",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-14T22:10:38Z",
+ "updated_at_ist": "2026-11-15 03:40 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-17 11:26 IST",
+ "files": {
+  "all": [
+   "changelog.d/+initializer-metadata.change.md",
+   "docs/init.md",
+   "src/attr/_make.py",
+   "tests/test_initializer_annotations.py",
+   "tests/test_initializer_metadata.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "changelog.d/+initializer-metadata.change.md",
+   "docs/init.md",
+   "src/attr/_make.py",
+   "tests/test_initializer_annotations.py",
+   "tests/test_initializer_metadata.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests, tests/test_initializer_annotations.py, tests/test_initializer_metadata.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 1401,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 6.3,
+   "pytest_summary": "1401 passed, 10 skipped, 1 xfailed in 5.23s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 1493,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 6.6,
+   "pytest_summary": "1493 passed, 10 skipped, 1 xfailed in 5.46s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 1401,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.6,
+   "pytest_summary": "1401 passed, 10 skipped, 1 xfailed in 4.56s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 1493,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.5,
+   "pytest_summary": "1493 passed, 10 skipped, 1 xfailed in 4.49s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 1401,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.8,
+   "pytest_summary": "1401 passed, 10 skipped, 1 xfailed in 4.85s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 1493,
+   "failed": 0,
+   "error": 0,
+   "skipped": 11,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.8,
+   "pytest_summary": "1493 passed, 10 skipped, 1 xfailed in 4.79s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "attrs-1659/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 30,
+  "changed_lines_covered": 30,
+  "files": [
+   {
+    "file": "src/attr/_make.py",
+    "changed_lines_total": 30,
+    "changed_lines_covered": 30
+   }
+  ],
+  "seconds": 8.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "d6aa8bbc2eec9019135e5dd50016015e2c50489e",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "some AI probes were rejected",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "blocked",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 8.4 GB (of 15.6 GB).",
+   "Setup check: free disk 90.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: attrs python setup install instructions https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python documentation install https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python install requirements https://pypi.org/project/attrs/ https://github.com/python-attrs/attrs site:pypi.org",
+   "Source: attrs/pyproject.toml at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/main/pyproject.toml",
+   "Source: attrs \u2014 https://pypi.org/project/attrs/",
+   "Source: Minor docs fixes \u00b7 python-attrs/attrs@307a646 \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/commit/307a6467d37308c22af32605f7e1e5e2b3e452f1",
+   "Source: Simplify contributing guide \u00b7 python-attrs/attrs@f2571ea \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/commit/f2571ea1443b2ec992e9712eedd76faf786ad2a2",
+   "Source: attrs/.github/CONTRIBUTING.md at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/main/.github/CONTRIBUTING.md",
+   "Source: [RFC] Add attrs package \u00b7 Issue #131 \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/issues/131",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install cloudpickle; platform_python_implementation == \"CPython\" (listed in the tests extra) on main and pr.",
+   "Setup plan: install hypothesis (listed in the tests extra) on main and pr.",
+   "Setup plan: install pympler (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest>9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-xdist[psutil] (listed in the tests extra) on main and pr.",
+   "Setup plan: install watchfiles (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install cogapp (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install doc2dash (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "Setup plan: refused dev.: no network or the package was not found",
+   "Installed cloudpickle 3.1.2 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed hypothesis 6.170.15 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pympler 1.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed watchfiles 1.3.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed cogapp 3.6.1 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed doc2dash 3.1.0 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/verify-lockfile.yml",
+   ".github/workflows/codspeed.yml",
+   ".github/workflows/pypi-package.yml",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/build-docset.yml",
+   ".github/workflows/ci.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "typing_tests/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+     "name": "cloudpickle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesis",
+     "name": "hypothesis",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pympler",
+     "name": "pympler",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist[psutil]",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "watchfiles",
+     "name": "watchfiles",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cogapp",
+     "name": "cogapp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "doc2dash",
+     "name": "doc2dash",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "cloudpickle; platform_python_implementation == \"CPython\"",
+    "hypothesis",
+    "pympler",
+    "pytest>9",
+    "pytest-xdist[psutil]",
+    "watchfiles",
+    "cogapp",
+    "doc2dash"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10, >=3.9"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "dev.",
+     "reason": "no network or the package was not found"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 8 setup item(s) in the project's files and the web lookup. Refused: dev. (no network or the package was not found).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: cloudpickle; platform_python_implementation == \"CPython\", hypothesis, pympler, pytest>9, pytest-xdist[psutil], watchfiles, cogapp, doc2dash."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 8
+  },
+  "installs": [
+   {
+    "package": "cloudpickle",
+    "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+    "version": "3.1.2",
+    "versions": {
+     "main": "3.1.2",
+     "pr": "3.1.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis",
+    "version": "6.170.15",
+    "versions": {
+     "main": "6.170.15",
+     "pr": "6.170.15"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pympler",
+    "requirement": "pympler",
+    "version": "1.1",
+    "versions": {
+     "main": "1.1",
+     "pr": "1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest>9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist[psutil]",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "watchfiles",
+    "requirement": "watchfiles",
+    "version": "1.3.0",
+    "versions": {
+     "main": "1.3.0",
+     "pr": "1.3.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "cogapp",
+    "requirement": "cogapp",
+    "version": "3.6.1",
+    "versions": {
+     "main": "3.6.1",
+     "pr": "3.6.1"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "doc2dash",
+    "requirement": "doc2dash",
+    "version": "3.1.0",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.1.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 1659,
+  "head_sha": "d6aa8bbc2eec9019135e5dd50016015e2c50489e",
+  "base_sha": "2a1fb86d44816afcc60e86d57956ce3604820326",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "2a1fb86d44816afcc60e86d57956ce3604820326",
+  "pr_sha": "11065f7c2af527749bbbd423f65e51e48f2994aa",
+  "merge_commit": "11065f7c2af527749bbbd423f65e51e48f2994aa",
+  "merge_parents": [
+   "2a1fb86d44816afcc60e86d57956ce3604820326",
+   "d6aa8bbc2eec9019135e5dd50016015e2c50489e"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 2a1fb86d4481 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 11065f7c2af5 (refs/pull/1659/merge) of head d6aa8bbc2eec"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe-example' rejected: cannot bind attr._make.evolve: evolve() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The example code does not raise KeyError(\"version\") when constructing Request with attr_dict={}.",
+    "source_quote": "For example, this currently raises `KeyError(\"version\")` on main.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After fix, request.attributes equals an empty dict.",
+    "source_quote": "assert request.attributes == {}",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "request.version equals 1.",
+    "source_quote": "assert request.version == 1",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "attrs.evolve(request).version equals 1.",
+    "source_quote": "assert attrs.evolve(request).version == 1",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The internal metadata name chosen for a field excludes any normalized constructor parameter names and existing module globals.",
+    "source_quote": "Choose the internal metadata name after excluding normalized constructor parameter names and existing module globals.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The chosen internal metadata name is propagated to default expressions and converters that receive the field.",
+    "source_quote": "Carry that name through default expressions and converters that receive the field.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "Preserving module globals ensures that generated initializer string annotations remain resolvable via typing.get_type_hints().",
+    "source_quote": "Preserving module globals also keeps generated initializer string annotations resolvable with `typing.get_type_hints()`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "Public signatures and type stubs are unchanged and remain applicable.",
+    "source_quote": "The public signatures and type stubs remain applicable.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "probe-public-api",
+    "claims": [
+     "C8"
+    ]
+   },
+   {
+    "id": "probe-mod-global-alias",
+    "claims": [
+     "C5"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-annotation.py",
+    "source": "model",
+    "sha256": "8b6d7ee40e8cc0619de88f562b55dac7730f705baeba4304dc3e4e0fdb2f29b9",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-17T05:59:16.174632+00:00",
+    "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+    "inputs": {
+     "title_chars": 59,
+     "body_chars": 4425,
+     "base_files": {
+      "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-public-api.py",
+    "source": "model",
+    "sha256": "04d6f1f05ac817c5e3829ab6830b81b8455cc639aa61fe7fbeecf863ddd9c5ff",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-17T05:59:16.174798+00:00",
+    "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+    "inputs": {
+     "title_chars": 59,
+     "body_chars": 4425,
+     "base_files": {
+      "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-mod-global-alias.py",
+    "source": "model",
+    "sha256": "7e89664fb5724589e67d7d98812c9fe9f625fb01547448ba700b8188dd81f8a3",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-17T05:59:16.174894+00:00",
+    "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+    "inputs": {
+     "title_chars": 59,
+     "body_chars": 4425,
+     "base_files": {
+      "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-xdist[psutil]"
+ ],
+ "pr_side_started_at": "2026-11-17T05:59:16.324598+00:00",
+ "test_targets": {
+  "main": [
+   "tests"
+  ],
+  "pr": [
+   "tests",
+   "tests/test_initializer_annotations.py",
+   "tests/test_initializer_metadata.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "attrs",
+   "expected": "2a1fb86d44816afcc60e86d57956ce3604820326",
+   "installed": "2a1fb86d44816afcc60e86d57956ce3604820326",
+   "ok": true
+  },
+  "pr": {
+   "dist": "attrs",
+   "expected": "11065f7c2af527749bbbd423f65e51e48f2994aa",
+   "installed": "11065f7c2af527749bbbd423f65e51e48f2994aa",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-xdist[psutil]"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "2a1fb86d44816afcc60e86d57956ce3604820326",
+ "comparison": {
+  "same": 1412,
+  "same_skipped_both": 11,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 92,
+  "new_tests_passing_ids": [
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-False-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-False-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-False-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-True-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-True-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-False-True-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-False-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-False-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-False-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-True-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-True-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[False-True-True-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-False-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-False-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-False-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-True-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-True-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-False-True-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-False-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-False-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-False-payload]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-True-\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-True-attr_dict]",
+   "tests.test_initializer_annotations::test_module_annotation_names[True-True-True-payload]",
+   "tests.test_initializer_annotations::test_single_module_annotation_name[False-False]",
+   "tests.test_initializer_annotations::test_single_module_annotation_name[False-True]",
+   "tests.test_initializer_annotations::test_single_module_annotation_name[True-False]",
+   "tests.test_initializer_annotations::test_single_module_annotation_name[True-True]",
+   "tests.test_initializer_metadata::test_attrs_init_metadata",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-False-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-False-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-False-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-False-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-required-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-required-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-False-True-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-False-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-False-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-False-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-False-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-required-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-required-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[False-True-True-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-False-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-False-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-False-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-False-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-required-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-required-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-False-True-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-False-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-False-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-False-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-False-scalar-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-factory-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-factory-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-required-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-required-True]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-scalar-False]",
+   "tests.test_initializer_metadata::test_converter_metadata[True-True-True-scalar-True]",
+   "tests.test_initializer_metadata::test_default_metadata[False-False-payload0-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[False-False-payload0-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[False-False-payload1-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[False-False-payload1-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[False-True-payload0-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[False-True-payload0-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[False-True-payload1-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[False-True-payload1-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[True-False-payload0-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[True-False-payload0-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[True-False-payload1-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[True-False-payload1-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[True-True-payload0-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[True-True-payload0-payload]",
+   "tests.test_initializer_metadata::test_default_metadata[True-True-payload1-attr_dict]",
+   "tests.test_initializer_metadata::test_default_metadata[True-True-payload1-payload]",
+   "tests.test_initializer_metadata::test_inherited_slotted_converter",
+   "tests.test_initializer_metadata::test_multiple_metadata_name_collisions[\\uff41\\uff54\\uff54\\uff52_\\uff44\\uff49\\uff43\\uff54_]",
+   "tests.test_initializer_metadata::test_multiple_metadata_name_collisions[attr_dict_]",
+   "tests.test_initializer_metadata::test_natural_name_and_inherited_default[False-False]",
+   "tests.test_initializer_metadata::test_natural_name_and_inherited_default[False-True]",
+   "tests.test_initializer_metadata::test_natural_name_and_inherited_default[True-False]",
+   "tests.test_initializer_metadata::test_natural_name_and_inherited_default[True-True]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 1401,
+   "pr": 1493
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-annotation",
+    "source": "model",
+    "path": "model-probes/model-probe-annotation.py",
+    "sha256": "8b6d7ee40e8cc0619de88f562b55dac7730f705baeba4304dc3e4e0fdb2f29b9",
+    "target": "python-attrs/attrs#1659",
+    "about": "Test string annotation resolution in initializer",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-annotation-main-1.jsonl",
+      "probe-model-probe-annotation-main-2.jsonl",
+      "probe-model-probe-annotation-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-annotation-pr-1.jsonl",
+      "probe-model-probe-annotation-pr-2.jsonl",
+      "probe-model-probe-annotation-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c7.annotation_value": 42
+      },
+      {
+       "c7.annotation_value": 42
+      },
+      {
+       "c7.annotation_value": 42
+      }
+     ],
+     "pr": [
+      {
+       "c7.annotation_value": 42
+      },
+      {
+       "c7.annotation_value": 42
+      },
+      {
+       "c7.annotation_value": 42
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c7.annotation_value",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 42,
+      "pr": 42,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-annotation-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.annotation_value\""
+       },
+       "pr": {
+        "file": "probe-model-probe-annotation-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.annotation_value\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8b6d7ee40e8cc0619de88f562b55dac7730f705baeba4304dc3e4e0fdb2f29b9",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-17T05:59:16.174632+00:00",
+     "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+     "inputs": {
+      "title_chars": 59,
+      "body_chars": 4425,
+      "base_files": {
+       "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T05:59:16.324598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 25,
+     "changed_lines_covered": 9,
+     "files": [
+      {
+       "file": "src/attr/_make.py",
+       "changed_lines_total": 25,
+       "changed_lines_covered": 9
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 9 of 25 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-annotation.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-public-api",
+    "source": "model",
+    "path": "model-probes/model-probe-public-api.py",
+    "sha256": "04d6f1f05ac817c5e3829ab6830b81b8455cc639aa61fe7fbeecf863ddd9c5ff",
+    "target": "python-attrs/attrs#1659",
+    "about": "Test public API signatures",
+    "claims": [
+     {
+      "id": "C8",
+      "source": "PR description",
+      "text": "Public signatures and type stubs are unchanged and remain applicable.",
+      "covers": [
+       "c8.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-public-api-main-1.jsonl",
+      "probe-model-probe-public-api-main-2.jsonl",
+      "probe-model-probe-public-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-public-api-pr-1.jsonl",
+      "probe-model-probe-public-api-pr-2.jsonl",
+      "probe-model-probe-public-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      },
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      },
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      }
+     ],
+     "pr": [
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      },
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      },
+      {
+       "c8.attrs_define_signature": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+       "c8.attrs_field_signature": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c8.attrs_define_signature",
+      "state": "same",
+      "label": "proven",
+      "claim": "C8",
+      "main": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+      "pr": "(maybe_cls=None, *, these=None, repr=None, unsafe_hash=None, hash=None, init=None, slots=True, frozen=False, weakref_slot=True, str=False, auto_attribs=None, kw_only=False, cache_hash=False, auto_exc=True, eq=None, order=False, auto_detect=True, getstate_setstate=None, on_setattr=None, field_transformer=None, match_args=True, force_kw_only=False)",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-public-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c8.attrs_define_signature\""
+       },
+       "pr": {
+        "file": "probe-model-probe-public-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c8.attrs_define_signature\""
+       }
+      }
+     },
+     {
+      "name": "c8.attrs_field_signature",
+      "state": "same",
+      "label": "proven",
+      "claim": "C8",
+      "main": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)",
+      "pr": "(*, default=NOTHING, validator=None, repr=True, hash=None, init=True, metadata=None, type=None, converter=None, factory=None, kw_only=None, eq=None, order=None, on_setattr=None, alias=None)",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-public-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c8.attrs_field_signature\""
+       },
+       "pr": {
+        "file": "probe-model-probe-public-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c8.attrs_field_signature\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "04d6f1f05ac817c5e3829ab6830b81b8455cc639aa61fe7fbeecf863ddd9c5ff",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-17T05:59:16.174798+00:00",
+     "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+     "inputs": {
+      "title_chars": 59,
+      "body_chars": 4425,
+      "base_files": {
+       "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T05:59:16.324598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 25,
+     "changed_lines_covered": 8,
+     "files": [
+      {
+       "file": "src/attr/_make.py",
+       "changed_lines_total": 25,
+       "changed_lines_covered": 8
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 8 of 25 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-public-api.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-mod-global-alias",
+    "source": "model",
+    "path": "model-probes/model-probe-mod-global-alias.py",
+    "sha256": "7e89664fb5724589e67d7d98812c9fe9f625fb01547448ba700b8188dd81f8a3",
+    "target": "python-attrs/attrs#1659",
+    "about": "Test that internal metadata name excludes module globals (C5)",
+    "claims": [
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The internal metadata name chosen for a field excludes any normalized constructor parameter names and existing module globals.",
+      "covers": [
+       "c5.*",
+       "c5_*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-mod-global-alias-main-1.jsonl",
+      "probe-model-probe-mod-global-alias-main-2.jsonl",
+      "probe-model-probe-mod-global-alias-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-mod-global-alias-pr-1.jsonl",
+      "probe-model-probe-mod-global-alias-pr-2.jsonl",
+      "probe-model-probe-mod-global-alias-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      },
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      },
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      }
+     ],
+     "pr": [
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      },
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      },
+      {
+       "c5.construction_success": true,
+       "c5.construction_exception_type": null,
+       "c5.construction_exception_message": null,
+       "c5.field_value": "passed_value"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c5.construction_exception_message",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C5",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-mod-global-alias-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.construction_exception_message\""
+       },
+       "pr": {
+        "file": "probe-model-probe-mod-global-alias-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.construction_exception_message\""
+       }
+      }
+     },
+     {
+      "name": "c5.construction_exception_type",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C5",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-mod-global-alias-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c5.construction_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-mod-global-alias-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c5.construction_exception_type\""
+       }
+      }
+     },
+     {
+      "name": "c5.construction_success",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C5",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-mod-global-alias-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c5.construction_success\""
+       },
+       "pr": {
+        "file": "probe-model-probe-mod-global-alias-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c5.construction_success\""
+       }
+      }
+     },
+     {
+      "name": "c5.field_value",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C5",
+      "main": "passed_value",
+      "pr": "passed_value",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-mod-global-alias-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c5.field_value\""
+       },
+       "pr": {
+        "file": "probe-model-probe-mod-global-alias-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c5.field_value\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "7e89664fb5724589e67d7d98812c9fe9f625fb01547448ba700b8188dd81f8a3",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-17T05:59:16.174894+00:00",
+     "inputs_sha256": "3f2a9fb3751fe39bc180382f759fd07ee17daff699f13ef41952b8ccaba90d0f",
+     "inputs": {
+      "title_chars": 59,
+      "body_chars": 4425,
+      "base_files": {
+       "src/attr/_make.py": "db3b8d7a08c7ed547459e6828e906ae4044e234d0144c189595bdf56cff61a91"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T05:59:16.324598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 25,
+     "changed_lines_covered": 8,
+     "files": [
+      {
+       "file": "src/attr/_make.py",
+       "changed_lines_total": 25,
+       "changed_lines_covered": 8
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 8 of 25 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-mod-global-alias.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "proven",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe-mod-global-alias",
+     "name": "c5.construction_exception_message",
+     "label": "needs_human",
+     "claim": "C5"
+    },
+    {
+     "probe": "model-probe-mod-global-alias",
+     "name": "c5.construction_exception_type",
+     "label": "needs_human",
+     "claim": "C5"
+    },
+    {
+     "probe": "model-probe-mod-global-alias",
+     "name": "c5.construction_success",
+     "label": "needs_human",
+     "claim": "C5"
+    },
+    {
+     "probe": "model-probe-mod-global-alias",
+     "name": "c5.field_value",
+     "label": "needs_human",
+     "claim": "C5"
+    }
+   ],
+   "proven_claims": [
+    "C8"
+   ],
+   "reason": "probe: 4 observation(s) need attention: c5.construction_exception_message does not differ although the claim says it does (C5); c5.construction_exception_type does not differ although the claim says it does (C5); c5.construction_success does not differ although the claim says it does (C5); c5.field_value does not differ although the claim says it does (C5); probe: claim(s) C8 proven; probe: 1 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-annotation": {
+    "status": "measured",
+    "changed_lines_covered": 9,
+    "changed_lines_total": 25,
+    "adequacy": "adequate"
+   },
+   "model-probe-public-api": {
+    "status": "measured",
+    "changed_lines_covered": 8,
+    "changed_lines_total": 25,
+    "adequacy": "adequate"
+   },
+   "model-probe-mod-global-alias": {
+    "status": "measured",
+    "changed_lines_covered": 8,
+    "changed_lines_total": 25,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 4 observation(s) need attention: c5.construction_exception_message does not differ although the claim says it does (C5); c5.construction_exception_type does not differ although the claim says it does (C5); c5.construction_success does not differ although the claim says it does (C5); c5.field_value does not differ although the claim says it does (C5); probe: claim(s) C8 proven; probe: 1 other observation(s) identical on both sides; tests: 1401 test(s) ran on main, 1493 on the PR; 92 new test(s) pass, 1412 unchanged (11 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 4 observation(s) need attention: c5.construction_exception_message does not differ although the claim says it does (C5); c5.construction_exception_type does not differ although the claim says it does (C5); c5.construction_success does not differ although the claim says it does (C5); c5.field_value does not differ although the claim says it does (C5); probe: claim(s) C8 proven; probe: 1 other observation(s) identical on both sides; tests: 1401 test(s) ran on main, 1493 on the PR; 92 new test(s) pass, 1412 unchanged (11 of them skipped on both sides)",
+ "changed_lines_total": 30,
+ "changed_lines_covered": 30,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "30 of 30 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "changelog.d/+initializer-metadata.change.md",
+   "docs/init.md",
+   "src/attr/_make.py",
+   "tests/test_initializer_annotations.py",
+   "tests/test_initializer_metadata.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 210.5,
+  "tests": 35.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 35508,
+  "output_tokens": 31070,
+  "thinking_tokens": 28515,
+  "cost_usd": 0.038615,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.038615,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 210.5,
+   "tests": 35.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.014033,
+  "total_cost_usd": 0.052648,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-17/ef12096/attrs-1659"
+ }
+}
