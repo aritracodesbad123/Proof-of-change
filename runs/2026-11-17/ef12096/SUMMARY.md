@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-17 on ef12096
 
-5 report(s) in this folder: 1 need attention, 3 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+6 report(s) in this folder: 1 need attention, 4 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -8,6 +8,7 @@
 - **COULD NOT VERIFY**: mahmoud/boltons#197: Add strutils.assemble. Install failed (1); see setup-main.log
 - **COULD NOT VERIFY**: mahmoud/boltons#799: Validate anonymous format arguments under Python optimization. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 5 test(s) ran on main, 6 on the PR; 1 new test(s) pass, 5 unchanged; probe model-p1 is not_adequate (ran none of the 4 changed line(s) on the main side); its results do not count either way
 - **COULD NOT VERIFY**: pyinvoke/invoke#278: A bunch of work for refactoring Program re #276. No tests could be mapped to the touched files
+- **COULD NOT VERIFY**: Delgan/loguru#1545: Fix file sink stuck on closed file after close error during rotation. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 152 on the PR; 0 new test(s) pass, 154 unchanged (3 of them skipped on both sides)
 
 ## All reports
 
@@ -17,4 +18,5 @@
 | COULD NOT VERIFY | mahmoud/boltons#197: Add strutils.assemble | Install failed (1); see setup-main.log | [PDF](boltons-197/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#799: Validate anonymous format arguments under Python optimization | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 5 test(s) ran on main, 6 on the PR; 1 new test(s) pass, 5 unchanged; probe model-p1 is not_adequate (ran none of the 4 changed line(s) on the main side); its results do not count either way | [PDF](boltons-799/REPORT.pdf) |
 | COULD NOT VERIFY | pyinvoke/invoke#278: A bunch of work for refactoring Program re #276 | No tests could be mapped to the touched files | [PDF](invoke-278/REPORT.pdf) |
+| COULD NOT VERIFY | Delgan/loguru#1545: Fix file sink stuck on closed file after close error during rotation | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 152 on the PR; 0 new test(s) pass, 154 unchanged (3 of them skipped on both sides) | [PDF](loguru-1545/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#797: dictutils: apply update_extend's keyword arguments | 2 test(s) fail on main and pass on the PR; 100 test(s) ran on main, 100 on the PR; 0 new test(s) pass, 98 unchanged; probe: claim(s) C1, C2 proven | [PDF](boltons-797/REPORT.pdf) |
