@@ -1,0 +1,1384 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-912-5402829cb241-2026-11-17",
+ "date_ist": "2026-11-17 11:57 IST",
+ "run_date": "2026-11-17",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 912,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/912",
+  "title": "Fix grouping of datetime cast timezone suffixes",
+  "base_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "5402829cb24105c38cfaed78f83ab5fc50272a1d",
+  "merge_commit": "884e1c0c26c7298ae1e7b22ae30440e2fa54b643",
+  "tested_main_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "SAY-5",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-16T20:38:43Z",
+ "updated_at_ist": "2026-11-17 02:08 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-17 11:57 IST",
+ "files": {
+  "all": [
+   "sqlparse/engine/grouping.py",
+   "sqlparse/sql.py",
+   "tests/test_grouping.py",
+   "tests/test_regressions.py"
+  ],
+  "package_py": [
+   "sqlparse/engine/grouping.py",
+   "sqlparse/sql.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_grouping.py",
+   "tests/test_regressions.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_grouping.py, tests/test_regressions.py, tests/test_dos_prevention.py, tests/test_cli.py, tests/test_format.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 308,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "307 passed, 2 xfailed, 1 xpassed in 1.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 372,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "371 passed, 2 xfailed, 1 xpassed in 1.25s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 308,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "307 passed, 2 xfailed, 1 xpassed in 1.25s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 372,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "371 passed, 2 xfailed, 1 xpassed in 1.26s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 308,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "307 passed, 2 xfailed, 1 xpassed in 1.26s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 372,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "371 passed, 2 xfailed, 1 xpassed in 1.28s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "The 64 focused cases produce 45 failures and 19 passes on untouched master, then all pass with the fix.",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-912/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 30,
+  "changed_lines_covered": 29,
+  "files": [
+   {
+    "file": "sqlparse/engine/grouping.py",
+    "changed_lines_total": 15,
+    "changed_lines_covered": 15
+   },
+   {
+    "file": "sqlparse/sql.py",
+    "changed_lines_total": 15,
+    "changed_lines_covered": 14
+   }
+  ],
+  "seconds": 3.4,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "5402829cb24105c38cfaed78f83ab5fc50272a1d",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
+   "Setup check: free disk 90.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse/pyproject.toml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/pyproject.toml",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+   "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install build (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/python-app.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "benchmarks/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "build",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "build"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: build."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "build",
+    "requirement": "build",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "pr_sha": "884e1c0c26c7298ae1e7b22ae30440e2fa54b643",
+  "merge_commit": "884e1c0c26c7298ae1e7b22ae30440e2fa54b643",
+  "merge_parents": [
+   "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+   "5402829cb24105c38cfaed78f83ab5fc50272a1d"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 09dbe1eec31e (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 884e1c0c26c7 (refs/pull/912/merge) of head 5402829cb241"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'main-probe' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "\"SELECT '2020-01-01'::timestamp WITH TIME ZONE AS moment, ARRAY(SELECT 1) AS items;\" currently leaves the timezone suffix outside the cast.",
+    "source_quote": "`SELECT '2020-01-01'::timestamp WITH TIME ZONE AS moment, ARRAY(SELECT 1) AS items;` currently leaves the timezone suffix outside the cast.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The SELECT list then starts at the alias, and reindent places ARRAY 49 spaces from the left edge instead of 7.",
+    "source_quote": "The SELECT list then starts at the alias, and reindent places ARRAY 49 spaces from the left edge instead of 7.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Extend `::` casts of TIME/TIMESTAMP, including optional precision, through a complete WITH/WITHOUT TIME ZONE suffix.",
+    "source_quote": "Extend `::` casts of TIME/TIMESTAMP, including optional precision, through a complete WITH/WITHOUT TIME ZONE suffix.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Preserve the original tokens and keep unaliased casts from reporting the operand or type name as an alias.",
+    "source_quote": "Preserve the original tokens and keep unaliased casts from reporting the operand or type name as an alias.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "The regression tests cover formatting, comments, explicit and implicit aliases, chained casts, custom types, CTEs, and subsequent AT TIME ZONE conversion.",
+    "source_quote": "The regression tests cover formatting, comments, explicit and implicit aliases, chained casts, custom types, CTEs, and subsequent AT TIME ZONE conversion.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "This change is limited to PostgreSQL-style `::` casts.",
+    "source_quote": "This change is limited to PostgreSQL-style `::` casts.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "It does not change CAST expressions, typed literals, or AT TIME ZONE tokenization.",
+    "source_quote": "It does not change CAST expressions, typed literals, or AT TIME ZONE tokenization.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C8",
+    "text": "Validation on macOS with Python 3.13.0: 570 passed, 2 xfailed, 1 xpassed; Ruff passed.",
+    "source_quote": "Validation on macOS with Python 3.13.0: 570 passed, 2 xfailed, 1 xpassed; Ruff passed.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "The 64 focused cases produce 45 failures and 19 passes on untouched master, then all pass with the fix.",
+    "source_quote": "The 64 focused cases produce 45 failures and 19 passes on untouched master, then all pass with the fix.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C10",
+    "text": "The grouping benchmark and bounded datetime-cast parsing/formatting benchmarks report linear scaling.",
+    "source_quote": "The grouping benchmark and bounded datetime-cast parsing/formatting benchmarks report linear scaling.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "sqlparse.engine.grouping.group_typecasts"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "8f6072fb53a760153f5731a18542a8d12eba73b4e71bc68e357ea0f1c6a72e79",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-17T06:29:27.875439+00:00",
+    "inputs_sha256": "79fdea3ef3b0d7b4e9bbbb22346032b76111b4d9a5d4336354c3052b4ddbad8b",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "sqlparse/engine/grouping.py": "d0912101c641e5da59b0c14c6c24a7ad5abcc7a9e60b22b6574ee98bbf9d83f7",
+      "sqlparse/sql.py": "9e8e78ab0f25c2cc7456c83218c5d14f1656070ee60c32b70246a26bba10d009"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "build"
+ ],
+ "pr_side_started_at": "2026-11-17T06:29:28.011496+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_grouping.py",
+   "tests/test_regressions.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_cli.py",
+   "tests/test_format.py"
+  ],
+  "pr": [
+   "tests/test_grouping.py",
+   "tests/test_regressions.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_cli.py",
+   "tests/test_format.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sqlparse",
+   "expected": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+   "installed": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sqlparse",
+   "expected": "884e1c0c26c7298ae1e7b22ae30440e2fa54b643",
+   "installed": "884e1c0c26c7298ae1e7b22ae30440e2fa54b643",
+   "ok": true
+  }
+ },
+ "base_head_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+ "comparison": {
+  "same": 310,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TIMESTAMP(3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TIMESTAMP\\n(3) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TiMeStAmP(6) WiTh TiMe ZoNe]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time (0) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp /* precision */ (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TIMESTAMP(3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TIMESTAMP\\n(3) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TiMeStAmP(6) WiTh TiMe ZoNe]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time (0) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp /* precision */ (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TIMESTAMP(3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TIMESTAMP\\n(3) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TiMeStAmP(6) WiTh TiMe ZoNe]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time (0) WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp /* precision */ (3) WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp WITH TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp WITHOUT TIME ZONE]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE \"Local moment\"-Local moment]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE AS \"Local moment\"-Local moment]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE AS zone-zone]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::pg_catalog.text AS \"Local moment\"-Local moment]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::text moment-moment]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::varchar(3) moment-moment]",
+   "tests.test_grouping::test_grouping_datetime_typecast_cte",
+   "tests.test_grouping::test_grouping_datetime_typecast_timezone_conversion",
+   "tests.test_regressions::test_issue811_datetime_typecast_reindent"
+  ],
+  "new_tests_passing": 19,
+  "new_tests_passing_ids": [
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries['2020-01-01'::timestamp(6) WITHOUT TIME ZONE-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[events.ts::timestamp WITH TIME ZONE /* note */-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::custom_type-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::pg_catalog.text-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::text-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::text[]-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::varchar(3)-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE[]-None]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[\"schema\".\"timestamp\"]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[\"time\"]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[\"timestamp\"]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[TIMESTAMP\\n(3)]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[custom_type]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[schema.timestamp(3)]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[schema.timestamp]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[time]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[timestamp (3)]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[timestamp]",
+   "tests.test_grouping::test_grouping_datetime_typecast_custom_types[timestamptz]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 353,
+   "pr": 372
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TIMESTAMP(3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TIMESTAMP\\n(3) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-TiMeStAmP(6) WiTh TiMe ZoNe]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time (0) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-time WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp /* precision */ (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ AS moment-timestamp WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TIMESTAMP(3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TIMESTAMP\\n(3) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-TiMeStAmP(6) WiTh TiMe ZoNe]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time (0) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-time WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp /* precision */ (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[ moment-timestamp WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-/* type */ timestamp /* zone */ WITH /* time */ TIME /* end */ ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TIMESTAMP(3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TIMESTAMP\\n(3) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-TiMeStAmP(6) WiTh TiMe ZoNe]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time (0) WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time -- precision\\n(0) WITHOUT -- zone\\nTIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-time WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp /* precision */ (3) WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp WITH TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast[-timestamp WITHOUT TIME ZONE]": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE \"Local moment\"-Local moment]": "AssertionError: assert None == 'Local moment'",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE AS \"Local moment\"-Local moment]": "AssertionError: assert None == 'Local moment'",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE AS zone-zone]": "AssertionError: assert None == 'zone'",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::pg_catalog.text AS \"Local moment\"-Local moment]": "AssertionError: assert None == 'Local moment'",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::text moment-moment]": "AssertionError: assert None == 'moment'",
+   "tests.test_grouping::test_grouping_datetime_typecast_alias_boundaries[ts::timestamp WITH TIME ZONE::varchar(3) moment-moment]": "AssertionError: assert None == 'moment'",
+   "tests.test_grouping::test_grouping_datetime_typecast_cte": "AssertionError: assert False",
+   "tests.test_grouping::test_grouping_datetime_typecast_timezone_conversion": "AssertionError: assert False",
+   "tests.test_regressions::test_issue811_datetime_typecast_reindent": "AssertionError: assert \"SELECT '2020... 1) AS items;\" == \"SELECT '2020... 1) AS items;\""
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "uninformative",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "8f6072fb53a760153f5731a18542a8d12eba73b4e71bc68e357ea0f1c6a72e79",
+    "target": "andialbrecht/sqlparse#912",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "sqlparse.engine.grouping.group_typecasts.input0": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input1": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input10": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input11": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input2": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input3": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input4": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input5": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input6": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input7": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input8": {
+        "raises": "AttributeError"
+       },
+       "sqlparse.engine.grouping.group_typecasts.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input0\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input1\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input10\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input11\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input2\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input3\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input4\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input5\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input6\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input7\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input8\""
+       }
+      }
+     },
+     {
+      "name": "sqlparse.engine.grouping.group_typecasts.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"sqlparse.engine.grouping.group_typecasts.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "8f6072fb53a760153f5731a18542a8d12eba73b4e71bc68e357ea0f1c6a72e79",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-17T06:29:27.875439+00:00",
+     "inputs_sha256": "79fdea3ef3b0d7b4e9bbbb22346032b76111b4d9a5d4336354c3052b4ddbad8b",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "sqlparse/engine/grouping.py": "d0912101c641e5da59b0c14c6c24a7ad5abcc7a9e60b22b6574ee98bbf9d83f7",
+       "sqlparse/sql.py": "9e8e78ab0f25c2cc7456c83218c5d14f1656070ee60c32b70246a26bba10d009"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T06:29:28.011496+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 4,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "sqlparse/engine/grouping.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      },
+      {
+       "file": "sqlparse/sql.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json",
+     "changed_lines_touched": 1
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 4,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "unverified behaviour claim: \"The 64 focused cases produce 45 failures and 19 passes on untouched master, then all pass with the fix.\"; needs a probe (45 test(s) fail on main and pass on the PR; 353 test(s) ran on main, 372 on the PR; 19 new test(s) pass, 310 unchanged (2 of them skipped on both sides))",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "unverified behaviour claim: \"The 64 focused cases produce 45 failures and 19 passes on untouched master, then all pass with the fix.\"; needs a probe (45 test(s) fail on main and pass on the PR; 353 test(s) ran on main, 372 on the PR; 19 new test(s) pass, 310 unchanged (2 of them skipped on both sides))",
+ "changed_lines_total": 30,
+ "changed_lines_covered": 29,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "29 of 30 changed executable line(s) ran (97%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/engine/grouping.py",
+   "sqlparse/sql.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_grouping.py",
+   "tests/test_regressions.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 165.9,
+  "tests": 10.1
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 25325,
+  "output_tokens": 27135,
+  "thinking_tokens": 22540,
+  "cost_usd": 0.032019,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.032019,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 165.9,
+   "tests": 10.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01106,
+  "total_cost_usd": 0.043079,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-17/ef12096/sqlparse-912"
+ }
+}
