@@ -1,0 +1,370 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-197-2b4059855ab4-2026-11-17",
+ "date_ist": "2026-11-17 11:45 IST",
+ "run_date": "2026-11-17",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 197,
+  "url": "https://github.com/mahmoud/boltons/pull/197",
+  "title": "Add strutils.assemble",
+  "base_sha": "46435b66dd45f3f45c49e5ca91cba83cc1ddd97d",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "2b4059855ab4ceae54032bff55da0a6622f1ff01",
+  "merge_commit": null,
+  "tested_main_sha": "46435b66dd45f3f45c49e5ca91cba83cc1ddd97d",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "jpic",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-16T08:48:37Z",
+ "updated_at_ist": "2026-11-16 14:18 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-17 11:45 IST",
+ "files": {
+  "all": [
+   "boltons/strutils.py",
+   "tests/test_strutils.py"
+  ],
+  "package_py": [
+   "boltons/strutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": null,
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-197/",
+ "freeze": {},
+ "coverage": {
+  "status": "not measured",
+  "why": "coverage has not been run for this check"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "2b4059855ab4ceae54032bff55da0a6622f1ff01",
+ "tested_invocation": 1,
+ "model_provider_used": "none",
+ "model_provider_fallback": "no AI call ran (asked for nebius)",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
+   "Setup check: free disk 90.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.github/workflows/tests.yaml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/.github/workflows/tests.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install coverage==4.5.1 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install py<1.6.0 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install pytest==3.0.7 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install pytest-cov==2.5.1 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install tox==2.9.1 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install virtualenv==15.0.2 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install tox-virtualenv-no-download==1.0.2 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7",
+   "rerun, setup problem: main install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "install_docs": [
+   "setup.py",
+   "README.md",
+   "setup.cfg",
+   "tox.ini",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "coverage==4.5.1",
+     "name": "coverage",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "py<1.6.0",
+     "name": "py",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==3.0.7",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov==2.5.1",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox==2.9.1",
+     "name": "tox",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "virtualenv==15.0.2",
+     "name": "virtualenv",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox-virtualenv-no-download==1.0.2",
+     "name": "tox-virtualenv-no-download",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "coverage==4.5.1",
+    "py<1.6.0",
+    "pytest==3.0.7",
+    "pytest-cov==2.5.1",
+    "tox==2.9.1",
+    "virtualenv==15.0.2",
+    "tox-virtualenv-no-download==1.0.2"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 7 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: coverage==4.5.1, py<1.6.0, pytest==3.0.7, pytest-cov==2.5.1, tox==2.9.1, virtualenv==15.0.2, tox-virtualenv-no-download==1.0.2."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 7
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "main install",
+   "attempts": 3,
+   "detail": "install failed (1); see setup-main.log"
+  }
+ },
+ "sides": {
+  "main_sha": "46435b66dd45f3f45c49e5ca91cba83cc1ddd97d",
+  "pr_sha": "2b4059855ab4ceae54032bff55da0a6622f1ff01",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "46435b66dd45f3f45c49e5ca91cba83cc1ddd97d",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "master @ 46435b66dd45 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 2b4059855ab4"
+ },
+ "verdict": "could_not_verify",
+ "reason": "install failed (1); see setup-main.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (1); see setup-main.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
+  "measurement": "not measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/strutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 25.2,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 25.2,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00168,
+  "total_cost_usd": 0.00168,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-17/ef12096/boltons-197"
+ }
+}
