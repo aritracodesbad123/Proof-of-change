@@ -1,0 +1,3648 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-5365-80702391fc66-2026-11-17",
+ "date_ist": "2026-11-17 11:30 IST",
+ "run_date": "2026-11-17",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 5365,
+  "url": "https://github.com/urllib3/urllib3/pull/5365",
+  "title": "Prevent empty bodies from one-shot iterator retries",
+  "base_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+  "merge_commit": null,
+  "tested_main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "Zhuyuyangyy",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-16T10:53:28Z",
+ "updated_at_ist": "2026-11-16 16:23 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-17 11:30 IST",
+ "files": {
+  "all": [
+   "changelog/5362.bugfix.rst",
+   "src/urllib3/connectionpool.py",
+   "src/urllib3/poolmanager.py",
+   "src/urllib3/util/request.py",
+   "test/test_request_body_retries.py"
+  ],
+  "package_py": [
+   "src/urllib3/connectionpool.py",
+   "src/urllib3/poolmanager.py",
+   "src/urllib3/util/request.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/5362.bugfix.rst",
+   "test/test_request_body_retries.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: test/test_request_body_retries.py, test/test_connectionpool.py, test/with_dummyserver/test_connectionpool.py, test/test_poolmanager.py, test/with_dummyserver/test_poolmanager.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 188,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 20.0,
+   "pytest_summary": "5 failed, 188 passed, 2 skipped, 5 warnings, 191 errors in 18.51s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 199,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 29.9,
+   "pytest_summary": "5 failed, 199 passed, 2 skipped, 5 warnings, 191 errors in 28.45s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 188,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 19.9,
+   "pytest_summary": "5 failed, 188 passed, 2 skipped, 5 warnings, 191 errors in 18.46s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 199,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 29.9,
+   "pytest_summary": "5 failed, 199 passed, 2 skipped, 5 warnings, 191 errors in 28.45s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 188,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 19.9,
+   "pytest_summary": "5 failed, 188 passed, 2 skipped, 5 warnings, 191 errors in 18.45s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 199,
+   "failed": 0,
+   "error": 191,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 29.9,
+   "pytest_summary": "5 failed, 199 passed, 2 skipped, 5 warnings, 191 errors in 28.44s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-5365/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 28,
+  "changed_lines_covered": 28,
+  "files": [
+   {
+    "file": "src/urllib3/connectionpool.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   },
+   {
+    "file": "src/urllib3/poolmanager.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   },
+   {
+    "file": "src/urllib3/util/request.py",
+    "changed_lines_total": 23,
+    "changed_lines_covered": 23
+   }
+  ],
+  "seconds": 32.4,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "behind",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 90.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: urllib3 \u00b7 PyPI \u2014 https://pypi.org/project/urllib3/",
+   "Source: urllib3 installation requires setuptools >= 36.2.5 \u00b7 Issue #1753 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1753",
+   "Source: urllib3/docs/advanced-usage.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/master/docs/advanced-usage.rst",
+   "Source: update of urllib3 makes kodi start up much slower \u00b7 Issue #1590 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1590",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: urllib3/CHANGES.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/CHANGES.rst",
+   "Source: Installing urllib3 \u00b7 Issue #829 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/829",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install trustme>=1.2.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr.",
+   "Before rerun: needs_attention: probe: 6 observation(s) need attention: c2.generator_body_exhausted_after differs although the claim says it does not (C2); c2.generator_body_type differs although the claim says it does not (C2); c2.iter_list_body_exhausted_after differs although the claim says it does not (C2); c2.iter_list_body_type differs although the claim says it does not (C2); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.attempt1_body_exhausted (C1); c1.attempt1_body_type (C1); c1.exception_type (C1); probe: claim(s) C1 proven; probe: 3 probe(s) could not run on either side; tests: 379 test(s) ran on main, 390 on the PR; 11 new test(s) pass, 190 unchanged (2 of them skipped on both sides); 191 test failure(s) pre-existing and identical on both sides",
+   "After rerun: not rerun. The collection import was a setup gap, but it was not repaired, so the recorded verdict was kept."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "noxfile.py",
+   "pyproject.toml",
+   "docs/Makefile",
+   "docs/contributing.rst",
+   ".github/workflows/lint.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/downstream.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/changelog.yml",
+   ".github/workflows/scorecards.yml",
+   ".github/workflows/ci.yml",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "trustme>=1.2.1",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "trustme>=1.2.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: trustme>=1.2.1."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "trustme",
+    "requirement": "trustme>=1.2.1",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": false,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "needs_attention",
+     "reason": "probe: 6 observation(s) need attention: c2.generator_body_exhausted_after differs although the claim says it does not (C2); c2.generator_body_type differs although the claim says it does not (C2); c2.iter_list_body_exhausted_after differs although the claim says it does not (C2); c2.iter_list_body_type differs although the claim says it does not (C2); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.attempt1_body_exhausted (C1); c1.attempt1_body_type (C1); c1.exception_type (C1); probe: claim(s) C1 proven; probe: 3 probe(s) could not run on either side; tests: 379 test(s) ran on main, 390 on the PR; 11 new test(s) pass, 190 unchanged (2 of them skipped on both sides); 191 test failure(s) pre-existing and identical on both sides"
+    }
+   ],
+   "installed": []
+  }
+ },
+ "chosen": {
+  "pr": 5365,
+  "head_sha": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+  "base_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "pr_sha": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "d9f9b0ad5b99247e06aa9a50b7a5747aa5c2e35d",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ c5347bbd3920 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 80702391fc66"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The fix raises UnrewindableBodyError instead of silently resending consumed request-body iterators as empty on retries or redirects.",
+    "source_quote": "`UnrewindableBodyError` rather than silently resending consumed request-body iterators as empty on retries or redirects",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Regression tests were added covering generators, iter(list), and map cases.",
+    "source_quote": "adds regression tests for generators, `iter(list)`, and `map`",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "urllib3.util.request.rewind_body"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c1.py",
+    "source": "model",
+    "sha256": "bb105993a1ad2e4fff4802f2b88b39e16bb056186cd29c830c9fd1b4f8ebae3e",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-17T06:02:39.609769+00:00",
+    "inputs_sha256": "45998df9e046bc7030132e6baa5fe5376570971ef4cd5c9db3f2cd588c27afe8",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 228,
+     "base_files": {
+      "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+      "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+      "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c2.py",
+    "source": "model",
+    "sha256": "38a7576d58ab41b41ed2ce4416c3304bd2af42116874753570e46d215e6de097",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-17T06:02:39.609901+00:00",
+    "inputs_sha256": "45998df9e046bc7030132e6baa5fe5376570971ef4cd5c9db3f2cd588c27afe8",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 228,
+     "base_files": {
+      "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+      "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+      "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "a4fe95e3f0ca9d30b22467146f27a7a52d88cd74aa71c5489e8d181a1739d9e6",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-17T06:02:39.615556+00:00",
+    "inputs_sha256": "a4f84d2e384792fab559e3c844115f1cdf9f22f1c0166750ef370c2a3265b5a3",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+      "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+      "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-socket>=0.7.0",
+  "pytest-timeout>=2.3.1",
+  "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+  "pytest-xdist>=3.8.0",
+  "pytest-pyodide>=0.58.4"
+ ],
+ "pr_side_started_at": "2026-11-17T06:02:39.756488+00:00",
+ "test_targets": {
+  "main": [
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_connectionpool.py",
+   "test/test_poolmanager.py",
+   "test/with_dummyserver/test_poolmanager.py"
+  ],
+  "pr": [
+   "test/test_request_body_retries.py",
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_connectionpool.py",
+   "test/test_poolmanager.py",
+   "test/with_dummyserver/test_poolmanager.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "urllib3",
+   "expected": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "installed": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "ok": true
+  },
+  "pr": {
+   "dist": "urllib3",
+   "expected": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+   "installed": "80702391fc663b1fd77bd7fe8d443ccc8a6a7bd6",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-socket>=0.7.0",
+   "pytest-timeout>=2.3.1",
+   "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+   "pytest-xdist>=3.8.0",
+   "pytest-pyodide>=0.58.4"
+  ],
+  "installed": true
+ },
+ "pytest_plugins_off": [
+  "asyncio"
+ ],
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "worked",
+  "main_error": "",
+  "pr_error": ""
+ },
+ "collection_plugin_note": "Setup: pytest plugin asyncio was turned off. Pytest stopped at startup the same way on both sides, and the traceback pointed into that third-party plugin (AttributeError: module 'pytest' has no attribute 'pyodide_options_stack'). The tests were run again with the plugin turned off. This does not change how the verdict is chosen. Detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: worked.",
+ "base_head_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+ "comparison": {
+  "same": 381,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 11,
+  "new_tests_passing_ids": [
+   "test.test_request_body_retries::test_connect_error_before_body_consumption_can_be_retried",
+   "test.test_request_body_retries::test_connection_pool_request_rejects_reusing_consumed_iterator",
+   "test.test_request_body_retries::test_iterator_can_be_reused_if_no_chunk_was_consumed",
+   "test.test_request_body_retries::test_iterator_exception_makes_body_unrewindable",
+   "test.test_request_body_retries::test_reiterable_body_can_still_be_retried",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[redirect-generator]",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[redirect-list-iterator]",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[redirect-map]",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[status-retry-generator]",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[status-retry-list-iterator]",
+   "test.test_request_body_retries::test_retry_does_not_silently_resend_an_exhausted_iterator[status-retry-map]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[header]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[kwarg]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_connect",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_decode",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bytes_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_deflate",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_gzip",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_chunked_gzip",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_cleanup_on_connection_error",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count_bigpool",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_error_retries",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_debug_log",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_default_user_agent_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_defaults_are_applied",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[socket_options1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_dns_error",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_for_double_release",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_get",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h11]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[ ]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\n]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\r]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\x00]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive_close",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_lazy_load_twice",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_mixed_case_hostname",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_nagle",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_decoding_with_redirect_when_preload_disabled",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_user_agent_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_one_name_multiple_values",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_partial_response",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_percent_encode_invalid_target_chars",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_url",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart__iter__",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_urlencode",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_preserves_path_dot_segments",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_on_closed_response",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_short_circuit",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect_relative_url_no_deprecation",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_release_conn_parameter",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_chunked_is_deprecated",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_method_body",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_shutdown_on_connection_released_to_pool",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-Content-Length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-content-length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-Content-Length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-content-length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[1-expect_settimeout_calls0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[None-expect_settimeout_calls1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout2-expect_settimeout_calls2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout3-expect_settimeout_calls3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout4-expect_settimeout_calls4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[1-expect_settimeout_calls0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[None-expect_settimeout_calls1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout2-expect_settimeout_calls2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout3-expect_settimeout_calls3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout4-expect_settimeout_calls4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address0-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address1-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_stream_keepalive",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_timeout_success",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_tunnel",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_unicode_upload",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_upload",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_urlopen_put",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers5]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers5]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_wrong_specific_method",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_conn_closed",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_create_connection_timeout",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout_float",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_total_timeout",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_303_redirect_with_failed_tell",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_put_file",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_with_failed_tell",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_retries_put_filehandle",
+   "test.with_dummyserver.test_connectionpool.TestRedirectPoolSize::test_pool_size_redirect",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_default_method_forcelist_retried",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_disabled_retry",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_max_retry",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_multi_redirect_history",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries_unsuccessful",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_total_retries",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_forcelist",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_method_list",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_redirect_history",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_return_in_response",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_reuse_safe",
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_redirect_after",
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_retry_after",
+   "test.with_dummyserver.test_connectionpool.TestRetryPoolSize::test_pool_size_retry",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body_framing[header]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body_framing[kwarg]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_with_body_pos",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_body",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_cross_host_redirect",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri#!#-/echo_uri?]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri#!-/echo_uri?]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri-/echo_uri?]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?#-/echo_uri?]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?%3F#-/echo_uri?%3F]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?%3f#-/echo_uri?%3F]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri??#-/echo_uri??]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?[]-/echo_uri?%5B%5D]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?q=1#fragment-/echo_uri?q=1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers_http_header_dict",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers_http_multi_header_multipart",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_ca_cert_dir",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_server_hostname",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_ssl_keywords",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_merge_headers_with_pool_manager_headers",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_missing_port",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_raise_on_redirect",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_raise_on_status",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs0]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs2]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs3]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_headers_none",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_no_remove_headers",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_remove_headers",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_set_removed_headers",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_honors_retry_after",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_retry_after_keeps_pool_retry_after_max",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_to_relative_url",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs0]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs2]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs3]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_without_preload_releases_connection",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_individual_request",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[0]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries2]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries3]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[False]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries2]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries3]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[None]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers1]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers2]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers3]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers4]",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_too_many_redirects",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_body",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_body_and_json",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_decode_content",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_invalid_body",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_json_with_httpheaderdict",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_preload_content",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_redirect",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_retries",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_timeout",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_without_keyword_args",
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_unknown_scheme"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[header]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[kwarg]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_connect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_decode": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bytes_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_deflate": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_gzip": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_chunked_gzip": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_cleanup_on_connection_error": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count_bigpool": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_error_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_debug_log": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_default_user_agent_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_defaults_are_applied": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[socket_options1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_dns_error": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_for_double_release": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_get": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h11]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[ ]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\n]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\r]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\x00]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive_close": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_lazy_load_twice": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_mixed_case_hostname": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_nagle": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_decoding_with_redirect_when_preload_disabled": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_user_agent_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_one_name_multiple_values": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_partial_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_percent_encode_invalid_target_chars": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_url": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart__iter__": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_urlencode": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_preserves_path_dot_segments": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_on_closed_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_short_circuit": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect_relative_url_no_deprecation": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_release_conn_parameter": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_chunked_is_deprecated": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_method_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_shutdown_on_connection_released_to_pool": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-Content-Length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-content-length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-Content-Length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-content-length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[1-expect_settimeout_calls0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[None-expect_settimeout_calls1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout2-expect_settimeout_calls2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout3-expect_settimeout_calls3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout4-expect_settimeout_calls4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[1-expect_settimeout_calls0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[None-expect_settimeout_calls1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout2-expect_settimeout_calls2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout3-expect_settimeout_calls3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout4-expect_settimeout_calls4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address0-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address1-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_stream_keepalive": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_timeout_success": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_tunnel": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_unicode_upload": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_upload": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_urlopen_put": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers5]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers5]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_wrong_specific_method": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_conn_closed": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_create_connection_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout_float": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_total_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_303_redirect_with_failed_tell": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_put_file": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_with_failed_tell": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_retries_put_filehandle": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRedirectPoolSize::test_pool_size_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_default_method_forcelist_retried": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_disabled_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_max_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_multi_redirect_history": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries_unsuccessful": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_total_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_forcelist": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_method_list": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_redirect_history": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_return_in_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_reuse_safe": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_redirect_after": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_retry_after": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryPoolSize::test_pool_size_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body_framing[header]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_makes_request_lose_body_framing[kwarg]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_303_redirect_with_body_pos": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_cross_host_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri#!#-/echo_uri?]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri#!-/echo_uri?]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri-/echo_uri?]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?#-/echo_uri?]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?%3F#-/echo_uri?%3F]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?%3f#-/echo_uri?%3F]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri??#-/echo_uri??]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?[]-/echo_uri?%5B%5D]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_encode_http_target[/echo_uri?q=1#fragment-/echo_uri?q=1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers_http_header_dict": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_headers_http_multi_header_multipart": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_ca_cert_dir": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_server_hostname": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_http_with_ssl_keywords": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_merge_headers_with_pool_manager_headers": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_missing_port": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_raise_on_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_raise_on_status": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect[pool_manager_kwargs3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_headers_none": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_no_remove_headers": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_remove_headers": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_cross_host_set_removed_headers": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_honors_retry_after": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_retry_after_keeps_pool_retry_after_max": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_to_relative_url": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_twice[pool_manager_kwargs3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirect_without_preload_releases_connection": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_individual_request": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_0[retries3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_redirects_disabled_for_pool_manager_with_false[retries3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_request_with_json[headers4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_too_many_redirects": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_body_and_json": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_decode_content": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_invalid_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_json_with_httpheaderdict": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_preload_content": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_with_timeout": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_top_level_request_without_keyword_args": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_poolmanager.TestPoolManager::test_unknown_scheme": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 379,
+   "pr": 390
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 191 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "source": "model",
+    "path": "model-probes/model-probe-c1.py",
+    "sha256": "bb105993a1ad2e4fff4802f2b88b39e16bb056186cd29c830c9fd1b4f8ebae3e",
+    "target": "urllib3/urllib3#5365",
+    "about": "Tests that exhausted iterator bodies raise UnrewindableBodyError on retry",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The fix raises UnrewindableBodyError instead of silently resending consumed request-body iterators as empty on retries or redirects.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c1-main-1.jsonl",
+      "probe-model-probe-c1-main-2.jsonl",
+      "probe-model-probe-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c1-pr-1.jsonl",
+      "probe-model-probe-c1-pr-2.jsonl",
+      "probe-model-probe-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "generator",
+       "c1.attempt0_body_exhausted": true,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      },
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "generator",
+       "c1.attempt0_body_exhausted": true,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      },
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "generator",
+       "c1.attempt0_body_exhausted": true,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      }
+     ],
+     "pr": [
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "_IteratorWithRetryGuard",
+       "c1.attempt0_body_exhausted": null,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      },
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "_IteratorWithRetryGuard",
+       "c1.attempt0_body_exhausted": null,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      },
+      {
+       "c1.exception_type": "Exception",
+       "c1.attempt0_body_type": "_IteratorWithRetryGuard",
+       "c1.attempt0_body_exhausted": null,
+       "c1.attempt1_body_type": null,
+       "c1.attempt1_body_exhausted": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.attempt0_body_exhausted",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": true,
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.attempt0_body_exhausted\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.attempt0_body_exhausted\""
+       }
+      }
+     },
+     {
+      "name": "c1.attempt0_body_type",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "generator",
+      "pr": "_IteratorWithRetryGuard",
+      "diffs": [
+       {
+        "field": "",
+        "main": "generator",
+        "pr": "_IteratorWithRetryGuard"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.attempt0_body_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.attempt0_body_type\""
+       }
+      }
+     },
+     {
+      "name": "c1.attempt1_body_exhausted",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.attempt1_body_exhausted\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.attempt1_body_exhausted\""
+       }
+      }
+     },
+     {
+      "name": "c1.attempt1_body_type",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.attempt1_body_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.attempt1_body_type\""
+       }
+      }
+     },
+     {
+      "name": "c1.exception_type",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "Exception",
+      "pr": "Exception",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.exception_type\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "bb105993a1ad2e4fff4802f2b88b39e16bb056186cd29c830c9fd1b4f8ebae3e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-17T06:02:39.609769+00:00",
+     "inputs_sha256": "45998df9e046bc7030132e6baa5fe5376570971ef4cd5c9db3f2cd588c27afe8",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 228,
+      "base_files": {
+       "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+       "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+       "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T06:02:39.756488+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 8,
+     "changed_lines_covered": 5,
+     "files": [
+      {
+       "file": "src/urllib3/connectionpool.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "src/urllib3/poolmanager.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "src/urllib3/util/request.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 5 of 8 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c2",
+    "source": "model",
+    "path": "model-probes/model-probe-c2.py",
+    "sha256": "38a7576d58ab41b41ed2ce4416c3304bd2af42116874753570e46d215e6de097",
+    "target": "urllib3/urllib3#5365",
+    "about": "Tests that generator, iter(list), and map bodies work in non-retry scenario",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Regression tests were added covering generators, iter(list), and map cases.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c2-main-1.jsonl",
+      "probe-model-probe-c2-main-2.jsonl",
+      "probe-model-probe-c2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c2-pr-1.jsonl",
+      "probe-model-probe-c2-pr-2.jsonl",
+      "probe-model-probe-c2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "generator",
+       "c2.generator_body_exhausted_after": false,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "list_iterator",
+       "c2.iter_list_body_exhausted_after": false,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "map",
+       "c2.map_body_exhausted_after": false
+      },
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "generator",
+       "c2.generator_body_exhausted_after": false,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "list_iterator",
+       "c2.iter_list_body_exhausted_after": false,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "map",
+       "c2.map_body_exhausted_after": false
+      },
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "generator",
+       "c2.generator_body_exhausted_after": false,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "list_iterator",
+       "c2.iter_list_body_exhausted_after": false,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "map",
+       "c2.map_body_exhausted_after": false
+      }
+     ],
+     "pr": [
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "_IteratorWithRetryGuard",
+       "c2.generator_body_exhausted_after": null,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "_IteratorWithRetryGuard",
+       "c2.iter_list_body_exhausted_after": null,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "_IteratorWithRetryGuard",
+       "c2.map_body_exhausted_after": null
+      },
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "_IteratorWithRetryGuard",
+       "c2.generator_body_exhausted_after": null,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "_IteratorWithRetryGuard",
+       "c2.iter_list_body_exhausted_after": null,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "_IteratorWithRetryGuard",
+       "c2.map_body_exhausted_after": null
+      },
+      {
+       "c2.generator_exception_type": "MaxRetryError",
+       "c2.generator_body_type": "_IteratorWithRetryGuard",
+       "c2.generator_body_exhausted_after": null,
+       "c2.iter_list_exception_type": "MaxRetryError",
+       "c2.iter_list_body_type": "_IteratorWithRetryGuard",
+       "c2.iter_list_body_exhausted_after": null,
+       "c2.map_exception_type": "MaxRetryError",
+       "c2.map_body_type": "_IteratorWithRetryGuard",
+       "c2.map_body_exhausted_after": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.generator_body_exhausted_after",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": false,
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.generator_body_exhausted_after\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.generator_body_exhausted_after\""
+       }
+      }
+     },
+     {
+      "name": "c2.generator_body_type",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": "generator",
+      "pr": "_IteratorWithRetryGuard",
+      "diffs": [
+       {
+        "field": "",
+        "main": "generator",
+        "pr": "_IteratorWithRetryGuard"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.generator_body_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.generator_body_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.generator_exception_type",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C2",
+      "main": "MaxRetryError",
+      "pr": "MaxRetryError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.generator_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.generator_exception_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.iter_list_body_exhausted_after",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": false,
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.iter_list_body_exhausted_after\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.iter_list_body_exhausted_after\""
+       }
+      }
+     },
+     {
+      "name": "c2.iter_list_body_type",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": "list_iterator",
+      "pr": "_IteratorWithRetryGuard",
+      "diffs": [
+       {
+        "field": "",
+        "main": "list_iterator",
+        "pr": "_IteratorWithRetryGuard"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.iter_list_body_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.iter_list_body_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.iter_list_exception_type",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C2",
+      "main": "MaxRetryError",
+      "pr": "MaxRetryError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.iter_list_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.iter_list_exception_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.map_body_exhausted_after",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": false,
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c2.map_body_exhausted_after\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c2.map_body_exhausted_after\""
+       }
+      }
+     },
+     {
+      "name": "c2.map_body_type",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C2",
+      "main": "map",
+      "pr": "_IteratorWithRetryGuard",
+      "diffs": [
+       {
+        "field": "",
+        "main": "map",
+        "pr": "_IteratorWithRetryGuard"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c2.map_body_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c2.map_body_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.map_exception_type",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C2",
+      "main": "MaxRetryError",
+      "pr": "MaxRetryError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c2.map_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c2.map_exception_type\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "38a7576d58ab41b41ed2ce4416c3304bd2af42116874753570e46d215e6de097",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-17T06:02:39.609901+00:00",
+     "inputs_sha256": "45998df9e046bc7030132e6baa5fe5376570971ef4cd5c9db3f2cd588c27afe8",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 228,
+      "base_files": {
+       "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+       "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+       "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T06:02:39.756488+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 8,
+     "changed_lines_covered": 5,
+     "files": [
+      {
+       "file": "src/urllib3/connectionpool.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "src/urllib3/poolmanager.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "src/urllib3/util/request.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 5 of 8 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "a4fe95e3f0ca9d30b22467146f27a7a52d88cd74aa71c5489e8d181a1739d9e6",
+    "target": "urllib3/urllib3#5365",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      },
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      },
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      },
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      },
+      {
+       "urllib3.util.request.rewind_body.input0": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input1": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input10": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input11": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input2": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input3": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input4": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input5": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input6": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input7": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input8": {
+        "raises": "UnrewindableBodyError"
+       },
+       "urllib3.util.request.rewind_body.input9": {
+        "raises": "UnrewindableBodyError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "urllib3.util.request.rewind_body.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input0\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input1\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input10\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input11\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input2\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input3\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input4\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input5\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input6\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input7\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input8\""
+       }
+      }
+     },
+     {
+      "name": "urllib3.util.request.rewind_body.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "UnrewindableBodyError"
+      },
+      "pr": {
+       "raises": "UnrewindableBodyError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"urllib3.util.request.rewind_body.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "a4fe95e3f0ca9d30b22467146f27a7a52d88cd74aa71c5489e8d181a1739d9e6",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-17T06:02:39.615556+00:00",
+     "inputs_sha256": "a4f84d2e384792fab559e3c844115f1cdf9f22f1c0166750ef370c2a3265b5a3",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/urllib3/connectionpool.py": "e076a5be110fcbcbde4ffd4af77686763632601fa00e2f8274e8b3ecb2014a99",
+       "src/urllib3/poolmanager.py": "497b078d8cb76b44ea85c6b7d930bfb3add5910ee63dfc92eed2108b4ecf5d19",
+       "src/urllib3/util/request.py": "d9af3b7ae5309e3ca50777f27994b3fd5b3aeb32c6aaa44a252ddba5366c89b0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-17T06:02:39.756488+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 8,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/urllib3/connectionpool.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 1
+      },
+      {
+       "file": "src/urllib3/poolmanager.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "src/urllib3/util/request.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json",
+     "changed_lines_touched": 4
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "false_claim",
+    "false_claim",
+    "not_testable",
+    "false_claim",
+    "false_claim",
+    "not_testable",
+    "false_claim",
+    "false_claim",
+    "not_testable"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.generator_body_exhausted_after",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.generator_body_type",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.iter_list_body_exhausted_after",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.iter_list_body_type",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.map_body_exhausted_after",
+     "label": "false_claim",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe-c2",
+     "name": "c2.map_body_type",
+     "label": "false_claim",
+     "claim": "C2"
+    }
+   ],
+   "proven_claims": [
+    "C1"
+   ],
+   "reason": "probe: 6 observation(s) need attention: c2.generator_body_exhausted_after differs although the claim says it does not (C2); c2.generator_body_type differs although the claim says it does not (C2); c2.iter_list_body_exhausted_after differs although the claim says it does not (C2); c2.iter_list_body_type differs although the claim says it does not (C2); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.attempt1_body_exhausted (C1); c1.attempt1_body_type (C1); c1.exception_type (C1); probe: claim(s) C1 proven; probe: 3 probe(s) could not run on either side; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.attempt1_body_exhausted",
+    "c1.attempt1_body_type",
+    "c1.exception_type"
+   ],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 5,
+    "changed_lines_total": 8,
+    "adequacy": "adequate"
+   },
+   "model-probe-c2": {
+    "status": "measured",
+    "changed_lines_covered": 5,
+    "changed_lines_total": 8,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 8,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 6 observation(s) need attention: c2.generator_body_exhausted_after differs although the claim says it does not (C2); c2.generator_body_type differs although the claim says it does not (C2); c2.iter_list_body_exhausted_after differs although the claim says it does not (C2); c2.iter_list_body_type differs although the claim says it does not (C2); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.attempt1_body_exhausted (C1); c1.attempt1_body_type (C1); c1.exception_type (C1); probe: claim(s) C1 proven; probe: 3 probe(s) could not run on either side; tests: 379 test(s) ran on main, 390 on the PR; 11 new test(s) pass, 190 unchanged (2 of them skipped on both sides); 191 test failure(s) pre-existing and identical on both sides",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 6 observation(s) need attention: c2.generator_body_exhausted_after differs although the claim says it does not (C2); c2.generator_body_type differs although the claim says it does not (C2); c2.iter_list_body_exhausted_after differs although the claim says it does not (C2); c2.iter_list_body_type differs although the claim says it does not (C2); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.attempt1_body_exhausted (C1); c1.attempt1_body_type (C1); c1.exception_type (C1); probe: claim(s) C1 proven; probe: 3 probe(s) could not run on either side; tests: 379 test(s) ran on main, 390 on the PR; 11 new test(s) pass, 190 unchanged (2 of them skipped on both sides); 191 test failure(s) pre-existing and identical on both sides",
+ "changed_lines_total": 28,
+ "changed_lines_covered": 28,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "28 of 28 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/connectionpool.py",
+   "src/urllib3/poolmanager.py",
+   "src/urllib3/util/request.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/5362.bugfix.rst",
+   "test/test_request_body_retries.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 351.9,
+  "tests": 149.5
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 14276,
+  "output_tokens": 10677,
+  "thinking_tokens": 8978,
+  "cost_usd": 0.013892,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.013892,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 351.9,
+   "tests": 149.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.02346,
+  "total_cost_usd": 0.037352,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-17/ef12096/urllib3-5365"
+ }
+}
