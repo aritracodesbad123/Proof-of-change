@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-17 on ef12096
 
-12 report(s) in this folder: 1 need attention, 9 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+13 report(s) in this folder: 1 need attention, 10 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -14,6 +14,7 @@
 - **COULD NOT VERIFY**: psf/requests#5220: Fix connection pool managers not taking varying TLS parameters into account. Could not verify: setup gap urllib3
 - **COULD NOT VERIFY**: Textualize/rich#2556: feat(terminal_theme): add more themes. No tests could be mapped to the touched files
 - **COULD NOT VERIFY**: Textualize/rich#4116: Fix RichHandler console highlighter fallback. Install failed (2); see setup-main.log
+- **COULD NOT VERIFY**: andialbrecht/sqlparse#669: Strip last statement when it only contains comment. Not fully verified: changed code never ran: 0 of 6 changed executable line(s) ran (0%) (tests: 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 77 unchanged (2 of them skipped on both sides); probe: 1 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.split_len_no_comment (C1); probe: claim(s) C1 proven; probe model-p2 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way)
 
 ## All reports
 
@@ -29,5 +30,6 @@
 | COULD NOT VERIFY | psf/requests#5220: Fix connection pool managers not taking varying TLS parameters into account | Could not verify: setup gap urllib3 | [PDF](requests-5220/REPORT.pdf) |
 | COULD NOT VERIFY | Textualize/rich#2556: feat(terminal_theme): add more themes | No tests could be mapped to the touched files | [PDF](rich-2556/REPORT.pdf) |
 | COULD NOT VERIFY | Textualize/rich#4116: Fix RichHandler console highlighter fallback | Install failed (2); see setup-main.log | [PDF](rich-4116/REPORT.pdf) |
+| COULD NOT VERIFY | andialbrecht/sqlparse#669: Strip last statement when it only contains comment | Not fully verified: changed code never ran: 0 of 6 changed executable line(s) ran (0%) (tests: 75 test(s) ran on main, 75 on the PR; 0 new test(s) pass, 77 unchanged (2 of them skipped on both sides); probe: 1 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.split_len_no_comment (C1); probe: claim(s) C1 proven; probe model-p2 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way) | [PDF](sqlparse-669/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#797: dictutils: apply update_extend's keyword arguments | 2 test(s) fail on main and pass on the PR; 100 test(s) ran on main, 100 on the PR; 0 new test(s) pass, 98 unchanged; probe: claim(s) C1, C2 proven | [PDF](boltons-797/REPORT.pdf) |
 | VERIFIED | Textualize/rich#4182: Skip hidden line-range syntax prefix text | 25 test(s) ran on main, 26 on the PR; 1 new test(s) pass, 19 unchanged; 6 test failure(s) pre-existing and identical on both sides; probe: claim(s) C3 proven; probe: 1 other observation(s) identical on both sides | [PDF](rich-4182/REPORT.pdf) |
