@@ -1,0 +1,565 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-920-f0687aa96fe1-2026-11-19",
+ "date_ist": "2026-11-19 11:27 IST",
+ "run_date": "2026-11-19",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 920,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/920",
+  "title": "Keep the PostgreSQL JSON-path operator intact",
+  "base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+  "merge_commit": null,
+  "tested_main_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "jadenfix",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-19T00:37:48Z",
+ "updated_at_ist": "2026-10-19 06:07 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-19 11:27 IST",
+ "files": {
+  "all": [
+   "sqlparse/keywords.py",
+   "tests/test_format.py",
+   "tests/test_parse.py"
+  ],
+  "package_py": [
+   "sqlparse/keywords.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_format.py",
+   "tests/test_parse.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_format.py, tests/test_parse.py, tests/test_keywords.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 159,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "159 passed, 2 xfailed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 165,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "165 passed, 2 xfailed in 0.68s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 159,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "159 passed, 2 xfailed in 0.66s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 165,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "165 passed, 2 xfailed in 0.70s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 159,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "159 passed, 2 xfailed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 165,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "165 passed, 2 xfailed in 0.66s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-920/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "sqlparse/keywords.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 1.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.2 GB (of 15.6 GB).",
+   "Setup check: free disk 90.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse/pyproject.toml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/pyproject.toml",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/Makefile at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/Makefile",
+   "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+   "Source: sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install build (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/python-app.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "benchmarks/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "build",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "build"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: build."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "build",
+    "requirement": "build",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 920,
+  "head_sha": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+  "base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "pr_sha": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "09dbe1eec31ed1b3cd05366748865f11ba427d32",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "master @ 60cdc649726b (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head f0687aa96fe1"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p-c1' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'p-c2' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'p-c3-pipe' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'p-c3-amp' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "With use_space_around_operators=True, formatting SELECT data@?? produces SELECT data @ ??.",
+    "source_quote": "`@?` is split into `@` and a `?` placeholder, so formatting `SELECT data@??` with `use_space_around_operators=True` produces `SELECT data @ ??`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Recognize the PostgreSQL JSON-path operator as one token, preserving the following parameter: SELECT data @? ?.",
+    "source_quote": "Recognize the PostgreSQL JSON-path operator as one token, preserving the following parameter: `SELECT data @? ?`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The operators ?| and ?& remain outside this change because they are ambiguous with a ? parameter followed by a bitwise operator.",
+    "source_quote": "`?|` and `?&` remain outside this change because they are ambiguous with a `?` parameter followed by a bitwise operator.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Added parsing and formatting regressions plus controls for parameters followed by ||, | and &.",
+    "source_quote": "Added parsing and formatting regressions plus controls for parameters followed by `||`, `|` and `&`.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "Validation: make test passes on Python 3.10\u20133.14 (512 passed, 2 expected failures and 1 existing unexpected pass per version); lint, coverage (97%), and package build pass.",
+    "source_quote": "Validation: `make test` passes on Python 3.10\u20133.14 (512 passed, 2 expected failures and 1 existing unexpected pass per version); lint, coverage (97%), and package build pass.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "The full native test matrix also passes on the exact PR commit: Python 3.10\u20133.14 on Linux and Python 3.11 on macOS and Windows.",
+    "source_quote": "The [full native test matrix](https://github.com/jadenfix/sqlparse/actions/runs/37414344125) also passes on the exact PR commit: Python 3.10\u20133.14 on Linux and Python 3.11 on macOS and Windows.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7a",
+    "text": "@? tokenization and formatting fail on the base commit and pass with this change.",
+    "source_quote": "Confirmed `@?` tokenization and formatting fail on the base commit and pass with this change, while parameter/operator controls retain their original behavior.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7b",
+    "text": "Parameter/operator controls retain their original behavior.",
+    "source_quote": "Confirmed `@?` tokenization and formatting fail on the base commit and pass with this change, while parameter/operator controls retain their original behavior.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "build"
+ ],
+ "pr_side_started_at": "2026-11-19T05:58:34.415872+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_format.py",
+   "tests/test_parse.py",
+   "tests/test_keywords.py"
+  ],
+  "pr": [
+   "tests/test_format.py",
+   "tests/test_parse.py",
+   "tests/test_keywords.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sqlparse",
+   "expected": "60cdc649726bf1bc4f1b336050560b336da715ec",
+   "installed": "60cdc649726bf1bc4f1b336050560b336da715ec",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sqlparse",
+   "expected": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+   "installed": "f0687aa96fe19353c72db46e30cd5f137ea4acf9",
+   "ok": true
+  }
+ },
+ "base_head_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+ "comparison": {
+  "same": 161,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.test_format.TestSpacesAroundOperators::test_json_path_operator",
+   "tests.test_parse::test_json_operators[@?]"
+  ],
+  "new_tests_passing": 4,
+  "new_tests_passing_ids": [
+   "tests.test_format.TestSpacesAroundOperators::test_operator_after_placeholder[&]",
+   "tests.test_format.TestSpacesAroundOperators::test_operator_after_placeholder[|]",
+   "tests.test_format.TestSpacesAroundOperators::test_operator_after_placeholder[||]",
+   "tests.test_parse::test_json_operators[@@]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 161,
+   "pr": 165
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_format.TestSpacesAroundOperators::test_json_path_operator": "AssertionError: assert 'select data @ ?? from table' == 'select data @? ? from table'",
+   "tests.test_parse::test_json_operators[@?]": "AssertionError: assert 2 == 1"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 161 test(s) ran on main, 165 on the PR; 4 new test(s) pass, 161 unchanged (2 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 161 test(s) ran on main, 165 on the PR; 4 new test(s) pass, 161 unchanged (2 of them skipped on both sides)",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/keywords.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_format.py",
+   "tests/test_parse.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 90.0,
+  "tests": 6.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 25811,
+  "output_tokens": 11267,
+  "thinking_tokens": 9666,
+  "cost_usd": 0.017884,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017884,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 90.0,
+   "tests": 6.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.006,
+  "total_cost_usd": 0.023884,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-19/ef12096/sqlparse-920"
+ }
+}
