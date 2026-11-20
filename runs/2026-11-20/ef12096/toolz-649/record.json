@@ -1,0 +1,636 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pytoolz-toolz-649-198e2023d4ec-2026-11-20",
+ "date_ist": "2026-11-20 11:29 IST",
+ "run_date": "2026-11-20",
+ "who": "ops/daily_run.py",
+ "repo": "pytoolz/toolz",
+ "library": "toolz",
+ "pr": {
+  "repo": "pytoolz/toolz",
+  "number": 649,
+  "url": "https://github.com/pytoolz/toolz/pull/649",
+  "title": "Don't fail compose signature when last function has no signature",
+  "base_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "198e2023d4eca0d2ac4c488ae4a60dadfe0e3ba9",
+  "merge_commit": "85ba764f1ceb817a04cac73cbe8e32f11f285edd",
+  "tested_main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "heykav",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-16T21:50:29Z",
+ "updated_at_ist": "2026-10-17 03:20 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-20 11:29 IST",
+ "files": {
+  "all": [
+   "toolz/functoolz.py",
+   "toolz/tests/test_functoolz.py"
+  ],
+  "package_py": [
+   "toolz/functoolz.py",
+   "toolz/tests/test_functoolz.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: toolz/tests/test_functoolz.py, toolz/tests/test_curried.py, toolz/tests/test_dicttoolz.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "100 passed, 1 skipped in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "101 passed, 1 skipped in 0.72s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "100 passed, 1 skipped in 0.70s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "101 passed, 1 skipped in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "100 passed, 1 skipped in 0.70s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "101 passed, 1 skipped in 0.71s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "toolz-649/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "toolz/functoolz.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 1.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "198e2023d4eca0d2ac4c488ae4a60dadfe0e3ba9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 90.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 http://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: Toolz \u2014 https://github.com/pytoolz/toolz/raw/refs/heads/master/README.rst",
+   "Source: toolz \u2014 https://pypi.org/project/toolz/",
+   "Source: GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install coverage (listed in the test extra) on main and pr.",
+   "Setup plan: install pycodestyle (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest (listed in the test extra) on main and pr.",
+   "Setup plan: install sphinx (listed in requirements.txt) on main and pr.",
+   "Setup plan: install furo (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Installed coverage 7.17.3 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pycodestyle 2.15.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed sphinx 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed furo 2025.12.19 from requirements.txt (listed in requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml",
+   "tox.ini",
+   "doc/Makefile",
+   ".github/workflows/publish_pypi.yml",
+   ".github/workflows/pre-commit.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "coverage",
+     "name": "coverage",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pycodestyle",
+     "name": "pycodestyle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "furo",
+     "name": "furo",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "coverage",
+    "pycodestyle",
+    "pytest",
+    "sphinx",
+    "furo"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 5 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: coverage, pycodestyle, pytest, sphinx, furo."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 5
+  },
+  "installs": [
+   {
+    "package": "coverage",
+    "requirement": "coverage",
+    "version": "7.17.3",
+    "versions": {
+     "main": "7.17.3",
+     "pr": "7.17.3"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pycodestyle",
+    "requirement": "pycodestyle",
+    "version": "2.15.0",
+    "versions": {
+     "main": "2.15.0",
+     "pr": "2.15.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx",
+    "requirement": "sphinx",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "furo",
+    "requirement": "furo",
+    "version": "2025.12.19",
+    "versions": {
+     "main": "2025.12.19",
+     "pr": "2025.12.19"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 649,
+  "head_sha": "198e2023d4eca0d2ac4c488ae4a60dadfe0e3ba9",
+  "base_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "pr_sha": "85ba764f1ceb817a04cac73cbe8e32f11f285edd",
+  "merge_commit": "85ba764f1ceb817a04cac73cbe8e32f11f285edd",
+  "merge_parents": [
+   "451af60dec590a6010e2babdbf391ea8f815122f",
+   "198e2023d4eca0d2ac4c488ae4a60dadfe0e3ba9"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 451af60dec59 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 85ba764f1ceb (refs/pull/649/merge) of head 198e2023d4ec"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind toolz.functoolz.compose: compose() was called with *args, so its positional arguments cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Before the PR, inspect.signature(compose(max, f)) raises ValueError: no signature found for builtin max.",
+    "source_quote": "`inspect.signature(compose(max, f))` raises `ValueError: no signature found for builtin max`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After the PR, inspect.signature(compose(max, f)) does not raise and returns a signature (with no return annotation when the last function lacks a signature).",
+    "source_quote": "`Compose.__signature__` only uses the last function for the return annotation, so I wrapped that lookup in a try/except and fall back to no return annotation.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The test that uses max as the last function fails before the change and passes after the change.",
+    "source_quote": "I added a test that uses `max` as the last function. It fails before the change and passes after, and the existing tests still pass.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Existing tests continue to pass after the change.",
+    "source_quote": "I added a test that uses `max` as the last function. It fails before the change and passes after, and the existing tests still pass.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-20T06:01:42.228855+00:00",
+ "test_targets": {
+  "main": [
+   "toolz/tests/test_functoolz.py",
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_dicttoolz.py"
+  ],
+  "pr": [
+   "toolz/tests/test_functoolz.py",
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_dicttoolz.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "toolz",
+   "expected": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "installed": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "toolz",
+   "expected": "85ba764f1ceb817a04cac73cbe8e32f11f285edd",
+   "installed": "85ba764f1ceb817a04cac73cbe8e32f11f285edd",
+   "ok": true
+  }
+ },
+ "base_head_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+ "comparison": {
+  "same": 101,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "toolz.tests.test_functoolz::test_compose_signature_last_func_without_signature"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 100,
+   "pr": 101
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 100 test(s) ran on main, 101 on the PR; 1 new test(s) pass, 101 unchanged (1 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "100 test(s) ran on main, 101 on the PR; 1 new test(s) pass, 101 unchanged (1 of them skipped on both sides)",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "toolz/functoolz.py",
+   "toolz/tests/test_functoolz.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 142.5,
+  "tests": 6.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 19230,
+  "output_tokens": 13329,
+  "thinking_tokens": 12504,
+  "cost_usd": 0.017765,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017765,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 142.5,
+   "tests": 6.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0095,
+  "total_cost_usd": 0.027265,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-20/ef12096/toolz-649"
+ }
+}
