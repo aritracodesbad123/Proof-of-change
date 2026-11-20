@@ -1,0 +1,1504 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-817-cf8e48eb6f1b-2026-11-20",
+ "date_ist": "2026-11-20 12:12 IST",
+ "run_date": "2026-11-20",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 817,
+  "url": "https://github.com/mahmoud/boltons/pull/817",
+  "title": "Accept uppercase hexadecimal prefixes in Bits",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "cf8e48eb6f1b9eb6a21a631060db807a33abda52",
+  "merge_commit": "7fdbe8a4bbb04b56bdc626de99a09f46e514bd8f",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-20T00:13:48Z",
+ "updated_at_ist": "2026-11-20 05:43 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-20 12:12 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/mathutils.py",
+   "tests/test_mathutils.py"
+  ],
+  "package_py": [
+   "boltons/mathutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_mathutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_mathutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 16,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "16 passed in 0.61s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.61s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 16,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "16 passed in 0.62s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "26 passed in 0.56s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 16,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "16 passed in 0.56s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "26 passed in 0.55s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-817/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "boltons/mathutils.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 1.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "cf8e48eb6f1b9eb6a21a631060db807a33abda52",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.3 GB (of 15.6 GB).",
+   "Setup check: free disk 90.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "7fdbe8a4bbb04b56bdc626de99a09f46e514bd8f",
+  "merge_commit": "7fdbe8a4bbb04b56bdc626de99a09f46e514bd8f",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "cf8e48eb6f1b9eb6a21a631060db807a33abda52"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 7fdbe8a4bbb0 (refs/pull/817/merge) of head cf8e48eb6f1b"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The Bits constructor recognizes both `0x` and `0X` prefixes for width/base checks.",
+    "source_quote": "Recognize both `0x` and `0X` in the `Bits` constructor's width/base checks",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The `Bits.from_hex` method recognizes both `0x` and `0X` prefixes.",
+    "source_quote": "Recognize both `0x` and `0X` in the `Bits` constructor's width/base checks and the `from_hex` prefix check.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "`Bits.from_hex(\"0XfF\")` produces the same eight-bit value as `Bits.from_hex(\"0xfF\")`.",
+    "source_quote": "`Bits.from_hex(\"0XfF\")` now produces the same eight-bit value as its lowercase-prefixed form.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)",
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "0a3a276a05c309db35108dedda4a3986db018b00d18be73fcdb789e083f63c1b",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:43:55.856460+00:00",
+    "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1050,
+     "base_files": {
+      "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "8b5fd3cbc44ca9c528c2b0db29f30905926de45f39bef1a509632960b42bb31e",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:43:55.856644+00:00",
+    "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1050,
+     "base_files": {
+      "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "8bbaea619cbc60e32a2fc156e4f1df4622879c36c90ffb7a1a5da6da172f7c95",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:43:55.856777+00:00",
+    "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1050,
+     "base_files": {
+      "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-20T06:43:56.025278+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_mathutils.py"
+  ],
+  "pr": [
+   "tests/test_mathutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "7fdbe8a4bbb04b56bdc626de99a09f46e514bd8f",
+   "installed": "7fdbe8a4bbb04b56bdc626de99a09f46e514bd8f",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 16,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_mathutils::test_bits_uppercase_hex_explicit_width",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0-0-4-Bits]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0-0-4-from_hex]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X00F-15-12-Bits]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X00F-15-12-from_hex]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0f-15-8-Bits]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0f-15-8-from_hex]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0XfF-255-8-Bits]",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0XfF-255-8-from_hex]"
+  ],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "tests.test_mathutils::test_bits_hex_prefix_controls"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 25,
+   "pr": 26
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_mathutils::test_bits_uppercase_hex_explicit_width": "ValueError: invalid literal for int() with base 2: '0Xf'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0-0-4-Bits]": "ValueError: invalid literal for int() with base 2: '0X0'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0-0-4-from_hex]": "ValueError: invalid literal for int() with base 16: '0x0X0'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X00F-15-12-Bits]": "ValueError: invalid literal for int() with base 2: '0X00F'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X00F-15-12-from_hex]": "ValueError: invalid literal for int() with base 16: '0x0X00F'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0f-15-8-Bits]": "ValueError: invalid literal for int() with base 2: '0X0f'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0X0f-15-8-from_hex]": "ValueError: invalid literal for int() with base 16: '0x0X0f'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0XfF-255-8-Bits]": "ValueError: invalid literal for int() with base 2: '0XfF'",
+   "tests.test_mathutils::test_bits_uppercase_hex_prefix[0XfF-255-8-from_hex]": "ValueError: invalid literal for int() with base 16: '0x0XfF'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "0a3a276a05c309db35108dedda4a3986db018b00d18be73fcdb789e083f63c1b",
+    "target": "mahmoud/boltons#817",
+    "about": "Test Bits constructor with lowercase and uppercase hex prefixes.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The Bits constructor recognizes both `0x` and `0X` prefixes for width/base checks.",
+      "covers": [
+       "c1.lower_success",
+       "c1.lower_len",
+       "c1.lower_val",
+       "c1.upper_success",
+       "c1.upper_len",
+       "c1.upper_val"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": false,
+       "c1.upper_exc": "ValueError"
+      },
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": false,
+       "c1.upper_exc": "ValueError"
+      },
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": false,
+       "c1.upper_exc": "ValueError"
+      }
+     ],
+     "pr": [
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": true,
+       "c1.upper_len": 8,
+       "c1.upper_val": 255
+      },
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": true,
+       "c1.upper_len": 8,
+       "c1.upper_val": 255
+      },
+      {
+       "c1.lower_success": true,
+       "c1.lower_len": 8,
+       "c1.lower_val": 255,
+       "c1.upper_success": true,
+       "c1.upper_len": 8,
+       "c1.upper_val": 255
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.lower_len",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 8,
+      "pr": 8,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.lower_len\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.lower_len\""
+       }
+      }
+     },
+     {
+      "name": "c1.lower_success",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.lower_success\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.lower_success\""
+       }
+      }
+     },
+     {
+      "name": "c1.lower_val",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 255,
+      "pr": 255,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.lower_val\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.lower_val\""
+       }
+      }
+     },
+     {
+      "name": "c1.upper_exc",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": "ValueError",
+      "pr": "<absent>",
+      "advisory": true,
+      "linked_by": "id",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ValueError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.upper_exc\""
+       }
+      }
+     },
+     {
+      "name": "c1.upper_len",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "<absent>",
+      "pr": 8,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": 8
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.upper_len\""
+       }
+      }
+     },
+     {
+      "name": "c1.upper_success",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.upper_success\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.upper_success\""
+       }
+      }
+     },
+     {
+      "name": "c1.upper_val",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "<absent>",
+      "pr": 255,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": 255
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.upper_val\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "0a3a276a05c309db35108dedda4a3986db018b00d18be73fcdb789e083f63c1b",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:43:55.856460+00:00",
+     "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1050,
+      "base_files": {
+       "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:43:56.025278+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/mathutils.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "8b5fd3cbc44ca9c528c2b0db29f30905926de45f39bef1a509632960b42bb31e",
+    "target": "mahmoud/boltons#817",
+    "about": "Test Bits.from_hex with lowercase and uppercase hex prefixes.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The `Bits.from_hex` method recognizes both `0x` and `0X` prefixes.",
+      "covers": [
+       "c2.lower_success",
+       "c2.lower_len",
+       "c2.lower_val",
+       "c2.upper_success",
+       "c2.upper_len",
+       "c2.upper_val"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": false,
+       "c2.upper_exc": "ValueError"
+      },
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": false,
+       "c2.upper_exc": "ValueError"
+      },
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": false,
+       "c2.upper_exc": "ValueError"
+      }
+     ],
+     "pr": [
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": true,
+       "c2.upper_len": 8,
+       "c2.upper_val": 255
+      },
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": true,
+       "c2.upper_len": 8,
+       "c2.upper_val": 255
+      },
+      {
+       "c2.lower_success": true,
+       "c2.lower_len": 8,
+       "c2.lower_val": 255,
+       "c2.upper_success": true,
+       "c2.upper_len": 8,
+       "c2.upper_val": 255
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.lower_len",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 8,
+      "pr": 8,
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.lower_len\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.lower_len\""
+       }
+      }
+     },
+     {
+      "name": "c2.lower_success",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.lower_success\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.lower_success\""
+       }
+      }
+     },
+     {
+      "name": "c2.lower_val",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 255,
+      "pr": 255,
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.lower_val\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.lower_val\""
+       }
+      }
+     },
+     {
+      "name": "c2.upper_exc",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": "ValueError",
+      "pr": "<absent>",
+      "advisory": true,
+      "linked_by": "id",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ValueError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.upper_exc\""
+       }
+      }
+     },
+     {
+      "name": "c2.upper_len",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "<absent>",
+      "pr": 8,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": 8
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.upper_len\""
+       }
+      }
+     },
+     {
+      "name": "c2.upper_success",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.upper_success\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.upper_success\""
+       }
+      }
+     },
+     {
+      "name": "c2.upper_val",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "<absent>",
+      "pr": 255,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": 255
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.upper_val\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8b5fd3cbc44ca9c528c2b0db29f30905926de45f39bef1a509632960b42bb31e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:43:55.856644+00:00",
+     "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1050,
+      "base_files": {
+       "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:43:56.025278+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "boltons/mathutils.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "8bbaea619cbc60e32a2fc156e4f1df4622879c36c90ffb7a1a5da6da172f7c95",
+    "target": "mahmoud/boltons#817",
+    "about": "Test that Bits.from_hex yields same value for uppercase and lowercase prefixes.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "`Bits.from_hex(\"0XfF\")` produces the same eight-bit value as `Bits.from_hex(\"0xfF\")`.",
+      "covers": [
+       "c3.lower_val",
+       "c3.upper_val",
+       "c3.equal"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": null,
+       "c3.equal": false
+      },
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": null,
+       "c3.equal": false
+      },
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": null,
+       "c3.equal": false
+      }
+     ],
+     "pr": [
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": 255,
+       "c3.equal": true
+      },
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": 255,
+       "c3.equal": true
+      },
+      {
+       "c3.lower_val": 255,
+       "c3.upper_val": 255,
+       "c3.equal": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.equal",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.equal\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.equal\""
+       }
+      }
+     },
+     {
+      "name": "c3.lower_val",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": 255,
+      "pr": 255,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.lower_val\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.lower_val\""
+       }
+      }
+     },
+     {
+      "name": "c3.upper_val",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": null,
+      "pr": 255,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": 255
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.upper_val\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.upper_val\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8bbaea619cbc60e32a2fc156e4f1df4622879c36c90ffb7a1a5da6da172f7c95",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:43:55.856777+00:00",
+     "inputs_sha256": "19715b31bc3e91963cc5a23de9a43311f34ca2fd5867032c31c53842c5c5455e",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1050,
+      "base_files": {
+       "boltons/mathutils.py": "f832235006d1a1fac34ff0d83f0f9819d00a3086cfb4df6169212b4d8d31d4fe"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:43:56.025278+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "boltons/mathutils.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p3.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "unmentioned",
+    "proven",
+    "proven",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "unmentioned",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "needs_human",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "reason": "probe: 2 difference(s) no linked claim covers, shown as advisory only: c1.upper_exc, c2.upper_exc; probe: 7 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.lower_len (C1); c1.lower_success (C1); c1.lower_val (C1); c2.lower_len (C2); probe: claim(s) C1, C2, C3 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.lower_len",
+    "c1.lower_success",
+    "c1.lower_val",
+    "c2.lower_len",
+    "c2.lower_success",
+    "c2.lower_val",
+    "c3.lower_val"
+   ],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "model-p2": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "model-p3": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: difference(s) no linked claim covers (model-p1 c1.upper_exc, model-p2 c2.upper_exc), so the change is not confirmed (9 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 26 on the PR; 1 new test(s) pass, 16 unchanged; probe: 2 difference(s) no linked claim covers, shown as advisory only: c1.upper_exc, c2.upper_exc; probe: 7 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.lower_len (C1); c1.lower_success (C1); c1.lower_val (C1); c2.lower_len (C2); probe: claim(s) C1, C2, C3 proven)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: difference(s) no linked claim covers (model-p1 c1.upper_exc, model-p2 c2.upper_exc), so the change is not confirmed (9 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 26 on the PR; 1 new test(s) pass, 16 unchanged; probe: 2 difference(s) no linked claim covers, shown as advisory only: c1.upper_exc, c2.upper_exc; probe: 7 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.lower_len (C1); c1.lower_success (C1); c1.lower_val (C1); c2.lower_len (C2); probe: claim(s) C1, C2, C3 proven)",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/mathutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_mathutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 93.3,
+  "tests": 6.3
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 7249,
+  "output_tokens": 5837,
+  "thinking_tokens": 4805,
+  "cost_usd": 0.007428,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.007428,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 93.3,
+   "tests": 6.3
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00622,
+  "total_cost_usd": 0.013648,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-20/ef12096/boltons-817"
+ }
+}
