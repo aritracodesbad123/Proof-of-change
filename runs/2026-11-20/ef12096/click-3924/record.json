@@ -1,0 +1,1928 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-click-3924-1ef22c0d2d94-2026-11-20",
+ "date_ist": "2026-11-20 11:41 IST",
+ "run_date": "2026-11-20",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/click",
+ "library": "click",
+ "pr": {
+  "repo": "pallets/click",
+  "number": 3924,
+  "url": "https://github.com/pallets/click/pull/3924",
+  "title": "Parser rewrite 2",
+  "base_sha": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "1ef22c0d2d94b7d52c0d17a80f09ee2e0a85e8f4",
+  "merge_commit": "a3bdbe7f16e4903bd01a39610dcc74916e23203e",
+  "tested_main_sha": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Rowlando13",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-19T21:09:29Z",
+ "updated_at_ist": "2026-11-20 02:39 IST",
+ "ci_state": "passing",
+ "ci_detail": "11 check runs completed without failure",
+ "tested_at_ist": "2026-11-20 11:41 IST",
+ "files": {
+  "all": [
+   "CHANGES.md",
+   "docs/api.md",
+   "docs/shell-completion.md",
+   "pyproject.toml",
+   "src/click/__init__.py",
+   "src/click/_base_utils.py",
+   "src/click/_parser.py",
+   "src/click/core.py",
+   "src/click/formatting.py",
+   "src/click/parser.py",
+   "src/click/shell_completion.py",
+   "tests/test_arguments.py",
+   "tests/test_basic.py",
+   "tests/test_commands.py",
+   "tests/test_deprecations.py",
+   "tests/test_imports.py",
+   "tests/test_options.py",
+   "tests/test_parser.py",
+   "tests/test_termui.py",
+   "uv.lock"
+  ],
+  "package_py": [
+   "src/click/__init__.py",
+   "src/click/_base_utils.py",
+   "src/click/_parser.py",
+   "src/click/core.py",
+   "src/click/formatting.py",
+   "src/click/parser.py",
+   "src/click/shell_completion.py"
+  ],
+  "compiled": [
+   "pyproject.toml"
+  ],
+  "other": [
+   "CHANGES.md",
+   "docs/api.md",
+   "docs/shell-completion.md",
+   "tests/test_arguments.py",
+   "tests/test_basic.py",
+   "tests/test_commands.py",
+   "tests/test_deprecations.py",
+   "tests/test_imports.py",
+   "tests/test_options.py",
+   "tests/test_parser.py",
+   "tests/test_termui.py",
+   "uv.lock"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_arguments.py, tests/test_basic.py, tests/test_commands.py, tests/test_deprecations.py, tests/test_imports.py, tests/test_options.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 1197,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "1197 passed in 1.18s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 1232,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "1232 passed in 1.56s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 1197,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "1197 passed in 1.28s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 1232,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "1232 passed in 1.24s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 1197,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "1197 passed in 1.23s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 1232,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "1232 passed in 1.28s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "So far as I can tell no behavior changes for new parser except a bugfix.",
+   "pattern": "no behaviour change"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "click-3924/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 241,
+  "changed_lines_covered": 231,
+  "files": [
+   {
+    "file": "src/click/__init__.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "src/click/_base_utils.py",
+    "changed_lines_total": 8,
+    "changed_lines_covered": 8
+   },
+   {
+    "file": "src/click/_parser.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 0
+   },
+   {
+    "file": "src/click/core.py",
+    "changed_lines_total": 225,
+    "changed_lines_covered": 221
+   },
+   {
+    "file": "src/click/formatting.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "src/click/shell_completion.py",
+    "changed_lines_total": 5,
+    "changed_lines_covered": 0
+   }
+  ],
+  "seconds": 3.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "1ef22c0d2d94b7d52c0d17a80f09ee2e0a85e8f4",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 2.7 GB (of 15.6 GB).",
+   "Setup check: free disk 90.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org",
+   "Source: click \u00b7 PyPI \u2014 https://pypi.org/project/click/",
+   "Source: nulink-click \u00b7 PyPI \u2014 https://pypi.org/project/nulink-click/",
+   "Source: click-log - PyPI \u2014 https://pypi.org/project/click-log/",
+   "Source: Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1684",
+   "Source: File option - prompting with pretty default? \u00b7 Issue #914 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/914",
+   "Source: Redesign completion system \u00b7 Issue #1484 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1484",
+   "Source: no_args_is_help for Command: documentation vs code is wrong \u00b7 Issue #1259 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1259",
+   "Source: GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub \u2014 https://github.com/pallets/click",
+   "Source: Click 8.2.2 breaks auto-reloader-active on flask --debug \u00b7 Issue #3024 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/3024",
+   "Setup plan: the PR changes install docs (pyproject.toml); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11, >=3.10",
+   "Setup plan: refused Copy: no network or the package was not found",
+   "Setup plan: refused PIP: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused instructions: its PyPI page does not link to this GitHub repository",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed click main 8.6.0.dev0, pr 9.0.0.dev0 from tavily (named by the error and its PyPI page links to this GitHub repository) on main and pr.",
+   "Before rerun: could_not_verify: not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe: claim(s) C3 proven",
+   "After rerun: could_not_verify: not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe model-probe-c3 has no measured line coverage (no coverage data); it does not count as covering the change"
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "docs/contributing.md",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/nightly.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml",
+   "examples/README"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "pyproject.toml"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11, >=3.10"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "Copy",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "PIP",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "instructions",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup. Refused: Copy (no network or the package was not found), PIP (its PyPI page does not link to this GitHub repository), instructions (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "click",
+    "requirement": "click",
+    "version": "main 8.6.0.dev0, pr 9.0.0.dev0",
+    "versions": {
+     "main": "8.6.0.dev0",
+     "pr": "9.0.0.dev0"
+    },
+    "source": "tavily",
+    "reason": "named by the error and its PyPI page links to this GitHub repository",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe: claim(s) C3 proven"
+    },
+    {
+     "round": 2,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe model-probe-c3 has no measured line coverage (no coverage data); it does not count as covering the change"
+    }
+   ],
+   "installed": [
+    {
+     "package": "click",
+     "requirement": "click",
+     "version": "main 8.6.0.dev0, pr 9.0.0.dev0",
+     "versions": {
+      "main": "8.6.0.dev0",
+      "pr": "9.0.0.dev0"
+     },
+     "source": "tavily",
+     "reason": "named by the error and its PyPI page links to this GitHub repository",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+  "pr_sha": "a3bdbe7f16e4903bd01a39610dcc74916e23203e",
+  "merge_commit": "a3bdbe7f16e4903bd01a39610dcc74916e23203e",
+  "merge_parents": [
+   "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+   "1ef22c0d2d94b7d52c0d17a80f09ee2e0a85e8f4"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 08b803cf32ce (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit a3bdbe7f16e4 (refs/pull/3924/merge) of head 1ef22c0d2d94"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C3",
+    "text": "`split_arg_string` is now public.",
+    "source_quote": "-`split_arg_string` is now public.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C1",
+    "text": "The parser now errors when a user invokes a normalized option that has collapsed to another option such that one is unreachable.",
+    "source_quote": "- The parser now errors when a user invokes a normalized option that has collapsed to another option such that one is unreachable.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C2",
+    "text": "The parser does not error when one of the names for an option collapses to another such as `-S` to `-s` for lowercase token normalization, when they are just other names for the same thing.",
+    "source_quote": "- It does not error when one of the names for an option collapses to another such as `-S` to `-s` for lowercase token normalization, when they are just other names for the same thing.",
+    "testable": true,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "click.shell_completion.split_arg_string"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c3.py",
+    "source": "model",
+    "sha256": "825c288edb3db0f15cc9ce6a342ec2a0d47994a74c10bd926c4dba60d808a189",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:14:43.442129+00:00",
+    "inputs_sha256": "dbaf00eff7de0dbec5ea9224f747dc08381c7005af9b9138b7c478d1887f465b",
+    "inputs": {
+     "title_chars": 16,
+     "body_chars": 959,
+     "base_files": {
+      "src/click/__init__.py": "5abfc54d37d47cc788b7e7a05e9514787f8c5a0b7db429d0f24d748ac89964ca",
+      "src/click/core.py": "cce257121e530d9fea502f0f4b0a7b7e2ebbf2294fab8d97eaa253d9d5672d77",
+      "src/click/formatting.py": "421994c476e0108d521f7c20da7a407a28425dd81afbfe8298bf59d3faf6580f",
+      "src/click/parser.py": "a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+      "src/click/shell_completion.py": "c5fcba42d9c50bf90367b21a7a80c32fb43f6dda55d0847c7e357b4c95f4e71a"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "d1f16a48118072de830d5d7083621ec5a2b0291b40e2ce033d8a86117c95b08d",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-20T06:14:43.715759+00:00",
+    "inputs_sha256": "648a00cb67e3898094a111f3c60049b31b99f1ed0064cbb4c1f13e191f7c8195",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/click/__init__.py": "5abfc54d37d47cc788b7e7a05e9514787f8c5a0b7db429d0f24d748ac89964ca",
+      "src/click/core.py": "cce257121e530d9fea502f0f4b0a7b7e2ebbf2294fab8d97eaa253d9d5672d77",
+      "src/click/formatting.py": "421994c476e0108d521f7c20da7a407a28425dd81afbfe8298bf59d3faf6580f",
+      "src/click/parser.py": "a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+      "src/click/shell_completion.py": "c5fcba42d9c50bf90367b21a7a80c32fb43f6dda55d0847c7e357b4c95f4e71a"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-randomly",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-11-20T06:14:44.018214+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_arguments.py",
+   "tests/test_basic.py",
+   "tests/test_commands.py",
+   "tests/test_deprecations.py",
+   "tests/test_imports.py",
+   "tests/test_options.py"
+  ],
+  "pr": [
+   "tests/test_arguments.py",
+   "tests/test_basic.py",
+   "tests/test_commands.py",
+   "tests/test_deprecations.py",
+   "tests/test_imports.py",
+   "tests/test_options.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "click",
+   "expected": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+   "installed": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+   "ok": true
+  },
+  "pr": {
+   "dist": "click",
+   "expected": "a3bdbe7f16e4903bd01a39610dcc74916e23203e",
+   "installed": "a3bdbe7f16e4903bd01a39610dcc74916e23203e",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-randomly",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "08b803cf32ceb2ae6a772c62d5da42757a897d44",
+ "comparison": {
+  "same": 1181,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_basic::test_string_option[args2-Error: Option '--s' requires a value.]",
+   "tests.test_commands::test_resilient_parsing_keeps_consumed_args",
+   "tests.test_termui::test_prompt_required_with_required[True-False-args1-Option '-v' requires a value.]"
+  ],
+  "new_tests_passing": 319,
+  "new_tests_passing_ids": [
+   "tests.test_arguments::test_partial_values_for_nargs",
+   "tests.test_basic::test_boolean_switch_secondary_does_not_take_value",
+   "tests.test_basic::test_boolean_switch_secondary_names[args0-True]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args1-False]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args2-False]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args3-False]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args4-True]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args5-False]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args6-False]",
+   "tests.test_basic::test_boolean_switch_secondary_names[args7-True]",
+   "tests.test_basic::test_boolean_switch_secondary_names_normalized[args0-True]",
+   "tests.test_basic::test_boolean_switch_secondary_names_normalized[args1-False]",
+   "tests.test_commands::test_allow_interspersed_args[False-args2-expect2]",
+   "tests.test_commands::test_allow_interspersed_args[False-args3-expect3]",
+   "tests.test_commands::test_allow_interspersed_args[False-args4-expect4]",
+   "tests.test_commands::test_allow_interspersed_args[True-args0-expect0]",
+   "tests.test_commands::test_allow_interspersed_args[True-args1-expect1]",
+   "tests.test_commands::test_resilient_parsing_suppresses_usage_errors[extra args]",
+   "tests.test_commands::test_resilient_parsing_suppresses_usage_errors[flag value]",
+   "tests.test_commands::test_resilient_parsing_suppresses_usage_errors[missing value]",
+   "tests.test_commands::test_resilient_parsing_suppresses_usage_errors[partial nargs]",
+   "tests.test_commands::test_resilient_parsing_suppresses_usage_errors[unknown]",
+   "tests.test_deprecations::test_attr_deprecated[click-__version__-9.0.0.dev0]",
+   "tests.test_options::test_bundled_short_flags[args0-expect0]",
+   "tests.test_options::test_bundled_short_flags[args1-expect1]",
+   "tests.test_options::test_bundled_short_flags[args2-expect2]",
+   "tests.test_options::test_bundled_short_flags[args3-expect3]",
+   "tests.test_options::test_bundled_short_flags[args4-expect4]",
+   "tests.test_options::test_custom_type_flag_value_standalone_option[opt_params10-args10-Usage:\\\\ scan\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'scan\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-pro'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n]",
+   "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+   "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-sentinel0]",
+   "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+   "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-sentinel0]",
+   "tests.test_options::test_duplicate_option_name_with_normalization_only_warns",
+   "tests.test_options::test_flag_does_not_take_value[count]",
+   "tests.test_options::test_flag_does_not_take_value[flag]",
+   "tests.test_options::test_nargs_too_few_values[2-args0-Option '--point' requires 2 values but 1 was given.]",
+   "tests.test_options::test_nargs_too_few_values[2-args3-Option '-p' requires 2 values but 1 was given.]",
+   "tests.test_options::test_nargs_too_few_values[2-args4-Option '--point' requires 2 values.]",
+   "tests.test_options::test_nargs_too_few_values[3-args1-Option '--point' requires 3 values but 2 were given.]",
+   "tests.test_options::test_nargs_too_few_values[3-args2-Option '--point' requires 3 values but 2 were given.]",
+   "tests.test_options::test_option_names_collide_after_normalization[secondary]",
+   "tests.test_options::test_option_names_collide_after_normalization[separate options reversed]",
+   "tests.test_options::test_option_names_collide_after_normalization[separate options]",
+   "tests.test_options::test_option_names_differing_in_case_without_normalization[args0-expect0]",
+   "tests.test_options::test_option_names_differing_in_case_without_normalization[args1-expect1]",
+   "tests.test_options::test_option_names_of_same_option_normalize_together[args0]",
+   "tests.test_options::test_option_names_of_same_option_normalize_together[args1]",
+   "tests.test_options::test_option_names_of_same_option_normalize_together[args2]",
+   "tests.test_parser::test_command_collects_prefixes",
+   "tests.test_parser::test_command_default_prefixes",
+   "tests.test_parser::test_split_arg_string[cli 'my file'-expect2]",
+   "tests.test_parser::test_split_arg_string[cli 'my file-expect1]",
+   "tests.test_parser::test_split_arg_string[cli a b c-expect0]",
+   "tests.test_parser::test_split_arg_string[cli my\\\\ file-expect4]",
+   "tests.test_parser::test_split_arg_string[cli my\\\\-expect3]",
+   "tests.test_termui::test_choices_list_in_prompt",
+   "tests.test_termui::test_confirmation_prompt[Confirm Password-password\\npassword\\n-None-password]",
+   "tests.test_termui::test_confirmation_prompt[False-None-None-None]",
+   "tests.test_termui::test_confirmation_prompt[True-\\n\\n--]",
+   "tests.test_termui::test_confirmation_prompt[True-password\\npassword-None-password]",
+   "tests.test_termui::test_echo_via_pager_real_pager_handles_ansi[preserve ansi]",
+   "tests.test_termui::test_echo_via_pager_real_pager_handles_ansi[strip ansi]",
+   "tests.test_termui::test_echo_via_pager_streams_each_write",
+   "tests.test_termui::test_echo_via_pager_tty_pager_missing",
+   "tests.test_termui::test_edit",
+   "tests.test_termui::test_edit_pathlib[iterable]",
+   "tests.test_termui::test_edit_pathlib[single]",
+   "tests.test_termui::test_editor_env_passed_through",
+   "tests.test_termui::test_editor_failure_exception",
+   "tests.test_termui::test_editor_nonexistent_exception",
+   "tests.test_termui::test_editor_path_normalization[command with flags]",
+   "tests.test_termui::test_editor_path_normalization[editor with args]",
+   "tests.test_termui::test_editor_path_normalization[escaped space in unix path]",
+   "tests.test_termui::test_editor_path_normalization[filename with double quote]",
+   "tests.test_termui::test_editor_path_normalization[filename with single quote]",
+   "tests.test_termui::test_editor_path_normalization[leading and trailing whitespace]",
+   "tests.test_termui::test_editor_path_normalization[multiple short flags]",
+   "tests.test_termui::test_editor_path_normalization[quoted command with args]",
+   "tests.test_termui::test_editor_path_normalization[quoted editor with multiple flags and filenames with spaces]",
+   "tests.test_termui::test_editor_path_normalization[quoted windows path with spaces]",
+   "tests.test_termui::test_editor_path_normalization[shell metacharacters in filename]",
+   "tests.test_termui::test_editor_path_normalization[single-quoted path with spaces]",
+   "tests.test_termui::test_editor_path_normalization[tab-separated tokens]",
+   "tests.test_termui::test_editor_path_normalization[unix absolute path]",
+   "tests.test_termui::test_editor_unclosed_quote",
+   "tests.test_termui::test_false_show_default_cause_no_default_display_in_prompt",
+   "tests.test_termui::test_fast_edit",
+   "tests.test_termui::test_file_prompt_default_format[file_kwargs0]",
+   "tests.test_termui::test_file_prompt_default_format[file_kwargs1]",
+   "tests.test_termui::test_file_prompt_default_format[file_kwargs2]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params41-args41---expected41]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params42-args42--y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params43-args43--n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params44-args44--foo-foo]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params45-args45-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params46-args46-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params47-args47-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params48-args48-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params49-args49-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params50-args50-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params51-args51---expected51]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params52-args52--y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params53-args53--n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params54-args54---expected54]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params55-args55--y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params56-args56--n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params57-args57-[Y/n]--True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params58-args58-[Y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params59-args59-[Y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params60-args60-[Y/n]--True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params61-args61-[Y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params62-args62-[Y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params63-args63-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params64-args64-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params65-args65-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params66-args66-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params67-args67-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params68-args68-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params69-args69-[y/n]--expected69]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params70-args70-[y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params71-args71-[y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params72-args72-[y/n]--expected72]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params73-args73-[y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params74-args74-[y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params75-args75---expected75]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params76-args76--y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params77-args77--n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params78-args78-[False]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params79-args79-[False]-y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params80-args80-[False]-n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params81-args81---expected81]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params82-args82--y-y]",
+   "tests.test_termui::test_flag_value_prompt[--flag-opt_params83-args83--n-n]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params0-args0-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params1-args1-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params10-args10-[y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params11-args11-[Y/n]--True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params12-args12-[Y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params13-args13-[Y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params14-args14-None-None-MissingParameter]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params15-args15-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params16-args16-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params17-args17-None-None-None]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params18-args18-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params19-args19-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params2-args2-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params20-args20-None-None-BadParameter]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params21-args21-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params22-args22-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params23-args23-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params24-args24-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params25-args25-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params26-args26-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params27-args27-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params28-args28-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params29-args29-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params3-args3-[Y/n]--True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params30-args30-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params31-args31-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params32-args32-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params33-args33-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params34-args34-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params35-args35-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params36-args36-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params37-args37-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params38-args38-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params39-args39-None-None-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params4-args4-[Y/n]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params40-args40-None-None-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params5-args5-[Y/n]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params6-args6-[y/N]--False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params7-args7-[y/N]-y-True]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params8-args8-[y/N]-n-False]",
+   "tests.test_termui::test_flag_value_prompt[--flag/--no-flag-opt_params9-args9-[y/n]-y-True]",
+   "tests.test_termui::test_get_pager_file_close_does_not_close_borrowed_stream",
+   "tests.test_termui::test_get_pager_file_flushes_stream_on_exception",
+   "tests.test_termui::test_get_pager_file_missing_pager_keeps_borrowed_stream_open",
+   "tests.test_termui::test_get_pager_file_nullpager_keeps_stringio_stream",
+   "tests.test_termui::test_get_pager_file_nullpager_wraps_textio_stream[preserve ansi]",
+   "tests.test_termui::test_get_pager_file_nullpager_wraps_textio_stream[strip ansi]",
+   "tests.test_termui::test_get_pager_file_pager_missing_binary_falls_back",
+   "tests.test_termui::test_get_pager_file_pager_unset_falls_back_when_no_default",
+   "tests.test_termui::test_get_pager_file_with_real_pager_binary_stream[empty string]",
+   "tests.test_termui::test_get_pager_file_with_real_pager_binary_stream[multiple write sites]",
+   "tests.test_termui::test_get_pager_file_with_real_pager_binary_stream[plain text]",
+   "tests.test_termui::test_get_pager_file_with_real_pager_binary_stream[preserve ansi]",
+   "tests.test_termui::test_get_pager_file_with_real_pager_binary_stream[strip ansi]",
+   "tests.test_termui::test_hide_input_confirmation_prompt_mismatch_unaffected",
+   "tests.test_termui::test_hide_input_error_message[apostrophe-in-value-uses-double-quote-repr]",
+   "tests.test_termui::test_hide_input_error_message[builtin-int-masks-repr-value]",
+   "tests.test_termui::test_hide_input_error_message[custom-no-value-shows-message]",
+   "tests.test_termui::test_hide_input_error_message[custom-raw-value-masked]",
+   "tests.test_termui::test_hide_input_error_message[intrange-numeric-substring-not-masked]",
+   "tests.test_termui::test_hide_input_error_message[mixed-quoted-and-raw-both-masked-at-source]",
+   "tests.test_termui::test_hide_input_error_message[mixed-quoted-and-raw-mask-both]",
+   "tests.test_termui::test_hide_input_error_message[multi-occurrence-raw-mask-all]",
+   "tests.test_termui::test_hide_input_error_message[multi-occurrence-repr-mask-all]",
+   "tests.test_termui::test_hide_input_error_message[partial-word-match-not-masked]",
+   "tests.test_termui::test_hide_input_error_message[raw-value-should-be-masked-not-fallback]",
+   "tests.test_termui::test_hide_input_error_message[regex-special-chars-must-be-escaped]",
+   "tests.test_termui::test_hide_input_error_message[unicode-value-masked]",
+   "tests.test_termui::test_hide_input_error_message[unquoted-custom-message-should-mask-not-fallback]",
+   "tests.test_termui::test_hide_input_value_never_leaks_when_err_true",
+   "tests.test_termui::test_pager_shlex_split[command with flags]",
+   "tests.test_termui::test_pager_shlex_split[empty string]",
+   "tests.test_termui::test_pager_shlex_split[escaped space in unix path]",
+   "tests.test_termui::test_pager_shlex_split[leading and trailing spaces]",
+   "tests.test_termui::test_pager_shlex_split[less]",
+   "tests.test_termui::test_pager_shlex_split[quoted windows path with flag]",
+   "tests.test_termui::test_pager_shlex_split[quoted windows path with spaces]",
+   "tests.test_termui::test_pager_shlex_split[simple command]",
+   "tests.test_termui::test_pager_shlex_split[single-quoted path with spaces]",
+   "tests.test_termui::test_pager_shlex_split[tab as separator]",
+   "tests.test_termui::test_pager_shlex_split[unix absolute path]",
+   "tests.test_termui::test_pager_shlex_split[unquoted backslashes eaten in POSIX mode]",
+   "tests.test_termui::test_pager_shlex_split[whitespace only]",
+   "tests.test_termui::test_pipepager_less_detection_case_insensitive_on_windows",
+   "tests.test_termui::test_pipepager_less_detection_matches_stem[less.exe]",
+   "tests.test_termui::test_pipepager_less_detection_matches_stem[less]",
+   "tests.test_termui::test_pipepager_less_detection_matches_stem[not less]",
+   "tests.test_termui::test_pipepager_less_detection_matches_stem[upper case stays unmatched on POSIX]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[LESS env var]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[bundled short flags]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[explicit -R]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[filename with R]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[filename with r]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[long option with r substring]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[long option with value]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[long option]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[no flags: inject LESS=-R]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[option terminator shields filenames]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[unparsable LESS]",
+   "tests.test_termui::test_pipepager_less_raw_mode_detection[unrelated flag]",
+   "tests.test_termui::test_progress_bar_update_min_steps",
+   "tests.test_termui::test_progressbar_eta[False-5]",
+   "tests.test_termui::test_progressbar_eta[True-0]",
+   "tests.test_termui::test_progressbar_format_bar[0-True-8-0-########]",
+   "tests.test_termui::test_progressbar_format_bar[8-False-7-0-#######-]",
+   "tests.test_termui::test_progressbar_format_eta[0-00:00:00]",
+   "tests.test_termui::test_progressbar_format_eta[30-00:00:30]",
+   "tests.test_termui::test_progressbar_format_eta[90-00:01:30]",
+   "tests.test_termui::test_progressbar_format_eta[900-00:15:00]",
+   "tests.test_termui::test_progressbar_format_eta[9000-02:30:00]",
+   "tests.test_termui::test_progressbar_format_eta[99999999999-1157407d 09:46:39]",
+   "tests.test_termui::test_progressbar_format_eta[None-]",
+   "tests.test_termui::test_progressbar_format_pos[-1-1]",
+   "tests.test_termui::test_progressbar_format_pos[0-5]",
+   "tests.test_termui::test_progressbar_format_pos[4-0]",
+   "tests.test_termui::test_progressbar_format_pos[5-5]",
+   "tests.test_termui::test_progressbar_format_pos[6-5]",
+   "tests.test_termui::test_progressbar_format_progress_line[0-False-False-0-  [--------]0]",
+   "tests.test_termui::test_progressbar_format_progress_line[0-False-False-0-  [--------]1]",
+   "tests.test_termui::test_progressbar_format_progress_line[0-False-True-0-  [--------]  0/0]",
+   "tests.test_termui::test_progressbar_format_progress_line[0-True-True-0-  [--------]  0/0    0%]",
+   "tests.test_termui::test_progressbar_format_progress_line[8-True-True-8-  [########]  8/8  100%]",
+   "tests.test_termui::test_progressbar_format_progress_line_with_show_func[None]",
+   "tests.test_termui::test_progressbar_format_progress_line_with_show_func[test]",
+   "tests.test_termui::test_progressbar_hidden_manual",
+   "tests.test_termui::test_progressbar_init_exceptions",
+   "tests.test_termui::test_progressbar_is_iterator",
+   "tests.test_termui::test_progressbar_item_show_func",
+   "tests.test_termui::test_progressbar_iter_outside_with_exceptions",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-1]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-20]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-25]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-2]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-3]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[iterate-7]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-1]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-20]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-25]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-2]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-3]",
+   "tests.test_termui::test_progressbar_lands_on_final_position[update-7]",
+   "tests.test_termui::test_progressbar_length_hint",
+   "tests.test_termui::test_progressbar_no_tty",
+   "tests.test_termui::test_progressbar_strip_regression",
+   "tests.test_termui::test_progressbar_time_per_iteration[avg0-0.0]",
+   "tests.test_termui::test_progressbar_time_per_iteration[avg1-2.5]",
+   "tests.test_termui::test_progressbar_update",
+   "tests.test_termui::test_progressbar_update_with_item_show_func",
+   "tests.test_termui::test_progressbar_yields_all_items",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[color-confirm]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[color-prompt]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-color-confirm]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-color-prompt]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-no-color-confirm]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-no-color-prompt]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[no-color-confirm]",
+   "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[no-color-prompt]",
+   "tests.test_termui::test_prompt_required_false[long join value]",
+   "tests.test_termui::test_prompt_required_false[long no value]",
+   "tests.test_termui::test_prompt_required_false[long sep value]",
+   "tests.test_termui::test_prompt_required_false[no flag]",
+   "tests.test_termui::test_prompt_required_false[no value opt]",
+   "tests.test_termui::test_prompt_required_false[short join value]",
+   "tests.test_termui::test_prompt_required_false[short no value]",
+   "tests.test_termui::test_prompt_required_false[short sep value]",
+   "tests.test_termui::test_prompt_required_with_required[False-True-None-prompt]",
+   "tests.test_termui::test_prompt_required_with_required[False-True-args3-prompt]",
+   "tests.test_termui::test_prompt_required_with_required[True-False-None-prompt]",
+   "tests.test_termui::test_secho",
+   "tests.test_termui::test_secho_non_text[123-\\x1b[45m123\\x1b[0m]",
+   "tests.test_termui::test_secho_non_text[test-test]",
+   "tests.test_termui::test_string_show_default_in_prompt[default-is-none]",
+   "tests.test_termui::test_string_show_default_in_prompt[default-is-unset]",
+   "tests.test_termui::test_string_show_default_in_prompt[empty-string-is-falsy]",
+   "tests.test_termui::test_string_show_default_in_prompt[numeric-default]",
+   "tests.test_termui::test_string_show_default_in_prompt[simple-string]",
+   "tests.test_termui::test_string_show_default_in_prompt[string-with-spaces]",
+   "tests.test_termui::test_string_show_default_in_prompt[unicode]",
+   "tests.test_termui::test_tempfile_pager_accepts_text[echo_via_pager]",
+   "tests.test_termui::test_tempfile_pager_accepts_text[get_pager_file]",
+   "tests.test_termui::test_tempfile_pager_closes_file_before_unlink",
+   "tests.test_termui::test_tempfile_pager_handles_ansi[context preserves ansi]",
+   "tests.test_termui::test_tempfile_pager_handles_ansi[preserve ansi]",
+   "tests.test_termui::test_tempfile_pager_handles_ansi[strip ansi]",
+   "tests.test_termui::test_tempfile_pager_passes_pager_params"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [
+   "tests.test_termui::test_editor_windows_path_normalization[plain notepad]",
+   "tests.test_termui::test_editor_windows_path_normalization[quoted path with flag]",
+   "tests.test_termui::test_getchar_special_key_windows[\\x00-a]",
+   "tests.test_termui::test_getchar_special_key_windows[\\x00-b]",
+   "tests.test_termui::test_getchar_special_key_windows[\\xe0-c]",
+   "tests.test_termui::test_getchar_windows[False- ]",
+   "tests.test_termui::test_getchar_windows[False-H]",
+   "tests.test_termui::test_getchar_windows[False-\\u5b57]",
+   "tests.test_termui::test_getchar_windows[False-\\xc0]",
+   "tests.test_termui::test_getchar_windows[False-\\xe0H]",
+   "tests.test_termui::test_getchar_windows[False-\\xe0R]",
+   "tests.test_termui::test_getchar_windows[False-\\xe9]",
+   "tests.test_termui::test_getchar_windows[False-h]",
+   "tests.test_termui::test_getchar_windows[True- ]",
+   "tests.test_termui::test_getchar_windows[True-H]",
+   "tests.test_termui::test_getchar_windows[True-\\u5b57]",
+   "tests.test_termui::test_getchar_windows[True-\\xc0]",
+   "tests.test_termui::test_getchar_windows[True-\\xe0H]",
+   "tests.test_termui::test_getchar_windows[True-\\xe0R]",
+   "tests.test_termui::test_getchar_windows[True-\\xe9]",
+   "tests.test_termui::test_getchar_windows[True-h]",
+   "tests.test_termui::test_getchar_windows_exceptions[\\x03-KeyboardInterrupt]",
+   "tests.test_termui::test_getchar_windows_exceptions[\\x1a-EOFError]"
+  ],
+  "removed_tests": [
+   "tests.test_basic::test_string_option[args2-Error: Option '--s' requires an argument.]",
+   "tests.test_deprecations::test_unknown_attribute_raises[click.parser]"
+  ],
+  "reparametrized": [
+   {
+    "test": "tests.test_deprecations::test_attr_deprecated",
+    "removed_ids": [
+     "tests.test_deprecations::test_attr_deprecated[click-OptionParser-_OptionParser]",
+     "tests.test_deprecations::test_attr_deprecated[click-__version__-8.6.0.dev0]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-Argument-_Argument]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-Option-_Option]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-OptionParser-_OptionParser]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-ParsingState-_ParsingState]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-normalize_opt-_normalize_opt]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-split_arg_string-split_arg_string]",
+     "tests.test_deprecations::test_attr_deprecated[click.parser-split_opt-_split_opt]"
+    ],
+    "added_ids": [
+     "tests.test_deprecations::test_attr_deprecated[click-__version__-9.0.0.dev0]"
+    ]
+   },
+   {
+    "test": "tests.test_options::test_custom_type_flag_value_standalone_option",
+    "removed_ids": [
+     "tests.test_options::test_custom_type_flag_value_standalone_option[opt_params10-args10-Error:\\\\ Option\\\\ '\\\\-\\\\-pro'\\\\ requires\\\\ an\\\\ argument\\\\.\\\\\\n]"
+    ],
+    "added_ids": [
+     "tests.test_options::test_custom_type_flag_value_standalone_option[opt_params10-args10-Usage:\\\\ scan\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'scan\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-pro'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n]"
+    ]
+   },
+   {
+    "test": "tests.test_options::test_dual_options_custom_type_sentinel_flag_value",
+    "removed_ids": [
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Error:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ an\\\\ argument\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Error:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ an\\\\ argument\\\\.\\\\\\n-sentinel0]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Error:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ an\\\\ argument\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Error:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ an\\\\ argument\\\\.\\\\\\n-sentinel0]"
+    ],
+    "added_ids": [
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args1-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-sentinel0]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-EnumSentinel.FALSY_SENTINEL]",
+     "tests.test_options::test_dual_options_custom_type_sentinel_flag_value[args2-Usage:\\\\ main\\\\ \\\\[OPTIONS\\\\]\\\\\\nTry\\\\ 'main\\\\ \\\\-\\\\-help'\\\\ for\\\\ help\\\\.\\\\\\n\\\\\\nError:\\\\ Option\\\\ '\\\\-\\\\-config'\\\\ requires\\\\ a\\\\ value\\\\.\\\\\\n-sentinel0]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 1200,
+   "pr": 1503
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_basic::test_string_option[args2-Error: Option '--s' requires a value.]": "AssertionError: assert \"Error: Option '--s' requires a value.\" in \"Error: Option '--s' requires an argument.\\n\"",
+   "tests.test_commands::test_resilient_parsing_keeps_consumed_args": "AssertionError: assert ['x', 'y', 'z'] == ['z']",
+   "tests.test_termui::test_prompt_required_with_required[True-False-args1-Option '-v' requires a value.]": "AssertionError: assert \"Option '-v' requires a value.\" in \"Error: Option '-v' requires an argument.\\n\""
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c3",
+    "source": "model",
+    "path": "model-probes/model-probe-c3.py",
+    "sha256": "825c288edb3db0f15cc9ce6a342ec2a0d47994a74c10bd926c4dba60d808a189",
+    "target": "pallets/click#3924",
+    "about": "Probe to check if split_arg_string is public in click module",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "`split_arg_string` is now public.",
+      "covers": [
+       "c3.split_arg_string_top_level"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c3-main-1.jsonl",
+      "probe-model-probe-c3-main-2.jsonl",
+      "probe-model-probe-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c3-pr-1.jsonl",
+      "probe-model-probe-c3-pr-2.jsonl",
+      "probe-model-probe-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.split_arg_string_top_level": "ImportError"
+      },
+      {
+       "c3.split_arg_string_top_level": "ImportError"
+      },
+      {
+       "c3.split_arg_string_top_level": "ImportError"
+      }
+     ],
+     "pr": [
+      {
+       "c3.split_arg_string_top_level": "split_arg_string"
+      },
+      {
+       "c3.split_arg_string_top_level": "split_arg_string"
+      },
+      {
+       "c3.split_arg_string_top_level": "split_arg_string"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.split_arg_string_top_level",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": "ImportError",
+      "pr": "split_arg_string",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ImportError",
+        "pr": "split_arg_string"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.split_arg_string_top_level\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.split_arg_string_top_level\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "825c288edb3db0f15cc9ce6a342ec2a0d47994a74c10bd926c4dba60d808a189",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:14:43.442129+00:00",
+     "inputs_sha256": "dbaf00eff7de0dbec5ea9224f747dc08381c7005af9b9138b7c478d1887f465b",
+     "inputs": {
+      "title_chars": 16,
+      "body_chars": 959,
+      "base_files": {
+       "src/click/__init__.py": "5abfc54d37d47cc788b7e7a05e9514787f8c5a0b7db429d0f24d748ac89964ca",
+       "src/click/core.py": "cce257121e530d9fea502f0f4b0a7b7e2ebbf2294fab8d97eaa253d9d5672d77",
+       "src/click/formatting.py": "421994c476e0108d521f7c20da7a407a28425dd81afbfe8298bf59d3faf6580f",
+       "src/click/parser.py": "a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+       "src/click/shell_completion.py": "c5fcba42d9c50bf90367b21a7a80c32fb43f6dda55d0847c7e357b4c95f4e71a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:14:44.018214+00:00"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "d1f16a48118072de830d5d7083621ec5a2b0291b40e2ce033d8a86117c95b08d",
+    "target": "pallets/click#3924",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      },
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      },
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      }
+     ],
+     "pr": [
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      },
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      },
+      {
+       "click.shell_completion.split_arg_string.input0": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input1": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input10": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input11": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input2": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input3": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input4": [
+        "abc"
+       ],
+       "click.shell_completion.split_arg_string.input5": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input6": [],
+       "click.shell_completion.split_arg_string.input7": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input8": {
+        "raises": "AttributeError"
+       },
+       "click.shell_completion.split_arg_string.input9": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "click.shell_completion.split_arg_string.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input0\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input1\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input10\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input11\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input2\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input3\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       "abc"
+      ],
+      "pr": [
+       "abc"
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input4\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input5\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input6\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input7\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input8\""
+       }
+      }
+     },
+     {
+      "name": "click.shell_completion.split_arg_string.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"click.shell_completion.split_arg_string.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "d1f16a48118072de830d5d7083621ec5a2b0291b40e2ce033d8a86117c95b08d",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-20T06:14:43.715759+00:00",
+     "inputs_sha256": "648a00cb67e3898094a111f3c60049b31b99f1ed0064cbb4c1f13e191f7c8195",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/click/__init__.py": "5abfc54d37d47cc788b7e7a05e9514787f8c5a0b7db429d0f24d748ac89964ca",
+       "src/click/core.py": "cce257121e530d9fea502f0f4b0a7b7e2ebbf2294fab8d97eaa253d9d5672d77",
+       "src/click/formatting.py": "421994c476e0108d521f7c20da7a407a28425dd81afbfe8298bf59d3faf6580f",
+       "src/click/parser.py": "a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+       "src/click/shell_completion.py": "c5fcba42d9c50bf90367b21a7a80c32fb43f6dda55d0847c7e357b4c95f4e71a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:14:44.018214+00:00"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C3"
+   ],
+   "reason": "probe: claim(s) C3 proven; probe: 3 other observation(s) identical on both sides; probe: 9 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c3": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   },
+   "diff-api": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe model-probe-c3 has no measured line coverage (no coverage data); it does not count as covering the change",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "not fully verified: a replaced test was not run on the PR (2 test(s) removed from a test file the PR edits, with new passing tests added (replaced, not a finding); 3 test(s) fail on main and pass on the PR; 23 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 3 test(s) re-parametrized (14 -> 6 ids); 1200 test(s) ran on main, 1503 on the PR; 319 new test(s) pass, 1181 unchanged); probe model-probe-c3 has no measured line coverage (no coverage data); it does not count as covering the change",
+ "changed_lines_total": 241,
+ "changed_lines_covered": 231,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "231 of 241 changed executable line(s) ran (96%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/click/__init__.py",
+   "src/click/_base_utils.py",
+   "src/click/_parser.py",
+   "src/click/core.py",
+   "src/click/formatting.py",
+   "src/click/parser.py",
+   "src/click/shell_completion.py"
+  ],
+  "compiled_files": [
+   "pyproject.toml"
+  ],
+  "other_files": [
+   "CHANGES.md",
+   "docs/api.md",
+   "docs/shell-completion.md",
+   "tests/test_arguments.py",
+   "tests/test_basic.py",
+   "tests/test_commands.py",
+   "tests/test_deprecations.py",
+   "tests/test_imports.py",
+   "tests/test_options.py",
+   "tests/test_parser.py",
+   "tests/test_termui.py",
+   "uv.lock"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 306.6,
+  "tests": 10.8
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 28375,
+  "output_tokens": 16377,
+  "thinking_tokens": 15898,
+  "cost_usd": 0.023252,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.023252,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 306.6,
+   "tests": 10.8
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.02044,
+  "total_cost_usd": 0.043692,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-20/ef12096/click-3924"
+ }
+}
