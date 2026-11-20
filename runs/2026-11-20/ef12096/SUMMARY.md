@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-20 on ef12096
 
-7 report(s) in this folder: 0 need attention, 6 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+8 report(s) in this folder: 0 need attention, 7 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -10,6 +10,7 @@
 - **COULD NOT VERIFY**: pyinvoke/invoke#1082: Fix #562: default task missing positionals raises ParseError. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 161 test(s) ran on main, 161 on the PR; 0 new test(s) pass, 161 unchanged (2 of them skipped on both sides)
 - **COULD NOT VERIFY**: PyCQA/isort#2790: fix(output): make a name-level type ignore idempotent. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 146 test(s) ran on main, 146 on the PR; 0 new test(s) pass, 145 unchanged
 - **COULD NOT VERIFY**: PyCQA/isort#2795: Keep a plain import that shares its line with an alias. Could not verify: probe line coverage after the setup rerun does not show a changed line ran
+- **COULD NOT VERIFY**: PyCQA/isort#2797: fix: preserve configured lines_between_types with force_alphabetical_sort (#1972). Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 356 test(s) ran on main, 356 on the PR; 0 new test(s) pass, 352 unchanged (6 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides
 
 ## All reports
 
@@ -21,4 +22,5 @@
 | COULD NOT VERIFY | pyinvoke/invoke#1082: Fix #562: default task missing positionals raises ParseError | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 161 test(s) ran on main, 161 on the PR; 0 new test(s) pass, 161 unchanged (2 of them skipped on both sides) | [PDF](invoke-1082/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2790: fix(output): make a name-level type ignore idempotent | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 146 test(s) ran on main, 146 on the PR; 0 new test(s) pass, 145 unchanged | [PDF](isort-2790/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2795: Keep a plain import that shares its line with an alias | Could not verify: probe line coverage after the setup rerun does not show a changed line ran | [PDF](isort-2795/REPORT.pdf) |
+| COULD NOT VERIFY | PyCQA/isort#2797: fix: preserve configured lines_between_types with force_alphabetical_sort (#1972) | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 356 test(s) ran on main, 356 on the PR; 0 new test(s) pass, 352 unchanged (6 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides | [PDF](isort-2797/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#813: Report out-of-range indices in get_path diagnostics | 2 test(s) fail on main and pass on the PR; 60 test(s) ran on main, 60 on the PR; 0 new test(s) pass, 58 unchanged; probe: claim(s) C2, C5 proven; probe: 2 probe(s) could not run on either side; probe model-probe1 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way; probe model-probe4 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way | [PDF](boltons-813/REPORT.pdf) |
