@@ -1,0 +1,2019 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-813-6289b54db6d1-2026-11-20",
+ "date_ist": "2026-11-20 12:16 IST",
+ "run_date": "2026-11-20",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 813,
+  "url": "https://github.com/mahmoud/boltons/pull/813",
+  "title": "Report out-of-range indices in get_path diagnostics",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6289b54db6d192bad51d0bb695e478ad7e8d1fcf",
+  "merge_commit": "f9c113c84005fe2fbcbe1de98ad615318fd6e01e",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Tibefox",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-19T12:03:18Z",
+ "updated_at_ist": "2026-11-19 17:33 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-20 12:16 IST",
+ "files": {
+  "all": [
+   "boltons/iterutils.py",
+   "tests/test_iterutils.py"
+  ],
+  "package_py": [
+   "boltons/iterutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_iterutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_iterutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 58,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "58 passed in 0.62s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 60,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "60 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 58,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "58 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 60,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "60 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 58,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "58 passed in 0.62s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 60,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "60 passed in 0.64s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-813/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "boltons/iterutils.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 2.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "6289b54db6d192bad51d0bb695e478ad7e8d1fcf",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.3 GB (of 15.6 GB).",
+   "Setup check: free disk 90.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "f9c113c84005fe2fbcbe1de98ad615318fd6e01e",
+  "merge_commit": "f9c113c84005fe2fbcbe1de98ad615318fd6e01e",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "6289b54db6d192bad51d0bb695e478ad7e8d1fcf"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit f9c113c84005 (refs/pull/813/merge) of head 6289b54db6d1"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "With `data = {\"items\": [\"apple\"]}`, `get_path(data, \"items.0\")` returns `\"apple\"`.",
+    "source_quote": "With `data = {\"items\": [\"apple\"]}`, `get_path(data, \"items.0\")` returns `\"apple\"`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "For `\"items.1\"`, the diagnostic says that the list index must be an integer.",
+    "source_quote": "For `\"items.1\"`, the diagnostic says that the list index must be an integer.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "This patch wraps the retry's lookup error in `PathAccessError`.",
+    "source_quote": "This patch wraps the retry's lookup error in `PathAccessError`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "It also corrects the failing index shown in the docstring.",
+    "source_quote": "It also corrects the failing index shown in the docstring.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The regression test covers positive and negative out-of-range indices and the caller's default.",
+    "source_quote": "The regression test covers positive and negative out-of-range indices and the caller's default.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Both regression cases fail on master.",
+    "source_quote": "Both regression cases fail on master.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "On macOS, the full tox suite passes on CPython 3.9, 3.10, 3.12, 3.13 and 3.14 (777 tests per environment, including doctests).",
+    "source_quote": "On macOS, the full tox suite passes on CPython 3.9, 3.10, 3.12, 3.13 and 3.14 (777 tests per environment, including doctests).",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "boltons.iterutils.get_path"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "d85c5cc2354a7eb883a6258b7bfe8ff96298955e1aa38ae2683b597eb15dd7ea",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:47:39.129573+00:00",
+    "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1484,
+     "base_files": {
+      "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "5a67e45257665f040a48d36ddda07ed55d45def117f392fe4c6d32471a48c3c1",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:47:39.129734+00:00",
+    "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1484,
+     "base_files": {
+      "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "4417f490d1c97120ad31e902fe77eea79b4a35746bb8e6d04dcfcdc37d03ca5a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:47:39.129813+00:00",
+    "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1484,
+     "base_files": {
+      "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe4.py",
+    "source": "model",
+    "sha256": "645e83746db78db13bf637a65d2b1383666d799e8c20db512ead95be94efd938",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-20T06:47:39.129879+00:00",
+    "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1484,
+     "base_files": {
+      "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "8096fc77dd870ec5ba8aaaf61827a64a98e8e1b847771b1222a2fd5149991918",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-20T06:47:39.134021+00:00",
+    "inputs_sha256": "2f4bc7e3cb0c3262bb49e328b70f415b9482f224cbea2b91d0197238b9b2425a",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-20T06:47:39.254564+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_iterutils.py"
+  ],
+  "pr": [
+   "tests/test_iterutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "f9c113c84005fe2fbcbe1de98ad615318fd6e01e",
+   "installed": "f9c113c84005fe2fbcbe1de98ad615318fd6e01e",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 58,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_iterutils.TestGetPath::test_dotted_path_index_out_of_range[-2]",
+   "tests.test_iterutils.TestGetPath::test_dotted_path_index_out_of_range[1]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 60,
+   "pr": 60
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_iterutils.TestGetPath::test_dotted_path_index_out_of_range[-2]": "AssertionError: assert False",
+   "tests.test_iterutils.TestGetPath::test_dotted_path_index_out_of_range[1]": "AssertionError: assert False"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "d85c5cc2354a7eb883a6258b7bfe8ff96298955e1aa38ae2683b597eb15dd7ea",
+    "target": "mahmoud/boltons#813",
+    "about": "Test C1: get_path with data={\"items\": [\"apple\"]} and path=\"items.0\" should return \"apple\"",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "With `data = {\"items\": [\"apple\"]}`, `get_path(data, \"items.0\")` returns `\"apple\"`.",
+      "covers": [
+       "c1.result"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.result": "apple"
+      },
+      {
+       "c1.result": "apple"
+      },
+      {
+       "c1.result": "apple"
+      }
+     ],
+     "pr": [
+      {
+       "c1.result": "apple"
+      },
+      {
+       "c1.result": "apple"
+      },
+      {
+       "c1.result": "apple"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.result",
+      "state": "same",
+      "label": "proven",
+      "claim": "C1",
+      "main": "apple",
+      "pr": "apple",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.result\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "d85c5cc2354a7eb883a6258b7bfe8ff96298955e1aa38ae2683b597eb15dd7ea",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:47:39.129573+00:00",
+     "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1484,
+      "base_files": {
+       "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:47:39.254564+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/iterutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "ran none of the 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "5a67e45257665f040a48d36ddda07ed55d45def117f392fe4c6d32471a48c3c1",
+    "target": "mahmoud/boltons#813",
+    "about": "Test C2 and C3: get_path with data={\"items\": [\"apple\"]} and path=\"items.1\" should raise an exception; we record the type and message",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "For `\"items.1\"`, the diagnostic says that the list index must be an integer.",
+      "covers": [
+       "c2.exc_type",
+       "c2.exc_str"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "This patch wraps the retry's lookup error in `PathAccessError`.",
+      "covers": [
+       "c2.exc_type",
+       "c2.exc_str"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: TypeError('list indices must be integers or slices, not str')"
+      },
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: TypeError('list indices must be integers or slices, not str')"
+      },
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: TypeError('list indices must be integers or slices, not str')"
+      }
+     ],
+     "pr": [
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: IndexError('list index out of range')"
+      },
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: IndexError('list index out of range')"
+      },
+      {
+       "c2.exc_type": "PathAccessError",
+       "c2.exc_str": "could not access 1 from path ['items', '1'], got error: IndexError('list index out of range')"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.exc_str",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "could not access 1 from path ['items', '1'], got error: TypeError('list indices must be integers or slices, not str')",
+      "pr": "could not access 1 from path ['items', '1'], got error: IndexError('list index out of range')",
+      "diffs": [
+       {
+        "field": "",
+        "main": "could not access 1 from path ['items', '1'], got error: TypeError('list indices must be integers or slices, not str')",
+        "pr": "could not access 1 from path ['items', '1'], got error: IndexError('list index out of range')"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.exc_str\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.exc_str\""
+       }
+      }
+     },
+     {
+      "name": "c2.exc_type",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C2",
+      "main": "PathAccessError",
+      "pr": "PathAccessError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.exc_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.exc_type\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "5a67e45257665f040a48d36ddda07ed55d45def117f392fe4c6d32471a48c3c1",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:47:39.129734+00:00",
+     "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1484,
+      "base_files": {
+       "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:47:39.254564+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "boltons/iterutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "4417f490d1c97120ad31e902fe77eea79b4a35746bb8e6d04dcfcdc37d03ca5a",
+    "target": "mahmoud/boltons#813",
+    "about": "Test negative out-of-range: get_path with data={\"items\": [\"apple\"]} and path=\"items.-2\"",
+    "claims": [
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The regression test covers positive and negative out-of-range indices and the caller's default.",
+      "covers": [
+       "c3.exc_type",
+       "c3.exc_str"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: TypeError('list indices must be integers or slices, not str')"
+      },
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: TypeError('list indices must be integers or slices, not str')"
+      },
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: TypeError('list indices must be integers or slices, not str')"
+      }
+     ],
+     "pr": [
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: IndexError('list index out of range')"
+      },
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: IndexError('list index out of range')"
+      },
+      {
+       "c3.exc_type": "PathAccessError",
+       "c3.exc_str": "could not access -2 from path ['items', '-2'], got error: IndexError('list index out of range')"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.exc_str",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C5",
+      "main": "could not access -2 from path ['items', '-2'], got error: TypeError('list indices must be integers or slices, not str')",
+      "pr": "could not access -2 from path ['items', '-2'], got error: IndexError('list index out of range')",
+      "diffs": [
+       {
+        "field": "",
+        "main": "could not access -2 from path ['items', '-2'], got error: TypeError('list indices must be integers or slices, not str')",
+        "pr": "could not access -2 from path ['items', '-2'], got error: IndexError('list index out of range')"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.exc_str\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.exc_str\""
+       }
+      }
+     },
+     {
+      "name": "c3.exc_type",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C5",
+      "main": "PathAccessError",
+      "pr": "PathAccessError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.exc_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.exc_type\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "4417f490d1c97120ad31e902fe77eea79b4a35746bb8e6d04dcfcdc37d03ca5a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:47:39.129813+00:00",
+     "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1484,
+      "base_files": {
+       "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:47:39.254564+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "boltons/iterutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe4",
+    "source": "model",
+    "path": "model-probes/model-probe4.py",
+    "sha256": "645e83746db78db13bf637a65d2b1383666d799e8c20db512ead95be94efd938",
+    "target": "mahmoud/boltons#813",
+    "about": "Test C4: extract the failing index from the docstring of get_path",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "It also corrects the failing index shown in the docstring.",
+      "covers": [
+       "c4.failing_index_in_docstring"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe4-main-1.jsonl",
+      "probe-model-probe4-main-2.jsonl",
+      "probe-model-probe4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe4-pr-1.jsonl",
+      "probe-model-probe4-pr-2.jsonl",
+      "probe-model-probe4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.failing_index_in_docstring": 2
+      },
+      {
+       "c4.failing_index_in_docstring": 2
+      },
+      {
+       "c4.failing_index_in_docstring": 2
+      }
+     ],
+     "pr": [
+      {
+       "c4.failing_index_in_docstring": 1
+      },
+      {
+       "c4.failing_index_in_docstring": 1
+      },
+      {
+       "c4.failing_index_in_docstring": 1
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c4.failing_index_in_docstring",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": 2,
+      "pr": 1,
+      "diffs": [
+       {
+        "field": "",
+        "main": 2,
+        "pr": 1
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.failing_index_in_docstring\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.failing_index_in_docstring\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "645e83746db78db13bf637a65d2b1383666d799e8c20db512ead95be94efd938",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-20T06:47:39.129879+00:00",
+     "inputs_sha256": "786a3c3e8ef44c58a0239196c157130814a62a5ebeb213cd649afd6be04ccca2",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1484,
+      "base_files": {
+       "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:47:39.254564+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/iterutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "ran none of the 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe4.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "8096fc77dd870ec5ba8aaaf61827a64a98e8e1b847771b1222a2fd5149991918",
+    "target": "mahmoud/boltons#813",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      },
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      },
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      },
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      },
+      {
+       "boltons.iterutils.get_path.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input10": [],
+       "boltons.iterutils.get_path.input11": {},
+       "boltons.iterutils.get_path.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input4": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input5": {
+        "raises": "PathAccessError"
+       },
+       "boltons.iterutils.get_path.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.get_path.input9": {
+        "raises": "PathAccessError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.iterutils.get_path.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "PathAccessError"
+      },
+      "pr": {
+       "raises": "PathAccessError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "PathAccessError"
+      },
+      "pr": {
+       "raises": "PathAccessError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.get_path.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "PathAccessError"
+      },
+      "pr": {
+       "raises": "PathAccessError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.iterutils.get_path.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "8096fc77dd870ec5ba8aaaf61827a64a98e8e1b847771b1222a2fd5149991918",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-20T06:47:39.134021+00:00",
+     "inputs_sha256": "2f4bc7e3cb0c3262bb49e328b70f415b9482f224cbea2b91d0197238b9b2425a",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/iterutils.py": "8f62bb690159f7d88eb3bbf38caa15df7d0495b4022ba175fc716629c1495241"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-20T06:47:39.254564+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "boltons/iterutils.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "not_testable",
+    "proven",
+    "not_testable",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C4",
+    "C5"
+   ],
+   "reason": "probe: claim(s) C1, C2, C4, C5 proven; probe: 2 other observation(s) identical on both sides; probe: 12 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 1,
+    "adequacy": "not_adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe3": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe4": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 1,
+    "adequacy": "not_adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe1",
+   "model-probe4"
+  ]
+ },
+ "verdict": "verified",
+ "reason": "2 test(s) fail on main and pass on the PR; 60 test(s) ran on main, 60 on the PR; 0 new test(s) pass, 58 unchanged; probe: claim(s) C2, C5 proven; probe: 2 probe(s) could not run on either side; probe model-probe1 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way; probe model-probe4 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 60 test(s) ran on main, 60 on the PR; 0 new test(s) pass, 58 unchanged; probe: claim(s) C2, C5 proven; probe: 2 probe(s) could not run on either side; probe model-probe1 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way; probe model-probe4 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 3 changed executable line(s) ran (67%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/iterutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_iterutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 71.0,
+  "tests": 6.1
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 18084,
+  "output_tokens": 9960,
+  "thinking_tokens": 8596,
+  "cost_usd": 0.014389,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.014389,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 71.0,
+   "tests": 6.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.004733,
+  "total_cost_usd": 0.019122,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-20/ef12096/boltons-813"
+ }
+}
