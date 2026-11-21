@@ -1,0 +1,477 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-820-3afb142e1fe0-2026-11-21",
+ "date_ist": "2026-11-21 11:40 IST",
+ "run_date": "2026-11-21",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 820,
+  "url": "https://github.com/mahmoud/boltons/pull/820",
+  "title": "Allow self fields in namedlist constructors",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3afb142e1fe0374fe51d3a6844eea1e8e3951048",
+  "merge_commit": "9906f4069574bb9a1648c399e3cc392aa8a180f0",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-21T00:12:06Z",
+ "updated_at_ist": "2026-11-21 05:42 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-21 11:40 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/namedutils.py",
+   "tests/test_namedutils.py"
+  ],
+  "package_py": [
+   "boltons/namedutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_namedutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_namedutils.py, tests/test_iterutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 69,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "69 passed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 76,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "76 passed in 0.66s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 69,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "69 passed in 0.68s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 76,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "76 passed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 69,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "69 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 76,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "76 passed in 0.71s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-820/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "boltons/namedutils.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 2.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "3afb142e1fe0374fe51d3a6844eea1e8e3951048",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.7 GB (of 15.6 GB).",
+   "Setup check: free disk 90.0 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.github/workflows/tests.yaml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/.github/workflows/tests.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "9906f4069574bb9a1648c399e3cc392aa8a180f0",
+  "merge_commit": "9906f4069574bb9a1648c399e3cc392aa8a180f0",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "3afb142e1fe0374fe51d3a6844eea1e8e3951048"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 9906f4069574 (refs/pull/820/merge) of head 3afb142e1fe0"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius probes request failed: TimeoutError"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The generated namedlist constructor uses _self for its receiver as _self, allowing the valid field name self to be passed as an ordinary field.",
+    "source_quote": "The generated namedlist constructor uses _self for its receiver, allowing the valid field name self to be passed as an ordinary field.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Tests cover self as the sole, first and last field, rename enabled/disabled, keyword construction, mutable property access, _asdict, _replace, _make and repr.",
+    "source_quote": "Tests cover self as the sole, first and last field, rename enabled/disabled, keyword construction, mutable property access, _asdict, _replace, _make and repr.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "The _self rename control and existing ordinary-record tests are preserved.",
+    "source_quote": "The _self rename control and existing ordinary-record tests are preserved.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-21T06:14:18.085507+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_namedutils.py",
+   "tests/test_iterutils.py"
+  ],
+  "pr": [
+   "tests/test_namedutils.py",
+   "tests/test_iterutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "9906f4069574bb9a1648c399e3cc392aa8a180f0",
+   "installed": "9906f4069574bb9a1648c399e3cc392aa8a180f0",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 69,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_namedutils::test_namedlist_self_field[False-self value]",
+   "tests.test_namedutils::test_namedlist_self_field[False-self]",
+   "tests.test_namedutils::test_namedlist_self_field[False-value self]",
+   "tests.test_namedutils::test_namedlist_self_field[True-self value]",
+   "tests.test_namedutils::test_namedlist_self_field[True-self]",
+   "tests.test_namedutils::test_namedlist_self_field[True-value self]"
+  ],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "tests.test_namedutils::test_namedlist_internal_receiver_field_is_renamed"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 75,
+   "pr": 76
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_namedutils::test_namedlist_self_field[False-self value]": "SyntaxError: duplicate argument 'self' in function definition:",
+   "tests.test_namedutils::test_namedlist_self_field[False-self]": "SyntaxError: duplicate argument 'self' in function definition:",
+   "tests.test_namedutils::test_namedlist_self_field[False-value self]": "SyntaxError: duplicate argument 'self' in function definition:",
+   "tests.test_namedutils::test_namedlist_self_field[True-self value]": "SyntaxError: duplicate argument 'self' in function definition:",
+   "tests.test_namedutils::test_namedlist_self_field[True-self]": "SyntaxError: duplicate argument 'self' in function definition:",
+   "tests.test_namedutils::test_namedlist_self_field[True-value self]": "SyntaxError: duplicate argument 'self' in function definition:"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 6 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 76 on the PR; 1 new test(s) pass, 69 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "6 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 76 on the PR; 1 new test(s) pass, 69 unchanged",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/namedutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_namedutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 240.0,
+  "tests": 6.5
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 1,
+  "input_tokens": 700,
+  "output_tokens": 1429,
+  "thinking_tokens": 1178,
+  "cost_usd": 0.001496,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.001496,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 240.0,
+   "tests": 6.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.016,
+  "total_cost_usd": 0.017496,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-21/ef12096/boltons-820"
+ }
+}
