@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-21 on ef12096
 
-5 report(s) in this folder: 1 need attention, 4 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+6 report(s) in this folder: 1 need attention, 5 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -9,6 +9,7 @@
 - **COULD NOT VERIFY**: mahmoud/boltons#820: Allow self fields in namedlist constructors. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 6 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 76 on the PR; 1 new test(s) pass, 69 unchanged
 - **COULD NOT VERIFY**: pyinvoke/invoke#1103: Fix deduplication of tasks with distinct callables. Could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
 - **COULD NOT VERIFY**: PyCQA/isort#2742: Keep the comment of a wrapped `X as X` import. Could not verify: probe line coverage after the setup rerun does not show a changed line ran
+- **COULD NOT VERIFY**: pytest-dev/pytest#15418: Exclude patch.multiple keyword arguments from fixture requests. No tests could be mapped to the touched files; probe: claim(s) C1, C2, C3, C4, C5, C6 proven
 
 ## All reports
 
@@ -19,3 +20,4 @@
 | COULD NOT VERIFY | mahmoud/boltons#820: Allow self fields in namedlist constructors | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 6 test(s) fail on main and pass on the PR; 75 test(s) ran on main, 76 on the PR; 1 new test(s) pass, 69 unchanged | [PDF](boltons-820/REPORT.pdf) |
 | COULD NOT VERIFY | pyinvoke/invoke#1103: Fix deduplication of tasks with distinct callables | Could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](invoke-1103/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2742: Keep the comment of a wrapped `X as X` import | Could not verify: probe line coverage after the setup rerun does not show a changed line ran | [PDF](isort-2742/REPORT.pdf) |
+| COULD NOT VERIFY | pytest-dev/pytest#15418: Exclude patch.multiple keyword arguments from fixture requests | No tests could be mapped to the touched files; probe: claim(s) C1, C2, C3, C4, C5, C6 proven | [PDF](pytest-15418/REPORT.pdf) |
