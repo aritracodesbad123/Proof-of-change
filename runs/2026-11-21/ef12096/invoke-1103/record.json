@@ -1,0 +1,1669 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-1103-3a201719438d-2026-11-21",
+ "date_ist": "2026-11-21 11:46 IST",
+ "run_date": "2026-11-21",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 1103,
+  "url": "https://github.com/pyinvoke/invoke/pull/1103",
+  "title": "Fix deduplication of tasks with distinct callables",
+  "base_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3a201719438dd987e7c539bb27c6ab3d06a5e9f5",
+  "merge_commit": "e03643a887f182cb82c873c9ead00b9c68eba3cf",
+  "tested_main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "wozhenbang2004",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-20T10:45:37Z",
+ "updated_at_ist": "2026-11-20 16:15 IST",
+ "ci_state": "passing",
+ "ci_detail": "3 check runs completed without failure",
+ "tested_at_ist": "2026-11-21 11:46 IST",
+ "files": {
+  "all": [
+   "invoke/tasks.py",
+   "sites/docs/concepts/invoking-tasks.rst",
+   "sites/www/changelog.rst",
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py"
+  ],
+  "package_py": [
+   "invoke/tasks.py"
+  ],
+  "compiled": [],
+  "other": [
+   "sites/docs/concepts/invoking-tasks.rst",
+   "sites/www/changelog.rst",
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/collection.py, tests/executor.py, tests/task.py, tests/parser_context.py, tests/config.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 358,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "358 passed, 1 skipped, 5 warnings in 1.34s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 362,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "362 passed, 1 skipped, 5 warnings in 1.35s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 358,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.2,
+   "pytest_summary": "358 passed, 1 skipped, 5 warnings in 1.43s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 362,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "362 passed, 1 skipped, 5 warnings in 1.38s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 358,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "358 passed, 1 skipped, 5 warnings in 1.34s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 362,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "362 passed, 1 skipped, 5 warnings in 1.39s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-1103/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "invoke/tasks.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 4.1,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "3a201719438dd987e7c539bb27c6ab3d06a5e9f5",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "some AI probes were rejected",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.7 GB (of 15.6 GB).",
+   "Setup check: free disk 89.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: Clean head install of invoke causes ImportError \u00b7 Issue #55 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/55",
+   "Source: Documentation for users of invoke based projects \u00b7 Issue #1020 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/1020",
+   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
+   "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: could_not_verify: tests produced no results on both sides (collection failed; see pytest logs); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+   "After rerun: could_not_verify: could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)"
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "icecream",
+    "requirement": "icecream>=2.1",
+    "version": "2.2.0",
+    "versions": {
+     "main": "2.2.0",
+     "pr": "2.2.0"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "tests produced no results on both sides (collection failed; see pytest logs); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count"
+    },
+    {
+     "round": 2,
+     "verdict": "could_not_verify",
+     "reason": "could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)"
+    }
+   ],
+   "installed": [
+    {
+     "package": "icecream",
+     "requirement": "icecream>=2.1",
+     "version": "2.2.0",
+     "versions": {
+      "main": "2.2.0",
+      "pr": "2.2.0"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "pr_sha": "e03643a887f182cb82c873c9ead00b9c68eba3cf",
+  "merge_commit": "e03643a887f182cb82c873c9ead00b9c68eba3cf",
+  "merge_parents": [
+   "6a71e680c535ba6520e935c497099fbca011d03c",
+   "3a201719438dd987e7c539bb27c6ab3d06a5e9f5"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 6a71e680c535 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit e03643a887f1 (refs/pull/1103/merge) of head 3a201719438d"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p4' rejected: cannot bind invoke.collection.Collection: Collection() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "References to the same callable still deduplicate.",
+    "source_quote": "References to the same callable still deduplicate",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "Custom callable equality is preserved.",
+    "source_quote": "and custom callable equality is preserved",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "Distinct function objects now compare unequal even when their code matches.",
+    "source_quote": "Distinct function objects now compare unequal even when their code matches",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Collections containing those tasks also reflect that distinction.",
+    "source_quote": "collections containing those tasks also reflect that distinction",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C1"
+    ]
+   },
+   {
+    "id": "p2",
+    "claims": [
+     "C2"
+    ]
+   },
+   {
+    "id": "p3",
+    "claims": [
+     "C3"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "bbc91e6c091384da6fc9c4844c50b1c5a53f9ac1ae1b0e61eac2ba918f7733e8",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-21T06:17:38.766220+00:00",
+    "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 1226,
+     "base_files": {
+      "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "1eb2d9e30971bf69808a875897a2d54d35682f6ba1e01851e6805a5f08943505",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-21T06:17:38.766365+00:00",
+    "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 1226,
+     "base_files": {
+      "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "ce8eda0db2a354f9f1b03c49669f75a42be3ca541f26362b650429fcbf720d9a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-21T06:17:38.766458+00:00",
+    "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 1226,
+     "base_files": {
+      "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-relaxed>=2"
+ ],
+ "pr_side_started_at": "2026-11-21T06:17:38.917082+00:00",
+ "test_targets": {
+  "main": [
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py",
+   "tests/parser_context.py",
+   "tests/config.py"
+  ],
+  "pr": [
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py",
+   "tests/parser_context.py",
+   "tests/config.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "invoke",
+   "expected": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "installed": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "ok": true
+  },
+  "pr": {
+   "dist": "invoke",
+   "expected": "e03643a887f182cb82c873c9ead00b9c68eba3cf",
+   "installed": "e03643a887f182cb82c873c9ead00b9c68eba3cf",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-relaxed>=2"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+ "base_new_tests": {
+  "ids": [
+   "tests/collection.py::Collection_::useful_special_methods::collections_with_distinct_task_functions_are_not_equal",
+   "tests/executor.py::Executor_::deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped",
+   "tests/task.py::Task_::functions_with_different_closures_are_not_equal",
+   "tests/task.py::Task_::functions_with_different_defaults_are_not_equal"
+  ],
+  "passed_on_base": [],
+  "failed_on_base": [
+   "tests/collection.py::Collection_::useful_special_methods::collections_with_distinct_task_functions_are_not_equal",
+   "tests/executor.py::Executor_::deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped",
+   "tests/task.py::Task_::functions_with_different_closures_are_not_equal",
+   "tests/task.py::Task_::functions_with_different_defaults_are_not_equal"
+  ],
+  "not_collected": [],
+  "collection_failed": [],
+  "discovery_empty": [],
+  "shared_ids": [
+   "tests/collection.py::Collection_::init::can_accept_task_varargs",
+   "tests/collection.py::Collection_::init::can_accept_collections_as_varargs_too",
+   "tests/collection.py::Collection_::init::kwargs_act_as_name_args_for_given_objects",
+   "tests/collection.py::Collection_::init::initial_string_arg_acts_as_name",
+   "tests/collection.py::Collection_::init::initial_string_arg_meshes_with_varargs_and_kwargs",
+   "tests/collection.py::Collection_::init::accepts_load_path_kwarg",
+   "tests/collection.py::Collection_::init::accepts_auto_dash_names_kwarg",
+   "tests/collection.py::Collection_::useful_special_methods::repr_",
+   "tests/collection.py::Collection_::useful_special_methods::equality_consists_of_name_tasks_and_collections",
+   "tests/collection.py::Collection_::useful_special_methods::boolean_is_equivalent_to_tasks_and_or_collections",
+   "tests/collection.py::Collection_::from_module::parameters::name_override",
+   "tests/collection.py::Collection_::from_module::parameters::inline_configuration",
+   "tests/collection.py::Collection_::from_module::parameters::name_and_config_simultaneously",
+   "tests/collection.py::Collection_::from_module::parameters::auto_dash_names_passed_to_constructor",
+   "tests/collection.py::Collection_::from_module::adds_tasks",
+   "tests/collection.py::Collection_::from_module::derives_collection_name_from_module_name",
+   "tests/collection.py::Collection_::from_module::copies_docstring_from_module",
+   "tests/collection.py::Collection_::from_module::works_great_with_subclassing",
+   "tests/collection.py::Collection_::from_module::submodule_names_are_stripped_to_last_chunk",
+   "tests/collection.py::Collection_::from_module::honors_explicit_collections",
+   "tests/collection.py::Collection_::from_module::allows_tasks_with_explicit_names_to_override_bound_name",
+   "tests/collection.py::Collection_::from_module::returns_unique_Collection_objects_for_same_input_module",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_config_with_root_namespaces_overrides_builtin",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_config_overrides_via_merge_not_replacement",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::config_override_merges_recursively",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_name_overrides_root_namespace_object_name",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::root_namespace_object_name_overrides_module_name",
+   "tests/collection.py::Collection_::from_module::explicit_root_ns::docstring_still_copied_from_module",
+   "tests/collection.py::Collection_::add_task::associates_given_callable_with_given_name",
+   "tests/collection.py::Collection_::add_task::uses_function_name_as_implicit_name",
+   "tests/collection.py::Collection_::add_task::prefers_name_kwarg_over_task_name_attr",
+   "tests/collection.py::Collection_::add_task::prefers_task_name_attr_over_function_name",
+   "tests/collection.py::Collection_::add_task::raises_ValueError_if_no_name_found",
+   "tests/collection.py::Collection_::add_task::raises_ValueError_on_multiple_defaults",
+   "tests/collection.py::Collection_::add_task::raises_ValueError_if_task_added_mirrors_subcollection_name",
+   "tests/collection.py::Collection_::add_task::allows_specifying_task_defaultness",
+   "tests/collection.py::Collection_::add_task::specifying_default_False_overrides_task_setting",
+   "tests/collection.py::Collection_::add_task::allows_specifying_aliases",
+   "tests/collection.py::Collection_::add_task::aliases_are_merged",
+   "tests/collection.py::Collection_::add_collection::adds_collection_as_subcollection_of_self",
+   "tests/collection.py::Collection_::add_collection::can_take_module_objects",
+   "tests/collection.py::Collection_::add_collection::allows_specifying_defaultness",
+   "tests/collection.py::Collection_::add_collection::raises_ValueError_if_collection_without_name",
+   "tests/collection.py::Collection_::add_collection::raises_ValueError_if_collection_named_same_as_task",
+   "tests/collection.py::Collection_::add_collection::raises_ValueError_on_multiple_defaults",
+   "tests/collection.py::Collection_::getitem::finds_own_tasks_by_name",
+   "tests/collection.py::Collection_::getitem::finds_subcollection_tasks_by_dotted_name",
+   "tests/collection.py::Collection_::getitem::honors_aliases_in_own_tasks",
+   "tests/collection.py::Collection_::getitem::honors_subcollection_task_aliases",
+   "tests/collection.py::Collection_::getitem::honors_own_default_task_with_no_args",
+   "tests/collection.py::Collection_::getitem::honors_own_default_subcollection",
+   "tests/collection.py::Collection_::getitem::honors_subcollection_default_tasks_on_subcollection_name",
+   "tests/collection.py::Collection_::getitem::raises_ValueError_for_no_name_and_no_default",
+   "tests/collection.py::Collection_::getitem::ValueError_for_empty_subcol_task_name_and_no_default",
+   "tests/collection.py::Collection_::to_contexts::returns_iterable_of_Contexts_corresponding_to_tasks",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::context_names_automatically_become_dashed",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::percolates_to_subcollection_tasks",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::percolates_to_subcollection_names",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::aliases_are_dashed_too",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::leading_and_trailing_underscores_are_not_affected",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::honors_init_setting_on_topmost_namespace",
+   "tests/collection.py::Collection_::to_contexts::auto_dash_names::transforms_are_applied_to_explicit_module_namespaces",
+   "tests/collection.py::Collection_::to_contexts::allows_flaglike_access_via_flags",
+   "tests/collection.py::Collection_::to_contexts::positional_arglist_preserves_order_given",
+   "tests/collection.py::Collection_::to_contexts::exposes_namespaced_task_names",
+   "tests/collection.py::Collection_::to_contexts::exposes_namespaced_task_aliases",
+   "tests/collection.py::Collection_::to_contexts::exposes_subcollection_default_tasks",
+   "tests/collection.py::Collection_::to_contexts::exposes_aliases",
+   "tests/collection.py::Collection_::task_names::returns_all_task_names_including_subtasks",
+   "tests/collection.py::Collection_::task_names::includes_aliases_and_defaults_as_values",
+   "tests/collection.py::Collection_::configuration::basic_set_and_get",
+   "tests/collection.py::Collection_::configuration::configure_performs_merging",
+   "tests/collection.py::Collection_::configuration::configure_merging_is_recursive_for_nested_dicts",
+   "tests/collection.py::Collection_::configuration::configure_allows_overwriting",
+   "tests/collection.py::Collection_::configuration::call_returns_dict",
+   "tests/collection.py::Collection_::configuration::access_merges_from_subcollections",
+   "tests/collection.py::Collection_::configuration::parents_overwrite_children_in_path",
+   "tests/collection.py::Collection_::configuration::sibling_subcollections_ignored",
+   "tests/collection.py::Collection_::configuration::subcollection_paths_may_be_dotted",
+   "tests/collection.py::Collection_::configuration::invalid_subcollection_paths_result_in_KeyError",
+   "tests/collection.py::Collection_::configuration::keys_dont_have_to_exist_in_full_path",
+   "tests/collection.py::Collection_::subcollection_from_path::top_level_path",
+   "tests/collection.py::Collection_::subcollection_from_path::nested_path",
+   "tests/collection.py::Collection_::subcollection_from_path::invalid_path",
+   "tests/collection.py::Collection_::serialized::empty_collection",
+   "tests/collection.py::Collection_::serialized::empty_named_collection",
+   "tests/collection.py::Collection_::serialized::empty_named_docstringed_collection",
+   "tests/collection.py::Collection_::serialized::name_docstring_default_and_tasks",
+   "tests/collection.py::Collection_::serialized::name_docstring_default_tasks_and_collections",
+   "tests/collection.py::Collection_::serialized::unnamed_subcollections",
+   "tests/executor.py::Executor_::init::allows_collection_and_config",
+   "tests/executor.py::Executor_::init::uses_blank_config_by_default",
+   "tests/executor.py::Executor_::init::can_grant_access_to_core_arg_parse_result",
+   "tests/executor.py::Executor_::init::core_arg_parse_result_defaults_to_empty_ParseResult",
+   "tests/executor.py::Executor_::execute::base_case",
+   "tests/executor.py::Executor_::execute::kwargs",
+   "tests/executor.py::Executor_::execute::contextualized_tasks_are_given_parser_context_arg",
+   "tests/executor.py::Executor_::execute::default_tasks_called_when_no_tasks_specified",
+   "tests/executor.py::Executor_::basic_pre_post::pre_tasks",
+   "tests/executor.py::Executor_::basic_pre_post::post_tasks",
+   "tests/executor.py::Executor_::basic_pre_post::calls_default_to_empty_args_always",
+   "tests/executor.py::Executor_::basic_pre_post::call_objs_play_well_with_context_args",
+   "tests/executor.py::Executor_::deduping_and_chaining::chaining_is_depth_first",
+   "tests/executor.py::Executor_::deduping_and_chaining::adjacent_hooks::deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::adjacent_hooks::no_deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_hooks::deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_hooks::no_deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::adjacent_top_level_tasks::deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::adjacent_top_level_tasks::no_deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_top_level_tasks::deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_top_level_tasks::no_deduping",
+   "tests/executor.py::Executor_::deduping_and_chaining::deduping_treats_different_calls_to_same_task_differently",
+   "tests/executor.py::Executor_::collection_driven_config::hands_collection_configuration_to_context",
+   "tests/executor.py::Executor_::collection_driven_config::hands_task_specific_configuration_to_context",
+   "tests/executor.py::Executor_::collection_driven_config::subcollection_config_works_with_default_tasks",
+   "tests/executor.py::Executor_::returns_return_value_of_specified_task::base_case",
+   "tests/executor.py::Executor_::returns_return_value_of_specified_task::with_pre_tasks",
+   "tests/executor.py::Executor_::returns_return_value_of_specified_task::with_post_tasks",
+   "tests/executor.py::Executor_::autoprinting::defaults_to_off_and_no_output",
+   "tests/executor.py::Executor_::autoprinting::prints_return_value_to_stdout_when_on",
+   "tests/executor.py::Executor_::autoprinting::prints_return_value_to_stdout_when_on_and_in_collection",
+   "tests/executor.py::Executor_::autoprinting::does_not_fire_on_pre_tasks",
+   "tests/executor.py::Executor_::autoprinting::does_not_fire_on_post_tasks",
+   "tests/executor.py::Executor_::inter_task_context_and_config_sharing::context_is_new_but_config_is_same",
+   "tests/executor.py::Executor_::inter_task_context_and_config_sharing::new_config_data_is_preserved_between_tasks",
+   "tests/executor.py::Executor_::inter_task_context_and_config_sharing::config_mutation_is_preserved_between_tasks",
+   "tests/executor.py::Executor_::inter_task_context_and_config_sharing::config_deletion_is_preserved_between_tasks",
+   "tests/task.py::task_::allows_access_to_wrapped_object",
+   "tests/task.py::task_::allows_alias_specification",
+   "tests/task.py::task_::allows_multiple_aliases",
+   "tests/task.py::task_::allows_default_specification",
+   "tests/task.py::task_::has_autoprint_option",
+   "tests/task.py::task_::raises_ValueError_on_multiple_defaults",
+   "tests/task.py::task_::sets_arg_kind",
+   "tests/task.py::task_::sets_which_args_are_optional",
+   "tests/task.py::task_::allows_annotating_args_as_positional",
+   "tests/task.py::task_::allows_annotating_args_as_iterable",
+   "tests/task.py::task_::allows_annotating_args_as_incrementable",
+   "tests/task.py::task_::when_positional_arg_missing_all_non_default_args_are_positional",
+   "tests/task.py::task_::context_arguments_should_not_appear_in_implicit_positional_list",
+   "tests/task.py::task_::pre_tasks_stored_directly",
+   "tests/task.py::task_::allows_star_args_as_shortcut_for_pre",
+   "tests/task.py::task_::disallows_ambiguity_between_star_args_and_pre_kwarg",
+   "tests/task.py::task_::sets_name",
+   "tests/task.py::task_::returns_Task_instances_by_default",
+   "tests/task.py::task_::klass_kwarg_allows_overriding_class_used",
+   "tests/task.py::task_::klass_kwarg_works_for_subclassers_without_kwargs",
+   "tests/task.py::task_::unknown_kwargs_get_mad_at_Task_level",
+   "tests/task.py::Task_::has_useful_repr",
+   "tests/task.py::Task_::equality_testing",
+   "tests/task.py::Task_::equality_testing_false_for_non_task_objects",
+   "tests/task.py::Task_::function_like_behavior::inherits_module_from_body",
+   "tests/task.py::Task_::attributes::has_default_flag",
+   "tests/task.py::Task_::attributes::name_defaults_to_body_name",
+   "tests/task.py::Task_::attributes::can_override_name",
+   "tests/task.py::Task_::callability::dunder_call_wraps_body_call",
+   "tests/task.py::Task_::callability::errors_if_first_arg_not_Context",
+   "tests/task.py::Task_::callability::errors_if_no_first_arg_at_all",
+   "tests/task.py::Task_::callability::tracks_times_called",
+   "tests/task.py::Task_::callability::wraps_body_docstring",
+   "tests/task.py::Task_::callability::wraps_body_name",
+   "tests/task.py::Task_::get_arguments::positional_args_come_first",
+   "tests/task.py::Task_::get_arguments::kinds_are_preserved",
+   "tests/task.py::Task_::get_arguments::positional_flag_is_preserved",
+   "tests/task.py::Task_::get_arguments::optional_flag_is_preserved",
+   "tests/task.py::Task_::get_arguments::optional_prevents_bool_defaults_from_affecting_kind",
+   "tests/task.py::Task_::get_arguments::optional_plus_nonbool_default_does_not_override_kind",
+   "tests/task.py::Task_::get_arguments::turns_function_signature_into_Arguments",
+   "tests/task.py::Task_::get_arguments::shortflags_created_by_default",
+   "tests/task.py::Task_::get_arguments::shortflags_dont_care_about_positionals",
+   "tests/task.py::Task_::get_arguments::autocreated_short_flags_can_be_disabled",
+   "tests/task.py::Task_::get_arguments::autocreated_shortflags_dont_collide",
+   "tests/task.py::Task_::get_arguments::early_auto_shortflags_shouldnt_lock_out_real_shortflags",
+   "tests/task.py::Task_::get_arguments::context_arguments_are_not_returned",
+   "tests/task.py::Task_::get_arguments::underscores_become_dashes",
+   "tests/task.py::Task_::get_arguments::help::base_case",
+   "tests/task.py::Task_::get_arguments::help::underscored_name_via_underscores",
+   "tests/task.py::Task_::get_arguments::help::underscored_name_via_dashes",
+   "tests/task.py::Task_::get_arguments::help::raises_ValueError_on_keys_not_found_in_task_args",
+   "tests/task.py::Task_::get_arguments::help::no_ValueError_on_unfound_keys_when_configured_otherwise",
+   "tests/task.py::Task_::get_arguments::help::arg_value_is_copied_to_avoid_state_bleed_when_shared",
+   "tests/task.py::Call_::init::task::is_required",
+   "tests/task.py::Call_::init::task::is_first_posarg",
+   "tests/task.py::Call_::init::called_as::defaults_to_None",
+   "tests/task.py::Call_::init::called_as::may_be_given",
+   "tests/task.py::Call_::init::args::defaults_to_empty_tuple",
+   "tests/task.py::Call_::init::args::may_be_given",
+   "tests/task.py::Call_::init::kwargs::defaults_to_empty_dict",
+   "tests/task.py::Call_::init::kwargs::may_be_given",
+   "tests/task.py::Call_::stringrep::includes_task_name",
+   "tests/task.py::Call_::stringrep::works_for_subclasses",
+   "tests/task.py::Call_::stringrep::includes_args_and_kwargs",
+   "tests/task.py::Call_::stringrep::includes_aka_if_explicit_name_given",
+   "tests/task.py::Call_::stringrep::skips_aka_if_explicit_name_same_as_task_name",
+   "tests/task.py::Call_::make_context::requires_config_and_core_parse_result_arguments",
+   "tests/task.py::Call_::make_context::creates_a_new_Context_from_given_config_and_core_parse_result",
+   "tests/task.py::Call_::clone::returns_new_but_equivalent_object",
+   "tests/task.py::Call_::clone::can_clone_into_a_subclass",
+   "tests/task.py::Call_::clone::can_be_given_extra_kwargs_to_clone_with"
+  ],
+  "not_executed": [],
+  "reproduced": true,
+  "environment_limits": []
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "bbc91e6c091384da6fc9c4844c50b1c5a53f9ac1ae1b0e61eac2ba918f7733e8",
+    "target": "pyinvoke/invoke#1103",
+    "about": "Probe for C1: References to the same callable still deduplicate.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "References to the same callable still deduplicate.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "bbc91e6c091384da6fc9c4844c50b1c5a53f9ac1ae1b0e61eac2ba918f7733e8",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-21T06:17:38.766220+00:00",
+     "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 1226,
+      "base_files": {
+       "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-21T06:17:38.917082+00:00"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    }
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "1eb2d9e30971bf69808a875897a2d54d35682f6ba1e01851e6805a5f08943505",
+    "target": "pyinvoke/invoke#1103",
+    "about": "Probe for C2: Custom callable equality is preserved.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Custom callable equality is preserved.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "1eb2d9e30971bf69808a875897a2d54d35682f6ba1e01851e6805a5f08943505",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-21T06:17:38.766365+00:00",
+     "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 1226,
+      "base_files": {
+       "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-21T06:17:38.917082+00:00"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    }
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "ce8eda0db2a354f9f1b03c49669f75a42be3ca541f26362b650429fcbf720d9a",
+    "target": "pyinvoke/invoke#1103",
+    "about": "Probe for C3: Distinct function objects now compare unequal even when their code matches.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Distinct function objects now compare unequal even when their code matches.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "ce8eda0db2a354f9f1b03c49669f75a42be3ca541f26362b650429fcbf720d9a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-21T06:17:38.766458+00:00",
+     "inputs_sha256": "7a0d29d9e5ea27654d7cf07b7cd77546f362ca359a86e690958f9801cbc5a441",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 1226,
+      "base_files": {
+       "invoke/tasks.py": "ecefc487fd8e9791640db8ed4be00f95582dd4a15da8a760a910e3a6333fdcee"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-21T06:17:38.917082+00:00"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    }
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p3": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1",
+   "model-p2",
+   "model-p3"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "cross_run_collected_files": [
+  "tests/collection.py",
+  "tests/executor.py",
+  "tests/task.py"
+ ],
+ "comparison": {
+  "same": 359,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [
+   "tests.collection.Collection_.useful_special_methods::collections_with_distinct_task_functions_are_not_equal",
+   "tests.executor.Executor_.deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped",
+   "tests.task.Task_::functions_with_different_closures_are_not_equal",
+   "tests.task.Task_::functions_with_different_defaults_are_not_equal"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 362,
+   "pr": 362
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.collection.Collection_.useful_special_methods::collections_with_distinct_task_functions_are_not_equal": "AssertionError: assert <Collection 'tasks': clean> != <Collection 'tasks': clean>",
+   "tests.executor.Executor_.deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped": "AssertionError: assert ['first'] == ['first', 'second']",
+   "tests.task.Task_::functions_with_different_closures_are_not_equal": "AssertionError: assert <Task 'clean'> != <Task 'clean'>",
+   "tests.task.Task_::functions_with_different_defaults_are_not_equal": "AssertionError: assert <Task 'clean'> != <Task 'clean'>"
+  },
+  "collected_test_files": [
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py"
+  ],
+  "base_new_tests": {
+   "ids": [
+    "tests/collection.py::Collection_::useful_special_methods::collections_with_distinct_task_functions_are_not_equal",
+    "tests/executor.py::Executor_::deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped",
+    "tests/task.py::Task_::functions_with_different_closures_are_not_equal",
+    "tests/task.py::Task_::functions_with_different_defaults_are_not_equal"
+   ],
+   "passed_on_base": [],
+   "failed_on_base": [
+    "tests/collection.py::Collection_::useful_special_methods::collections_with_distinct_task_functions_are_not_equal",
+    "tests/executor.py::Executor_::deduping_and_chaining::tasks_with_distinct_closures_are_not_deduped",
+    "tests/task.py::Task_::functions_with_different_closures_are_not_equal",
+    "tests/task.py::Task_::functions_with_different_defaults_are_not_equal"
+   ],
+   "not_collected": [],
+   "collection_failed": [],
+   "discovery_empty": [],
+   "shared_ids": [
+    "tests/collection.py::Collection_::init::can_accept_task_varargs",
+    "tests/collection.py::Collection_::init::can_accept_collections_as_varargs_too",
+    "tests/collection.py::Collection_::init::kwargs_act_as_name_args_for_given_objects",
+    "tests/collection.py::Collection_::init::initial_string_arg_acts_as_name",
+    "tests/collection.py::Collection_::init::initial_string_arg_meshes_with_varargs_and_kwargs",
+    "tests/collection.py::Collection_::init::accepts_load_path_kwarg",
+    "tests/collection.py::Collection_::init::accepts_auto_dash_names_kwarg",
+    "tests/collection.py::Collection_::useful_special_methods::repr_",
+    "tests/collection.py::Collection_::useful_special_methods::equality_consists_of_name_tasks_and_collections",
+    "tests/collection.py::Collection_::useful_special_methods::boolean_is_equivalent_to_tasks_and_or_collections",
+    "tests/collection.py::Collection_::from_module::parameters::name_override",
+    "tests/collection.py::Collection_::from_module::parameters::inline_configuration",
+    "tests/collection.py::Collection_::from_module::parameters::name_and_config_simultaneously",
+    "tests/collection.py::Collection_::from_module::parameters::auto_dash_names_passed_to_constructor",
+    "tests/collection.py::Collection_::from_module::adds_tasks",
+    "tests/collection.py::Collection_::from_module::derives_collection_name_from_module_name",
+    "tests/collection.py::Collection_::from_module::copies_docstring_from_module",
+    "tests/collection.py::Collection_::from_module::works_great_with_subclassing",
+    "tests/collection.py::Collection_::from_module::submodule_names_are_stripped_to_last_chunk",
+    "tests/collection.py::Collection_::from_module::honors_explicit_collections",
+    "tests/collection.py::Collection_::from_module::allows_tasks_with_explicit_names_to_override_bound_name",
+    "tests/collection.py::Collection_::from_module::returns_unique_Collection_objects_for_same_input_module",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_config_with_root_namespaces_overrides_builtin",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_config_overrides_via_merge_not_replacement",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::config_override_merges_recursively",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::inline_name_overrides_root_namespace_object_name",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::root_namespace_object_name_overrides_module_name",
+    "tests/collection.py::Collection_::from_module::explicit_root_ns::docstring_still_copied_from_module",
+    "tests/collection.py::Collection_::add_task::associates_given_callable_with_given_name",
+    "tests/collection.py::Collection_::add_task::uses_function_name_as_implicit_name",
+    "tests/collection.py::Collection_::add_task::prefers_name_kwarg_over_task_name_attr",
+    "tests/collection.py::Collection_::add_task::prefers_task_name_attr_over_function_name",
+    "tests/collection.py::Collection_::add_task::raises_ValueError_if_no_name_found",
+    "tests/collection.py::Collection_::add_task::raises_ValueError_on_multiple_defaults",
+    "tests/collection.py::Collection_::add_task::raises_ValueError_if_task_added_mirrors_subcollection_name",
+    "tests/collection.py::Collection_::add_task::allows_specifying_task_defaultness",
+    "tests/collection.py::Collection_::add_task::specifying_default_False_overrides_task_setting",
+    "tests/collection.py::Collection_::add_task::allows_specifying_aliases",
+    "tests/collection.py::Collection_::add_task::aliases_are_merged",
+    "tests/collection.py::Collection_::add_collection::adds_collection_as_subcollection_of_self",
+    "tests/collection.py::Collection_::add_collection::can_take_module_objects",
+    "tests/collection.py::Collection_::add_collection::allows_specifying_defaultness",
+    "tests/collection.py::Collection_::add_collection::raises_ValueError_if_collection_without_name",
+    "tests/collection.py::Collection_::add_collection::raises_ValueError_if_collection_named_same_as_task",
+    "tests/collection.py::Collection_::add_collection::raises_ValueError_on_multiple_defaults",
+    "tests/collection.py::Collection_::getitem::finds_own_tasks_by_name",
+    "tests/collection.py::Collection_::getitem::finds_subcollection_tasks_by_dotted_name",
+    "tests/collection.py::Collection_::getitem::honors_aliases_in_own_tasks",
+    "tests/collection.py::Collection_::getitem::honors_subcollection_task_aliases",
+    "tests/collection.py::Collection_::getitem::honors_own_default_task_with_no_args",
+    "tests/collection.py::Collection_::getitem::honors_own_default_subcollection",
+    "tests/collection.py::Collection_::getitem::honors_subcollection_default_tasks_on_subcollection_name",
+    "tests/collection.py::Collection_::getitem::raises_ValueError_for_no_name_and_no_default",
+    "tests/collection.py::Collection_::getitem::ValueError_for_empty_subcol_task_name_and_no_default",
+    "tests/collection.py::Collection_::to_contexts::returns_iterable_of_Contexts_corresponding_to_tasks",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::context_names_automatically_become_dashed",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::percolates_to_subcollection_tasks",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::percolates_to_subcollection_names",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::aliases_are_dashed_too",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::leading_and_trailing_underscores_are_not_affected",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::honors_init_setting_on_topmost_namespace",
+    "tests/collection.py::Collection_::to_contexts::auto_dash_names::transforms_are_applied_to_explicit_module_namespaces",
+    "tests/collection.py::Collection_::to_contexts::allows_flaglike_access_via_flags",
+    "tests/collection.py::Collection_::to_contexts::positional_arglist_preserves_order_given",
+    "tests/collection.py::Collection_::to_contexts::exposes_namespaced_task_names",
+    "tests/collection.py::Collection_::to_contexts::exposes_namespaced_task_aliases",
+    "tests/collection.py::Collection_::to_contexts::exposes_subcollection_default_tasks",
+    "tests/collection.py::Collection_::to_contexts::exposes_aliases",
+    "tests/collection.py::Collection_::task_names::returns_all_task_names_including_subtasks",
+    "tests/collection.py::Collection_::task_names::includes_aliases_and_defaults_as_values",
+    "tests/collection.py::Collection_::configuration::basic_set_and_get",
+    "tests/collection.py::Collection_::configuration::configure_performs_merging",
+    "tests/collection.py::Collection_::configuration::configure_merging_is_recursive_for_nested_dicts",
+    "tests/collection.py::Collection_::configuration::configure_allows_overwriting",
+    "tests/collection.py::Collection_::configuration::call_returns_dict",
+    "tests/collection.py::Collection_::configuration::access_merges_from_subcollections",
+    "tests/collection.py::Collection_::configuration::parents_overwrite_children_in_path",
+    "tests/collection.py::Collection_::configuration::sibling_subcollections_ignored",
+    "tests/collection.py::Collection_::configuration::subcollection_paths_may_be_dotted",
+    "tests/collection.py::Collection_::configuration::invalid_subcollection_paths_result_in_KeyError",
+    "tests/collection.py::Collection_::configuration::keys_dont_have_to_exist_in_full_path",
+    "tests/collection.py::Collection_::subcollection_from_path::top_level_path",
+    "tests/collection.py::Collection_::subcollection_from_path::nested_path",
+    "tests/collection.py::Collection_::subcollection_from_path::invalid_path",
+    "tests/collection.py::Collection_::serialized::empty_collection",
+    "tests/collection.py::Collection_::serialized::empty_named_collection",
+    "tests/collection.py::Collection_::serialized::empty_named_docstringed_collection",
+    "tests/collection.py::Collection_::serialized::name_docstring_default_and_tasks",
+    "tests/collection.py::Collection_::serialized::name_docstring_default_tasks_and_collections",
+    "tests/collection.py::Collection_::serialized::unnamed_subcollections",
+    "tests/executor.py::Executor_::init::allows_collection_and_config",
+    "tests/executor.py::Executor_::init::uses_blank_config_by_default",
+    "tests/executor.py::Executor_::init::can_grant_access_to_core_arg_parse_result",
+    "tests/executor.py::Executor_::init::core_arg_parse_result_defaults_to_empty_ParseResult",
+    "tests/executor.py::Executor_::execute::base_case",
+    "tests/executor.py::Executor_::execute::kwargs",
+    "tests/executor.py::Executor_::execute::contextualized_tasks_are_given_parser_context_arg",
+    "tests/executor.py::Executor_::execute::default_tasks_called_when_no_tasks_specified",
+    "tests/executor.py::Executor_::basic_pre_post::pre_tasks",
+    "tests/executor.py::Executor_::basic_pre_post::post_tasks",
+    "tests/executor.py::Executor_::basic_pre_post::calls_default_to_empty_args_always",
+    "tests/executor.py::Executor_::basic_pre_post::call_objs_play_well_with_context_args",
+    "tests/executor.py::Executor_::deduping_and_chaining::chaining_is_depth_first",
+    "tests/executor.py::Executor_::deduping_and_chaining::adjacent_hooks::deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::adjacent_hooks::no_deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_hooks::deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_hooks::no_deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::adjacent_top_level_tasks::deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::adjacent_top_level_tasks::no_deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_top_level_tasks::deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::non_adjacent_top_level_tasks::no_deduping",
+    "tests/executor.py::Executor_::deduping_and_chaining::deduping_treats_different_calls_to_same_task_differently",
+    "tests/executor.py::Executor_::collection_driven_config::hands_collection_configuration_to_context",
+    "tests/executor.py::Executor_::collection_driven_config::hands_task_specific_configuration_to_context",
+    "tests/executor.py::Executor_::collection_driven_config::subcollection_config_works_with_default_tasks",
+    "tests/executor.py::Executor_::returns_return_value_of_specified_task::base_case",
+    "tests/executor.py::Executor_::returns_return_value_of_specified_task::with_pre_tasks",
+    "tests/executor.py::Executor_::returns_return_value_of_specified_task::with_post_tasks",
+    "tests/executor.py::Executor_::autoprinting::defaults_to_off_and_no_output",
+    "tests/executor.py::Executor_::autoprinting::prints_return_value_to_stdout_when_on",
+    "tests/executor.py::Executor_::autoprinting::prints_return_value_to_stdout_when_on_and_in_collection",
+    "tests/executor.py::Executor_::autoprinting::does_not_fire_on_pre_tasks",
+    "tests/executor.py::Executor_::autoprinting::does_not_fire_on_post_tasks",
+    "tests/executor.py::Executor_::inter_task_context_and_config_sharing::context_is_new_but_config_is_same",
+    "tests/executor.py::Executor_::inter_task_context_and_config_sharing::new_config_data_is_preserved_between_tasks",
+    "tests/executor.py::Executor_::inter_task_context_and_config_sharing::config_mutation_is_preserved_between_tasks",
+    "tests/executor.py::Executor_::inter_task_context_and_config_sharing::config_deletion_is_preserved_between_tasks",
+    "tests/task.py::task_::allows_access_to_wrapped_object",
+    "tests/task.py::task_::allows_alias_specification",
+    "tests/task.py::task_::allows_multiple_aliases",
+    "tests/task.py::task_::allows_default_specification",
+    "tests/task.py::task_::has_autoprint_option",
+    "tests/task.py::task_::raises_ValueError_on_multiple_defaults",
+    "tests/task.py::task_::sets_arg_kind",
+    "tests/task.py::task_::sets_which_args_are_optional",
+    "tests/task.py::task_::allows_annotating_args_as_positional",
+    "tests/task.py::task_::allows_annotating_args_as_iterable",
+    "tests/task.py::task_::allows_annotating_args_as_incrementable",
+    "tests/task.py::task_::when_positional_arg_missing_all_non_default_args_are_positional",
+    "tests/task.py::task_::context_arguments_should_not_appear_in_implicit_positional_list",
+    "tests/task.py::task_::pre_tasks_stored_directly",
+    "tests/task.py::task_::allows_star_args_as_shortcut_for_pre",
+    "tests/task.py::task_::disallows_ambiguity_between_star_args_and_pre_kwarg",
+    "tests/task.py::task_::sets_name",
+    "tests/task.py::task_::returns_Task_instances_by_default",
+    "tests/task.py::task_::klass_kwarg_allows_overriding_class_used",
+    "tests/task.py::task_::klass_kwarg_works_for_subclassers_without_kwargs",
+    "tests/task.py::task_::unknown_kwargs_get_mad_at_Task_level",
+    "tests/task.py::Task_::has_useful_repr",
+    "tests/task.py::Task_::equality_testing",
+    "tests/task.py::Task_::equality_testing_false_for_non_task_objects",
+    "tests/task.py::Task_::function_like_behavior::inherits_module_from_body",
+    "tests/task.py::Task_::attributes::has_default_flag",
+    "tests/task.py::Task_::attributes::name_defaults_to_body_name",
+    "tests/task.py::Task_::attributes::can_override_name",
+    "tests/task.py::Task_::callability::dunder_call_wraps_body_call",
+    "tests/task.py::Task_::callability::errors_if_first_arg_not_Context",
+    "tests/task.py::Task_::callability::errors_if_no_first_arg_at_all",
+    "tests/task.py::Task_::callability::tracks_times_called",
+    "tests/task.py::Task_::callability::wraps_body_docstring",
+    "tests/task.py::Task_::callability::wraps_body_name",
+    "tests/task.py::Task_::get_arguments::positional_args_come_first",
+    "tests/task.py::Task_::get_arguments::kinds_are_preserved",
+    "tests/task.py::Task_::get_arguments::positional_flag_is_preserved",
+    "tests/task.py::Task_::get_arguments::optional_flag_is_preserved",
+    "tests/task.py::Task_::get_arguments::optional_prevents_bool_defaults_from_affecting_kind",
+    "tests/task.py::Task_::get_arguments::optional_plus_nonbool_default_does_not_override_kind",
+    "tests/task.py::Task_::get_arguments::turns_function_signature_into_Arguments",
+    "tests/task.py::Task_::get_arguments::shortflags_created_by_default",
+    "tests/task.py::Task_::get_arguments::shortflags_dont_care_about_positionals",
+    "tests/task.py::Task_::get_arguments::autocreated_short_flags_can_be_disabled",
+    "tests/task.py::Task_::get_arguments::autocreated_shortflags_dont_collide",
+    "tests/task.py::Task_::get_arguments::early_auto_shortflags_shouldnt_lock_out_real_shortflags",
+    "tests/task.py::Task_::get_arguments::context_arguments_are_not_returned",
+    "tests/task.py::Task_::get_arguments::underscores_become_dashes",
+    "tests/task.py::Task_::get_arguments::help::base_case",
+    "tests/task.py::Task_::get_arguments::help::underscored_name_via_underscores",
+    "tests/task.py::Task_::get_arguments::help::underscored_name_via_dashes",
+    "tests/task.py::Task_::get_arguments::help::raises_ValueError_on_keys_not_found_in_task_args",
+    "tests/task.py::Task_::get_arguments::help::no_ValueError_on_unfound_keys_when_configured_otherwise",
+    "tests/task.py::Task_::get_arguments::help::arg_value_is_copied_to_avoid_state_bleed_when_shared",
+    "tests/task.py::Call_::init::task::is_required",
+    "tests/task.py::Call_::init::task::is_first_posarg",
+    "tests/task.py::Call_::init::called_as::defaults_to_None",
+    "tests/task.py::Call_::init::called_as::may_be_given",
+    "tests/task.py::Call_::init::args::defaults_to_empty_tuple",
+    "tests/task.py::Call_::init::args::may_be_given",
+    "tests/task.py::Call_::init::kwargs::defaults_to_empty_dict",
+    "tests/task.py::Call_::init::kwargs::may_be_given",
+    "tests/task.py::Call_::stringrep::includes_task_name",
+    "tests/task.py::Call_::stringrep::works_for_subclasses",
+    "tests/task.py::Call_::stringrep::includes_args_and_kwargs",
+    "tests/task.py::Call_::stringrep::includes_aka_if_explicit_name_given",
+    "tests/task.py::Call_::stringrep::skips_aka_if_explicit_name_same_as_task_name",
+    "tests/task.py::Call_::make_context::requires_config_and_core_parse_result_arguments",
+    "tests/task.py::Call_::make_context::creates_a_new_Context_from_given_config_and_core_parse_result",
+    "tests/task.py::Call_::clone::returns_new_but_equivalent_object",
+    "tests/task.py::Call_::clone::can_clone_into_a_subclass",
+    "tests/task.py::Call_::clone::can_be_given_extra_kwargs_to_clone_with"
+   ],
+   "not_executed": [],
+   "reproduced": true,
+   "environment_limits": []
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C3 expect a difference but no observation matches (4 test(s) fail on main and pass on the PR; 362 test(s) ran on main, 362 on the PR; 0 new test(s) pass, 359 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/tasks.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "sites/docs/concepts/invoking-tasks.rst",
+   "sites/www/changelog.rst",
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/task.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 225.6,
+  "tests": 12.7
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 11817,
+  "output_tokens": 13033,
+  "thinking_tokens": 12108,
+  "cost_usd": 0.015275,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.015275,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 225.6,
+   "tests": 12.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01504,
+  "total_cost_usd": 0.030315,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-21/ef12096/invoke-1103"
+ }
+}
