@@ -1,12 +1,13 @@
 # Proof-of-Change go/no-go: 2026-11-22 on ef12096
 
-5 report(s) in this folder: 0 need attention, 3 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+6 report(s) in this folder: 0 need attention, 4 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
 - **COULD NOT VERIFY**: mahmoud/boltons#821: fix parse_timedelta dropping units in compact strings like 1h30m. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged
 - **COULD NOT VERIFY**: mahmoud/boltons#822: fix SpooledStringIO.read(None) raising TypeError. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 97 test(s) ran on main, 97 on the PR; 0 new test(s) pass, 96 unchanged
 - **COULD NOT VERIFY**: mahmoud/boltons#824: Keep FunctionBuilder custom attributes independent. Could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
+- **COULD NOT VERIFY**: PyCQA/isort#2803: Add optional wrapping for long from-import module paths. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 37 test(s) fail on main and pass on the PR; 172 test(s) ran on main, 173 on the PR; 1 new test(s) pass, 136 unchanged (1 of them skipped on both sides)
 
 ## All reports
 
@@ -15,5 +16,6 @@
 | COULD NOT VERIFY | mahmoud/boltons#821: fix parse_timedelta dropping units in compact strings like 1h30m | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged | [PDF](boltons-821/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#822: fix SpooledStringIO.read(None) raising TypeError | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 97 test(s) ran on main, 97 on the PR; 0 new test(s) pass, 96 unchanged | [PDF](boltons-822/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#824: Keep FunctionBuilder custom attributes independent | Could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](boltons-824/REPORT.pdf) |
+| COULD NOT VERIFY | PyCQA/isort#2803: Add optional wrapping for long from-import module paths | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 37 test(s) fail on main and pass on the PR; 172 test(s) ran on main, 173 on the PR; 1 new test(s) pass, 136 unchanged (1 of them skipped on both sides) | [PDF](isort-2803/REPORT.pdf) |
 | VERIFIED | encode/httpx#3856: Raise ProtocolError on malformed Digest auth challenges | 6 test(s) fail on main and pass on the PR; 93 test(s) ran on main, 93 on the PR; 0 new test(s) pass, 88 unchanged (1 of them skipped on both sides); probe: claim(s) C1, C2 proven | [PDF](httpx-3856/REPORT.pdf) |
 | VERIFIED | pyinvoke/invoke#1104: Honor selected collections during shell completion | 8 test(s) fail on main and pass on the PR; 156 test(s) ran on main, 156 on the PR; 0 new test(s) pass, 150 unchanged (2 of them skipped on both sides); probe: claim(s) C2, C3, C4 proven; probe model-probe1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count | [PDF](invoke-1104/REPORT.pdf) |
