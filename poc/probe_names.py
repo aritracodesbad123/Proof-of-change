@@ -14,8 +14,13 @@ A call the probe makes on a base function or class is also checked against that 
 An unexpected keyword is not deleted to make the call run: that would keep a different
 scenario. A required parameter that is still missing is filled from a base call that passes
 that same parameter, and only that parameter, while the probe's other valid arguments stay.
-A call we cannot check (*args, **kwargs, or a constructor or method whose parameters are not
-in the file) is not run. A different call is not copied in just because it uses the same name.
+Named parameters are still checked when the definition also accepts *args or **kwargs.
+Extra positional arguments flow into *args, and extra keywords flow into **kwargs, and that
+call is run. A keyword that is not a parameter is still rejected when the definition has no
+**kwargs. A call written as **mapping is not judged. A constructor inherited from another
+file is checked when that file can be read. A dataclass or attrs class whose fields can be
+read is checked the same way. When the parameters cannot be read, the call is not judged
+and the probe is still run. A different call is not copied in just because it uses the same name.
 """
 from __future__ import annotations
 
@@ -673,10 +678,11 @@ class _Checker(ast.NodeVisitor):
     def _check_call(self, node: ast.Call) -> None:
         """Record a base call and report a keyword or argument list that cannot run.
 
-        Skipped when the callable is not a function or class defined in the base tree, when a
-        decorator other than staticmethod/classmethod wraps it, or when the signature accepts
-        **kwargs. Third-party and builtin calls are not checked. An import that only re-exports
-        the name is followed to the definition, so the parameters are the ones that actually run."""
+        Skipped when the callable is not a function or class defined in the base tree, or when a
+        decorator other than staticmethod/classmethod may have changed it. Third-party and builtin
+        calls are not checked. An import that only re-exports the name is followed to the definition,
+        so the parameters are the ones that actually run. A definition that accepts **kwargs still
+        rejects a positional-only name passed as a keyword; any other extra keyword is allowed."""
         sig, dotted = self._resolve_callable(node.func)
         if dotted and sig is None:
             if dotted not in self.unreadable:
@@ -718,7 +724,8 @@ class _Checker(ast.NodeVisitor):
 
 class _Sig:
     def __init__(self, display: str, names: list[str], posonly: set[str], var_keyword: bool, *,
-                 required=None, n_positional=None, vararg: bool = False, kwonly=None, explicit: bool = True):
+                 required=None, n_positional=None, vararg: bool = False, kwonly=None, explicit: bool = True,
+                 opaque: bool = False, from_fields: bool = False):
         self.display = display
         self.names = names
         self.posonly = posonly
@@ -727,6 +734,10 @@ class _Sig:
         self.required = list(required or ())
         self.vararg = vararg
         self.explicit = explicit
+        # opaque: a generated constructor whose fields could not be read. The call is not judged.
+        self.opaque = opaque
+        # from_fields: the parameters came from dataclass, attrs, or NamedTuple fields.
+        self.from_fields = from_fields
         self.n_positional = (len([n for n in names if n not in self.kwonly])
                              if n_positional is None else n_positional)
 
@@ -734,7 +745,13 @@ class _Sig:
 def _retarget(sig: _Sig, display: str) -> _Sig:
     """The same parameters, shown under the class that inherits them."""
     return _Sig(display, list(sig.names), set(sig.posonly), sig.var_keyword, required=list(sig.required),
-                n_positional=sig.n_positional, vararg=sig.vararg, kwonly=set(sig.kwonly), explicit=sig.explicit)
+                n_positional=sig.n_positional, vararg=sig.vararg, kwonly=set(sig.kwonly), explicit=sig.explicit,
+                opaque=sig.opaque, from_fields=sig.from_fields)
+
+
+def _opaque(display: str) -> _Sig:
+    """A constructor we know is generated, whose parameter names we cannot read."""
+    return _Sig(display, [], set(), False, explicit=False, opaque=True, from_fields=True)
 
 
 def _resolve_named(checker, module: str, attrs: list[str]):
@@ -758,7 +775,7 @@ def _resolve_named(checker, module: str, attrs: list[str]):
     dotted = f"{mod}.{node.name}"
     if not rest:
         if isinstance(node, ast.ClassDef):
-            return _init_signature(tree, node), dotted
+            return _init_signature(tree, node, checker, mod), dotted
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             return _function_signature(node, drop_first=False, display=node.name), dotted
         return None, None
@@ -851,28 +868,315 @@ def _method_on(cls: ast.ClassDef, method: str):
     return _function_signature(fn, drop_first=drop, display=f"{cls.name}.{method}")
 
 
-def _init_signature(tree: ast.AST, cls: ast.ClassDef, depth: int = 0):
-    if depth > 3:
+def _own_init(cls: ast.ClassDef):
+    """The implementation of __init__, skipping typing.overload stubs."""
+    for node in cls.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "__init__":
+            if any(_decorator_name(deco) == "overload" for deco in node.decorator_list):
+                continue
+            return node
+    return None
+
+
+def _dotted_name(node) -> str | None:
+    if isinstance(node, ast.Call):
+        return _dotted_name(node.func)
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        parent = _dotted_name(node.value)
+        return (parent + "." + node.attr) if parent else node.attr
+    return None
+
+
+def _is_dataclass_deco(node) -> bool:
+    name = _dotted_name(node) or ""
+    return name == "dataclass" or name.endswith(".dataclass")
+
+
+def _is_attrs_deco(node) -> bool:
+    name = _dotted_name(node) or ""
+    if name in {"attr.s", "attr.attrs", "attr.define", "attr.frozen", "attr.mutable",
+                "attrs.s", "attrs.define", "attrs.frozen", "attrs.mutable", "attrs.attrs"}:
+        return True
+    leaf = name.rsplit(".", 1)[-1]
+    head = name.split(".", 1)[0] if "." in name else ""
+    if leaf in {"define", "frozen", "mutable"} and head in {"", "attr", "attrs"}:
+        return True
+    return name in {"define", "frozen", "mutable", "attrs"}
+
+
+def _generated_kind(cls: ast.ClassDef) -> str | None:
+    """dataclass, attrs, or namedtuple when this class's constructor is generated from fields."""
+    for deco in cls.decorator_list:
+        if _is_dataclass_deco(deco):
+            return "dataclass"
+        if _is_attrs_deco(deco):
+            return "attrs"
+    for base in cls.bases:
+        if _base_label(base) == "namedtuple":
+            return "namedtuple"
+    return None
+
+
+def _base_label(node) -> str:
+    name = node.id if isinstance(node, ast.Name) else node.attr if isinstance(node, ast.Attribute) else ""
+    if name == "object":
+        return "object"
+    if name == "NamedTuple":
+        return "namedtuple"
+    return "class"
+
+
+def _const_bool(node) -> bool | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, bool):
+        return node.value
+    return None
+
+
+def _decorator_flag(cls: ast.ClassDef, kind: str, flag: str, default: bool) -> bool | None:
+    """A boolean keyword on the generating decorator, or None when it is not a constant."""
+    for deco in cls.decorator_list:
+        match = _is_dataclass_deco(deco) if kind == "dataclass" else _is_attrs_deco(deco)
+        if not match or not isinstance(deco, ast.Call):
+            continue
+        for kw in deco.keywords:
+            if kw.arg == flag:
+                return _const_bool(kw.value)
+    return default
+
+
+def _attrs_uses_annotations(cls: ast.ClassDef) -> bool | None:
+    """True when annotated names are fields. define/frozen default to that; attr.s does not."""
+    for deco in cls.decorator_list:
+        if not _is_attrs_deco(deco):
+            continue
+        leaf = (_dotted_name(deco) or "").rsplit(".", 1)[-1]
+        default = leaf in {"define", "frozen", "mutable"}
+        if isinstance(deco, ast.Call):
+            for kw in deco.keywords:
+                if kw.arg == "auto_attribs":
+                    return _const_bool(kw.value)
+        return default
+    return False
+
+
+def _ann_origin(node) -> str | None:
+    if isinstance(node, ast.Subscript):
+        return _decorator_name(node.value)
+    return _decorator_name(node)
+
+
+def _field_call(value):
+    """(required, init, kw_only) for a field()/attr.ib() call, or None when value is not one.
+
+    'unreadable' when a flag is present but not a constant."""
+    if not isinstance(value, ast.Call):
         return None
-    init = next((n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__"), None)
+    if _decorator_name(value.func) not in {"field", "ib", "attrib", "attr"}:
+        return None
+    required, init, kw_only = True, True, False
+    if value.args:
+        required = False
+    for kw in value.keywords:
+        if kw.arg in {"default", "default_factory", "factory"}:
+            required = False
+        elif kw.arg == "init":
+            flag = _const_bool(kw.value)
+            if flag is None:
+                return "unreadable"
+            init = flag
+        elif kw.arg == "kw_only":
+            flag = _const_bool(kw.value)
+            if flag is None:
+                return "unreadable"
+            kw_only = flag
+    return required, init, kw_only
+
+
+def _read_fields(cls: ast.ClassDef, use_annotations: bool):
+    """(name, required, keyword-only) for each constructor field, or None when a field cannot be read."""
+    fields = []
+    kw_rest = False
+    for stmt in cls.body:
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Pass, ast.Expr)):
+            continue
+        if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+            origin = _ann_origin(stmt.annotation)
+            if origin == "ClassVar":
+                continue
+            if origin == "KW_ONLY":
+                kw_rest = True
+                continue
+            parsed = _field_call(stmt.value)
+            if parsed == "unreadable":
+                return None
+            if parsed is None:
+                if not use_annotations:
+                    continue
+                required, init, kw_only = stmt.value is None, True, False
+            else:
+                required, init, kw_only = parsed
+            if not init:
+                continue
+            fields.append((stmt.target.id, required, kw_only or kw_rest))
+            continue
+        if isinstance(stmt, ast.Assign) and len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name):
+            parsed = _field_call(stmt.value)
+            if parsed is None:
+                continue
+            if parsed == "unreadable":
+                return None
+            required, init, kw_only = parsed
+            if not init:
+                continue
+            fields.append((stmt.targets[0].id, required, kw_only or kw_rest))
+            continue
+        return None
+    return fields
+
+
+def _sig_from_fields(display: str, fields: list, kw_only: bool) -> _Sig:
+    names, required, kwonly = [], [], set()
+    for name, is_required, field_kw in fields:
+        if name in names:
+            continue
+        names.append(name)
+        if kw_only or field_kw:
+            kwonly.add(name)
+        if is_required:
+            required.append(name)
+    return _Sig(display, names, set(), False, required=required, kwonly=kwonly, explicit=True, from_fields=True)
+
+
+def _fields_of(sig: _Sig) -> list:
+    return [(name, name in sig.required, name in sig.kwonly) for name in sig.names]
+
+
+def _merge_fields(parent: list, child: list) -> list:
+    """Parent fields first. A child field of the same name replaces the parent entry."""
+    order, meta = [], {}
+    for name, required, kw_only in parent + child:
+        if name not in meta:
+            order.append(name)
+        meta[name] = (required, kw_only)
+    return [(name, meta[name][0], meta[name][1]) for name in order]
+
+
+def _resolve_base(checker, tree, module, base):
+    """(tree, module, class) for a base class written in the base tree, or None."""
+    if isinstance(base, ast.Name):
+        if checker is None or not module:
+            parent = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == base.id), None)
+            return (tree, module, parent) if parent is not None else None
+        found = _lookup_def(checker, module, base.id)
+        if found and isinstance(found[2], ast.ClassDef):
+            return found
+        return None
+    if not isinstance(base, ast.Attribute) or checker is None or not module:
+        return None
+    parts = []
+    cur = base
+    while isinstance(cur, ast.Attribute):
+        parts.append(cur.attr)
+        cur = cur.value
+    parts.reverse()
+    if not isinstance(cur, ast.Name):
+        return None
+    mod = _imported_module(checker, tree, module, cur.id)
+    if not mod:
+        return None
+    full = mod.split(".") + parts
+    found = _lookup_def(checker, ".".join(full[:-1]), full[-1])
+    if found and isinstance(found[2], ast.ClassDef):
+        return found
+    return None
+
+
+def _imported_module(checker, tree, module, local: str) -> str | None:
+    """The module a name imported into this file refers to."""
+    loc = locate(checker.root, module) if module else None
+    is_package = loc is not None and loc.kind == "package"
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                bound = alias.asname or alias.name.split(".")[0]
+                if bound == local:
+                    return alias.name if alias.asname or "." not in alias.name else alias.name.split(".")[0]
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                if alias.name == "*" or (alias.asname or alias.name) != local:
+                    continue
+                target = _absolute_module(module, is_package, node.level or 0, node.module)
+                if target:
+                    return target + "." + alias.name
+    return None
+
+
+def _init_signature(tree, cls, checker=None, module=None, depth=0, seen=None):
+    if depth > 4:
+        return None
+    seen = seen if seen is not None else set()
+    key = (module or "", cls.name, id(cls))
+    if key in seen:
+        return None
+    seen.add(key)
+    init = _own_init(cls)
     if init is not None:
         return _function_signature(init, drop_first=True, display=cls.name)
+    kind = _generated_kind(cls)
+    if kind:
+        return _fields_signature(tree, cls, checker, module, depth, seen, kind)
     if not cls.bases:
         # No constructor in this class. A decorator may still add one, so argument counts are not checked.
         return _Sig(cls.name, [], set(), False, explicit=False)
     for base in cls.bases:
-        if isinstance(base, ast.Name) and base.id == "object":
+        if _base_label(base) in {"object", "namedtuple"}:
             continue
-        if not isinstance(base, ast.Name):
+        found = _resolve_base(checker, tree, module, base)
+        if found is None:
             return None
-        parent = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == base.id), None)
-        if parent is None:
-            return None
-        sig = _init_signature(tree, parent, depth + 1)
+        parent_tree, parent_mod, parent = found
+        sig = _init_signature(parent_tree, parent, checker, parent_mod, depth + 1, seen)
         if sig is None:
             return None
+        if not sig.explicit and not sig.names and not sig.opaque and not sig.from_fields:
+            continue
         return _retarget(sig, cls.name)
     return _Sig(cls.name, [], set(), False, explicit=False)
+
+
+def _fields_signature(tree, cls, checker, module, depth, seen, kind: str):
+    """The generated constructor, or an opaque signature when a field or base cannot be read."""
+    if kind == "attrs":
+        use_annotations = _attrs_uses_annotations(cls)
+        if use_annotations is None:
+            return _opaque(cls.name)
+    else:
+        use_annotations = True
+    own = _read_fields(cls, use_annotations)
+    if own is None:
+        return _opaque(cls.name)
+    kw_only = False
+    if kind == "dataclass":
+        flag = _decorator_flag(cls, "dataclass", "kw_only", False)
+        if flag is None:
+            return _opaque(cls.name)
+        kw_only = flag
+    parent_fields = []
+    for base in cls.bases:
+        if _base_label(base) in {"object", "namedtuple"}:
+            continue
+        found = _resolve_base(checker, tree, module, base)
+        if found is None:
+            return _opaque(cls.name)
+        parent_tree, parent_mod, parent = found
+        sig = _init_signature(parent_tree, parent, checker, parent_mod, depth + 1, seen)
+        if sig is None or sig.opaque:
+            return _opaque(cls.name)
+        if sig.from_fields:
+            parent_fields.extend(_fields_of(sig))
+    return _sig_from_fields(cls.name, _merge_fields(parent_fields, own), kw_only)
 
 
 def _decorator_name(node) -> str | None:
@@ -884,7 +1188,10 @@ def _decorator_name(node) -> str | None:
 
 
 def _function_signature(node, drop_first: bool, display: str):
-    """None when a decorator may have changed the callable. **kwargs means any keyword is allowed."""
+    """None when a decorator may have changed the callable.
+
+    Named parameters are kept when the definition also accepts *args or **kwargs. Extra arguments
+    flow into those collectors; a name the definition does declare is still checked."""
     for deco in node.decorator_list:
         if _decorator_name(deco) not in {"staticmethod", "classmethod"}:
             return None
@@ -893,8 +1200,6 @@ def _function_signature(node, drop_first: bool, display: str):
     if any(_decorator_name(deco) == "staticmethod" for deco in node.decorator_list):
         drop_first = False
     args = node.args
-    if args.kwarg is not None:
-        return _Sig(display, [], set(), True)
     pos = list(args.posonlyargs) + list(args.args)
     kwonly = list(args.kwonlyargs)
     n_default = len(args.defaults)
@@ -908,28 +1213,43 @@ def _function_signature(node, drop_first: bool, display: str):
         required_pos = [arg for arg in required_pos if arg.arg != dropped]
     names = [arg.arg for arg in pos + kwonly]
     required = [arg.arg for arg in required_pos + required_kw]
-    return _Sig(display, names, posonly, False, required=required, n_positional=len(pos),
+    return _Sig(display, names, posonly, args.kwarg is not None, required=required, n_positional=len(pos),
                 vararg=args.vararg is not None, kwonly={arg.arg for arg in kwonly}, explicit=True)
 
 
 def _param_list(sig: _Sig) -> str:
-    shown = ", ".join(sig.names[:_LIST_LIMIT]) or "(none)"
-    extra = f" (+{len(sig.names) - _LIST_LIMIT} more)" if len(sig.names) > _LIST_LIMIT else ""
+    if sig.opaque:
+        return "(parameters could not be read)"
+    display = []
+    placed_star = False
+    for name in sig.names:
+        if name in sig.kwonly and not placed_star:
+            display.append("*args" if sig.vararg else "*")
+            placed_star = True
+        display.append(name)
+    if sig.vararg and not placed_star:
+        display.append("*args")
+    if sig.var_keyword:
+        display.append("**kwargs")
+    shown = ", ".join(display[:_LIST_LIMIT]) or "(none)"
+    extra = f" (+{len(display) - _LIST_LIMIT} more)" if len(display) > _LIST_LIMIT else ""
     return shown + extra
 
 
 def _unchecked(node: ast.Call, sig: _Sig | None) -> str | None:
-    """Why this base call cannot be validated, or None when its arguments are visible.
+    """Why this base call is not judged, or None when its visible arguments can be checked.
 
-    Not being able to check is not the same as the call being sound. A call we cannot read must
-    not run. A third-party call (no base signature) is not this case."""
-    if sig is None:
+    A definition that accepts **kwargs is judged: declared names are checked, and any other
+    keyword flows into **kwargs. A call written with **mapping hides every keyword, so it is not
+    judged and the probe is not run. A call written with *args is judged when the definition
+    accepts *args, because those values flow into it. When the definition does not, the positional
+    count is hidden and the probe is not run. A generated constructor whose fields could not be
+    read is not this case: that call is run."""
+    if sig is None or sig.opaque:
         return None
-    if sig.var_keyword:
-        return f"{sig.display}() accepts **kwargs, so its keywords cannot be checked"
     if any(kw.arg is None for kw in node.keywords):
         return f"{sig.display}() was called with **mapping, so its keywords cannot be checked"
-    if any(isinstance(arg, ast.Starred) for arg in node.args):
+    if any(isinstance(arg, ast.Starred) for arg in node.args) and not sig.vararg:
         return f"{sig.display}() was called with *args, so its positional arguments cannot be checked"
     return None
 
@@ -937,13 +1257,17 @@ def _unchecked(node: ast.Call, sig: _Sig | None) -> str | None:
 def _call_problem(node: ast.Call, sig: _Sig | None) -> str | None:
     """Why this call cannot match the base signature, or None when it can.
 
-    A signature that accepts **kwargs, or a call that passes **mapping, is not judged: the names
-    are not visible. Counts are judged only for a definition that is actually written (a function,
-    or a class with its own __init__). A class whose constructor is added by a decorator is not
-    counted, so a normal construction is not rejected from an empty parameter list."""
-    if sig is None or sig.var_keyword or any(kw.arg is None for kw in node.keywords):
+    A call that passes **mapping is not judged. Extra keywords are allowed when the definition
+    accepts **kwargs, and a positional-only name is still rejected as a keyword. Counts are judged
+    only for a definition that is actually written (a function, a class with its own __init__, or
+    a generated constructor whose fields were read). A class whose constructor could not be read
+    is not counted."""
+    if sig is None or sig.opaque or any(kw.arg is None for kw in node.keywords):
         return None
-    bad = [kw.arg for kw in node.keywords if kw.arg not in sig.names or kw.arg in sig.posonly]
+    if sig.var_keyword:
+        bad = [kw.arg for kw in node.keywords if kw.arg in sig.posonly]
+    else:
+        bad = [kw.arg for kw in node.keywords if kw.arg not in sig.names or kw.arg in sig.posonly]
     if bad:
         quoted = ", ".join(repr(name) for name in bad)
         return f"{sig.display}() got unexpected keyword(s) {quoted}; parameters: {_param_list(sig)}"
@@ -1283,8 +1607,10 @@ def usage_notes(code: str, base_root) -> str:
         text = text[:_USAGE_CHARS] + "\n..."
     return ("\n\nHow the BASE side calls these names, from its own files. Use those parameters and, when "
             "you need a value, the arguments from one of those calls. A parameter that is not in the list "
-            "does not exist. Do not invent a value from the pull-request text when a call below already "
-            "shows one.\n" + text)
+            "does not exist, unless the list shows **kwargs (any other keyword is accepted) or *args "
+            "(further positional arguments are accepted). A list that says the parameters could not be "
+            "read is not a list of real parameters. Do not invent a value from the pull-request text when "
+            "a call below already shows one.\n" + text)
 
 
 def prepare_calls(code: str, base_root):
@@ -1293,15 +1619,13 @@ def prepare_calls(code: str, base_root):
     Returns (code, notes, reject). notes lists bindings that were applied. reject is a reason when
     a call does not match the base signature and no base call site (and no default) can fill its
     required parameters. The probe's callee is kept: only the arguments change. A call that already
-    matches the signature is left as written. Nothing here reads the pull-request tree or the network."""
+    matches the signature is left as written. A call whose parameters cannot be read is left as
+    written and does not reject the probe. Nothing here reads the pull-request tree or the network."""
     checker = _analyze(code, base_root)
     if checker is None or base_root is None:
         return code or "", [], None
-    if checker.unreadable:
-        name = checker.unreadable[0]
-        return (code or "", [],
-                f"cannot check {name}: its parameters are not in this file (an inherited constructor or "
-                "method we cannot read); the probe is not run")
+    # A constructor or method whose parameters are not in a file we can read is not judged. The probe
+    # still runs. A call we can read is checked below, including one in the same probe.
     if not checker.calls:
         return code or "", [], None
     for item in checker.calls:
@@ -1392,22 +1716,39 @@ def _site_hint(sites: list) -> str:
 def _bind_call(node: ast.Call, info: dict, sites: list, spelling: dict):
     """Keep this call's valid arguments. Fill only a missing required parameter from a base call.
 
-    A keyword or positional the signature accepts stays, including the value the probe wrote. An
-    unexpected keyword is not deleted: removing it would keep a different call, so this returns None
-    and the probe is not run. A required parameter that is still missing, and only that parameter,
-    is taken from a base call that passes it. None means the probe must not run."""
+    A keyword or positional the signature accepts stays, including the value the probe wrote. An extra
+    keyword stays when the definition accepts **kwargs, and an extra positional stays when it accepts
+    *args. An unexpected keyword, or a positional the definition does not accept, is not deleted:
+    removing it would keep a different call, so this returns None and the probe is not run. A required
+    parameter that is still missing, and only that parameter, is taken from a base call that passes it.
+    None means the probe must not run."""
     sig = info["sig"]
     if _unchecked(node, sig):
         return None
     pos_names = [name for name in sig.names if name not in sig.kwonly]
-    kept_pos = list(node.args[:sig.n_positional])
+    if sig.vararg:
+        kept_pos = list(node.args)
+        plain = []
+        for arg in node.args:
+            if isinstance(arg, ast.Starred):
+                break
+            plain.append(arg)
+        filled_names = set(pos_names[:len(plain)])
+    elif len(node.args) > sig.n_positional:
+        return None
+    else:
+        kept_pos = list(node.args)
+        filled_names = set(pos_names[:len(kept_pos)])
     kept_kw = []
     dropped = []
-    filled_names = set(pos_names[:len(kept_pos)])
     for kw in node.keywords:
+        if kw.arg is None:
+            return None
         if kw.arg in sig.names and kw.arg not in sig.posonly and kw.arg not in filled_names:
             kept_kw.append(ast.keyword(arg=kw.arg, value=kw.value))
             filled_names.add(kw.arg)
+        elif sig.var_keyword and kw.arg not in sig.posonly:
+            kept_kw.append(ast.keyword(arg=kw.arg, value=kw.value))
         else:
             dropped.append(kw.arg)
     if dropped:
