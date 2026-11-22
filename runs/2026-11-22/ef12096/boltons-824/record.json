@@ -1,0 +1,750 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-824-054fac09b2e5-2026-11-22",
+ "date_ist": "2026-11-22 11:44 IST",
+ "run_date": "2026-11-22",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 824,
+  "url": "https://github.com/mahmoud/boltons/pull/824",
+  "title": "Keep FunctionBuilder custom attributes independent",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "054fac09b2e586158951508e32a6a33d97914a55",
+  "merge_commit": "0ce35b842d9feacf7df8a53f48f44b1586769d56",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Gambit-Checkmate",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-22T00:16:26Z",
+ "updated_at_ist": "2026-11-22 05:46 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-22 11:44 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "boltons/funcutils.py",
+   "tests/test_funcutils_fb.py"
+  ],
+  "package_py": [
+   "boltons/funcutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "tests/test_funcutils_fb.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_funcutils_fb.py, tests/test_funcutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 23,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "23 passed in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 25,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "25 passed in 1.12s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 23,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "23 passed in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 25,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "25 passed in 1.07s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 23,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "23 passed in 1.05s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 25,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "25 passed in 1.06s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-824/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "boltons/funcutils.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 2.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "054fac09b2e586158951508e32a6a33d97914a55",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "some AI probes were rejected",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 89.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "0ce35b842d9feacf7df8a53f48f44b1586769d56",
+  "merge_commit": "0ce35b842d9feacf7df8a53f48f44b1586769d56",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "054fac09b2e586158951508e32a6a33d97914a55"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 0ce35b842d9f (refs/pull/824/merge) of head 054fac09b2e5"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe2' rejected: undefined name: FunctionBuilder",
+   "probe 'probe3' rejected: undefined name: FunctionBuilder, observations",
+   "probe 'probe4' rejected: undefined name: observations"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "FunctionBuilder.from_func now shallow-copies custom function attributes instead of sharing the original function's __dict__.",
+    "source_quote": "FunctionBuilder.from_func now shallow-copies custom function attributes instead of sharing the original function's __dict__.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Builder changes no longer mutate the source function or another builder.",
+    "source_quote": "Builder changes no longer mutate the source function or another builder.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Attribute values retain their identities.",
+    "source_quote": "Attribute values retain their identities",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Rebuilt functions receive the builder's configured metadata.",
+    "source_quote": "rebuilt functions receive the builder's configured metadata.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "This does not change function-body extraction (the separate #731) or copy_function (#655).",
+    "source_quote": "This does not change function-body extraction (the separate #731) or copy_function (#655).",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_name_checks": [
+   {
+    "probe": "probe2",
+    "error": [
+     "undefined name: FunctionBuilder"
+    ],
+    "outcome": "still missing: undefined name: FunctionBuilder"
+   },
+   {
+    "probe": "probe3",
+    "error": [
+     "undefined name: FunctionBuilder, observations"
+    ],
+    "outcome": "still missing: undefined name: FunctionBuilder"
+   },
+   {
+    "probe": "probe4",
+    "error": [
+     "undefined name: observations"
+    ],
+    "outcome": "still missing: undefined name: FunctionBuilder"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "1ad759bd155d75786cee8fa631fc23f161dd139345cf7717f219b23bca93bd79",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-22T06:16:02.049646+00:00",
+    "inputs_sha256": "aaf5b532d7721a4dd9f6ac8c5f98fd46744432090596ce0e45dcdf1aa6f2e726",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 2024,
+     "base_files": {
+      "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-22T06:16:02.175449+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_funcutils_fb.py",
+   "tests/test_funcutils.py"
+  ],
+  "pr": [
+   "tests/test_funcutils_fb.py",
+   "tests/test_funcutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "0ce35b842d9feacf7df8a53f48f44b1586769d56",
+   "installed": "0ce35b842d9feacf7df8a53f48f44b1586769d56",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 23,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_funcutils_fb::test_from_func_metadata_is_independent[False]",
+   "tests.test_funcutils_fb::test_from_func_metadata_is_independent[True]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 25,
+   "pr": 25
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_funcutils_fb::test_from_func_metadata_is_independent[False]": "AssertionError: assert {'label': 're...'added': True} == {'label': 'or... 'shared': []}",
+   "tests.test_funcutils_fb::test_from_func_metadata_is_independent[True]": "AssertionError: assert {'label': 're...'added': True} == {'label': 'or... 'shared': []}"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "1ad759bd155d75786cee8fa631fc23f161dd139345cf7717f219b23bca93bd79",
+    "target": "mahmoud/boltons#824",
+    "about": "Test shallow copy of __dict__ and identity of values (C1 and C3)",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "FunctionBuilder.from_func now shallow-copies custom function attributes instead of sharing the original function's __dict__.",
+      "covers": [
+       "c1.builder_dict_is_copy",
+       "c1.builder_dict_same_keys"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Attribute values retain their identities.",
+      "covers": [
+       "c1.builder_dict_same_values_identity"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "1ad759bd155d75786cee8fa631fc23f161dd139345cf7717f219b23bca93bd79",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-22T06:16:02.049646+00:00",
+     "inputs_sha256": "aaf5b532d7721a4dd9f6ac8c5f98fd46744432090596ce0e45dcdf1aa6f2e726",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 2024,
+      "base_files": {
+       "boltons/funcutils.py": "c950203489b989be96dbe762aedea579f9269d8525521a93052dafdb3637b572"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-22T06:16:02.175449+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/funcutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json",
+     "changed_lines_touched": 2
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 2,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/funcutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "tests/test_funcutils_fb.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 127.2,
+  "tests": 9.0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 23284,
+  "output_tokens": 21481,
+  "thinking_tokens": 18699,
+  "cost_usd": 0.026318,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.026318,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 127.2,
+   "tests": 9.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00848,
+  "total_cost_usd": 0.034798,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-22/ef12096/boltons-824"
+ }
+}
