@@ -5657,6 +5657,38 @@ def _proven_by_fail_then_pass(rec: dict) -> bool:
                                    rec.get("files") if isinstance(rec, dict) else None))
 
 
+TESTS_ONLY_NOTE = "The claimed fix is proven by tests. Other inputs were not checked."
+
+
+def _probe_is_adequate(item: dict) -> bool:
+    """A probe that ran and reached a changed line. A crashed, rejected or not_adequate probe is not one."""
+    if not isinstance(item, dict):
+        return False
+    if item.get("status") in ("crashed", "error", "uninformative", "not_run", "rejected"):
+        return False
+    if all_broken(item):
+        return False
+    cov = item.get("probe_changed_line_coverage") or {}
+    if cov.get("adequacy") == "not_adequate":
+        return False
+    if cov.get("adequacy") == "adequate":
+        return True
+    return (cov.get("changed_lines_covered") or 0) > 0
+
+
+def tests_only_verified_note(rec: dict | None) -> str | None:
+    """The plain sentence for a verified result that rests only on fail-then-pass tests.
+
+    None when the verdict is not verified, when no such test proves the fix, or when an adequate
+    probe also backs the result. Display only: it does not change the verdict."""
+    if not isinstance(rec, dict) or rec.get("verdict") != Verdict.VERIFIED.value:
+        return None
+    if not _proven_by_fail_then_pass(rec) or any(
+            _probe_is_adequate(it) for it in (rec.get("probes") or {}).get("items") or []):
+        return None
+    return TESTS_ONLY_NOTE
+
+
 def _unbound_preservation(claims: list | None) -> bool:
     """True when every behaviour claim is an untouched/unchanged claim with no tighter wording.
 
@@ -10677,6 +10709,9 @@ def _subject_of(rec: dict) -> str:
 
 def _reason_of(rec: dict) -> str:
     reason = str(rec.get("reason") or "no reason recorded").strip()
+    note = tests_only_verified_note(rec)
+    if note and note not in reason:
+        reason = f"{note} {reason}".strip()
     return reason[0].upper() + reason[1:] if reason else reason
 
 

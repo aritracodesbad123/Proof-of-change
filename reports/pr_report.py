@@ -598,6 +598,14 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         reason = f"{reason} {limit_text}"
     if limit_text and limit_text not in (d.get("why") or ""):
         d["why"] = f"{d['why']}; {limit_text}" if d.get("why") else limit_text
+    from ops.daily_run import tests_only_verified_note
+    # Display only. A verified result that rests on fail-then-pass tests, with no adequate probe,
+    # says so in the banner and in the summary row. An adequate probe keeps the wording above.
+    note = tests_only_verified_note(rec) if d["verdict"] == "VERIFIED" else None
+    if note:
+        reason = note if not limit_text or limit_text in note else f"{note} {limit_text}"
+        if note not in (d.get("why") or ""):
+            d["why"] = f"{note} {d['why']}".strip() if d.get("why") else note
     R.banner(d["verdict"], d["action"], d["confidence"], reason + " " + d["conf_why"], d["colour"],
              "Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.")
 

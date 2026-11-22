@@ -119,6 +119,11 @@ def records_pdfs(report_dir: str | Path, name: str, rows: list[tuple[str, dict]]
         any_attention |= v == "needs_attention"
         any_cnv |= v not in ("verified", "needs_attention", "no_code_change")
         why = str(fin.get("reason") or "")
+        # Display only. A verified result that rests on tests alone says so; the verdict is unchanged.
+        from ops.daily_run import tests_only_verified_note
+        tests_note = tests_only_verified_note({**rec, "verdict": v} if isinstance(rec, dict) else None)
+        if tests_note and tests_note not in why:
+            why = f"{tests_note} {why}".strip()
         # The go/no-go still follows the stored verdict. The file name stays in the reason when present.
         _gap_files, gap_sentence = record_collection_gap(rec if isinstance(rec, dict) else None)
         if gap_sentence and gap_sentence not in why:

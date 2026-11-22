@@ -214,6 +214,72 @@ def test_113_unbound_unchanged_claim_does_not_cancel_fail_then_pass():
     assert held == "could_not_verify" and "backwards compatible" in why
 
 
+def test_tests_only_verified_says_so_and_a_probe_keeps_the_old_wording(tmp_path, monkeypatch):
+    """A verified result with only fail-then-pass tests says so. An adequate probe keeps the old sentence."""
+    monkeypatch.setattr("reports.reviewer.latest_replay", lambda: None)
+    from ops.daily_run import TESTS_ONLY_NOTE, combined_run_summary_md
+    from reports.pr_report import build
+    from reports.reviewer import to_html, to_pdf, write_summary
+
+    old = "The PR's tests behave the same or better than on main"
+    common = {
+        "repo": "acme/widget", "library": "widget", "pr": 7, "title": "Fix the widget",
+        "url": "https://github.com/acme/widget/pull/7", "head_sha": "a" * 40, "route": "source-pair",
+        "tested_at_ist": "2026-01-01 12:00 IST", "verdict": "verified",
+        "reason": "1 test(s) fail on main and pass on the PR", "baseline": "full",
+        "runs_per_side": 3, "posted_upstream": False,
+        "machine_type": {"label": "test", "arch": "x86_64", "cpu_count": 4},
+        "thread_env": {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+                                        "NUMEXPR_NUM_THREADS")},
+        "per_run": [{"side": s, "run": i, "exit": 0} for i in (1, 2, 3) for s in ("main", "pr")],
+        "files": {"all": ["pkg/mod.py", "tests/test_mod.py"], "package_py": ["pkg/mod.py"],
+                  "compiled": [], "other": []},
+        "comparison": {"same": 1, "new_tests_passing": 0,
+                       "fixed": ["tests/test_mod.py::test_new"],
+                       "base_messages": {"tests/test_mod.py::test_new": "AssertionError: assert got == want"},
+                       "regressions": [], "new_tests_failing": [], "flaky": []},
+    }
+    adequate = {"id": "model-1", "source": "model", "status": "ran", "observations": [],
+                "probe_changed_line_coverage": {"status": "measured", "changed_lines_total": 2,
+                                                "changed_lines_covered": 2, "adequacy": "adequate"}}
+    backed = {**common, "pr": 8, "title": "Fix the widget, probed",
+              "probes": {"status": "ran", "items": [adequate]}}
+    cases = (("tests-only", dict(common), True),
+             ("probe-backed", backed, False))
+    rows = []
+    for name, rec, tests_only in cases:
+        report, row = build(rec, tmp_path / name, tmp_path / "out" / name)
+        assert row["verdict"] == "VERIFIED"
+        assert rec["verdict"] == "verified"
+        banner = next(block for block in report.blocks if block[0] == "banner")
+        blob = "\n".join(str(part) for part in report.blocks)
+        if tests_only:
+            assert TESTS_ONLY_NOTE in banner[4]
+            assert TESTS_ONLY_NOTE in blob
+            assert old not in banner[4]
+        else:
+            assert TESTS_ONLY_NOTE not in blob
+            assert old in banner[4]
+        rows.append(row)
+    out = tmp_path / "summary"
+    write_summary(rows, str(out), "Proof-of-Change daily summary", ("md", "html", "pdf"))
+    summary = (out / "SUMMARY.md").read_text()
+    tests_lines = [line for line in summary.splitlines() if "widget#7" in line]
+    probe_lines = [line for line in summary.splitlines() if "widget#8" in line]
+    assert tests_lines and all(TESTS_ONLY_NOTE in line for line in tests_lines)
+    assert probe_lines and all(TESTS_ONLY_NOTE not in line for line in probe_lines)
+    folder = combined_run_summary_md(
+        [{**common, "_pr_id": "widget-7"}, {**backed, "_pr_id": "widget-8"}],
+        "go/no-go")
+    assert folder.count(TESTS_ONLY_NOTE) == 1
+    html = out / "one.html"
+    pdf = out / "one.pdf"
+    html.write_text(to_html(build(dict(common), tmp_path / "pdf", out)[0], "report"))
+    assert to_pdf(str(html), str(pdf)) is None
+    from tests.test_relaxed_class_cross_run import _pdf_strings
+    assert TESTS_ONLY_NOTE in _pdf_strings(pdf)
+
+
 def test_formatter_round_trip_and_literal_args_are_seeded():
     source = (
         "def isoparse(text):\n"

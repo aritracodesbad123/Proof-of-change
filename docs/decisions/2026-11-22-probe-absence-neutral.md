@@ -12,6 +12,8 @@ A claim that only describes the old behaviour is not typed as expecting the two 
 
 Saved records are not rewritten. A verdict changes only when that record is re-judged.
 
+When a verified result rests only on those tests, and no adequate probe backs it, the per-PR report and the run summary say: "The claimed fix is proven by tests. Other inputs were not checked." A verified result that an adequate probe also backs keeps its existing wording. The sentence is display only. It does not change the verdict.
+
 ## Why
 
 The AI-probe gate treated a missing probe as evidence that the change was not exercised, even when new tests failed on the old code and passed on the new code. That hid fixes. Relaxing the gate on its own would also have let real breaks through, where the tests did not really prove the fix, the probe never reached the branch, or a claim was typed as "same" when it was not a comparison of the two sides.
