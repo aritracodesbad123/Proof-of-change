@@ -65,7 +65,9 @@ PROBES_SCHEMA = {
 CLAIMS_PROMPT = """You read a pull request's title and description and list its testable claims about behaviour.
 For each claim give: id (C1, C2, ...), text (one sentence), source_quote (copied exactly from the title or description),
 testable (false if it cannot be checked by running code), expect: "differs" if the claim says behaviour changes
-between the base and the PR, "same" if it says behaviour stays the same. Answer with JSON only."""
+between the base and the PR, "same" if it says behaviour stays the same. A claim that only describes the old or
+base behaviour is not "same": leave it out. A claim that the result is the same as, or behaves like, some other
+function is not a base-versus-PR comparison, so it is not "same" either. Answer with JSON only."""
 
 PROBES_PROMPT = """You write probes: small deterministic Python scripts that are run, unchanged, on the BASE side and on
 the PR side of a pull request, and whose printed observations are compared by plain code. You see only the PR title
@@ -82,7 +84,10 @@ testable claim; an empty "probes" list is not an acceptable answer. Each probe m
 claim is about directly, with several representative inputs and edge cases chosen generically from the code you see
 (for example: zero, negative and positive numbers, whole and fractional values, true and false, None, empty and
 non-empty containers, boundary sizes, each accepted input type, and a small numpy array or pandas value where the
-code uses those), so that a change in behaviour would show up in the observations. If you
+code uses those), so that a change in behaviour would show up in the observations. Also seed inputs from literal
+arguments of calls in the BASE source, and from formatter round-trips such as parser(value.isoformat()) or
+parser(value.strftime(fmt)), so an input reaches the changed branch. An input that raises on both sides did not
+exercise the change. If you
 are unsure whether behaviour changes, still record the outputs: plain code decides. Answer with JSON only."""
 
 

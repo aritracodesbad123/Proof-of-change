@@ -176,6 +176,15 @@ def apply(probe_results: dict | None) -> dict | None:
                 notes["dropped_claims"].append({"probe": it["id"], "claim": c.get("id"), "text": text})
                 changed = True
                 continue
+            if probes.describes_old_behaviour(c):
+                # A claim that only describes the base is never typed "same", even when the wording
+                # also says something is unchanged. It is checked on the base side only. Re-judge so
+                # a stored "same" label does not stay a finding or a proof.
+                notes.setdefault("base_only", []).append(
+                    {"probe": it["id"], "claim": c.get("id"), "text": text})
+                changed = True
+                new_claims.append(c)
+                continue
             if c.get("expect") == "differs" and says_stays_same(text):
                 c = dict(c, expect="same")
                 notes["retyped_same"].append({"probe": it["id"], "claim": c.get("id"), "text": text})
@@ -218,6 +227,9 @@ def note_text(notes: dict | None) -> str:
     if notes.get("retyped_same"):
         bits.append("claim(s) " + ", ".join(str(d["claim"]) for d in notes["retyped_same"])
                     + " say behaviour stays the same, so they expect no difference")
+    if notes.get("base_only"):
+        bits.append("claim(s) " + ", ".join(str(d["claim"]) for d in notes["base_only"])
+                    + " describe the old behaviour, so they are not typed as expecting no difference")
     if notes.get("relinked"):
         bits.append("claim(s) " + ", ".join(sorted({str(d["claim"]) for d in notes["relinked"]}))
                     + " linked to observations by claim id")

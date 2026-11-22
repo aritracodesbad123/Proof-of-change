@@ -305,6 +305,58 @@ def is_how_claim(claim: dict | None) -> bool:
     return bool(claim) and claim.get("expect") == "differs" and bool(_HOW_RE.search(str(claim.get("text") or "")))
 
 
+# "same as X" / "behaves like X" compares the pull request with some other function, not the base
+# with the pull request. "same as before" and "stay the same" are preservation claims, not this.
+_REFERENCE_RE = re.compile(
+    r"(?i)\b(?:behaves?|behave)\s+like\b|\bsame\s+as\s+(?!before\b|the\s+base\b|main\b)")
+# A claim that only says what the old code did. A sentence that also names the new behaviour
+# ("after", "now") is a real comparison and is left to the normal rules.
+_OLD_BEHAVIOUR_RE = re.compile(
+    r"(?i)(?:\bbefore\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\b|"
+    r"\bpreviously\b|\bused\s+to\b|"
+    r"\bthe\s+old\s+(?:code|behaviou?r)\b|"
+    r"\bprior\s+to\s+(?:the|this)\s+(?:fix|change)\b|"
+    r"\bon\s+the\s+base\b.{0,60}\b(?:returns?|raises?|returned|raised)\b|"
+    r"\bon\s+main\b.{0,60}\b(?:returns?|raises?|returned|raised)\b)")
+_NEW_SIDE_RE = re.compile(
+    r"(?i)\b(?:after(?:wards)?|now|instead|the\s+pr|the\s+pull request|the\s+patch)\b")
+# A claim that also says the behaviour is kept is a preservation claim, not a description of the base only.
+_KEPT_BEHAVIOUR_RE = re.compile(
+    r"(?i)\b(?:unchanged|preserved|preserves|stay(?:s|ed)?|remain(?:s|ed)?|as\s+before|keeps?|retained)\b")
+# Words that make the sentence about both sides. Those claims stay ordinary same/differs claims.
+_BOTH_SIDES_RE = re.compile(
+    r"(?i)\b(?:both|either|each|regardless|versions?|still|same|regress\w*|no\s+longer)\b")
+_NOT_A_SIDE_FINDING = {FindingLabel.FALSE_CLAIM.value, FindingLabel.NEEDS_HUMAN.value,
+                       FindingLabel.PROVEN.value}
+
+
+def _claim_text(claim) -> str:
+    if isinstance(claim, dict):
+        return str(claim.get("text") or "")
+    return str(claim or "")
+
+
+def is_reference_claim(claim) -> bool:
+    """True when the claim says the result is the same as, or behaves like, some other behaviour.
+
+    That is checked on the pull-request side only. A difference between the base and the pull
+    request is not, by itself, evidence about this claim, and it does not need attention."""
+    return bool(_REFERENCE_RE.search(_claim_text(claim)))
+
+
+def describes_old_behaviour(claim) -> bool:
+    """True when the claim only describes what the base did, not what the pull request does.
+
+    Such a claim is never evidence that the two sides stay the same. A sentence that also
+    talks about the new behaviour is not this case."""
+    text = _claim_text(claim)
+    if not text or not _OLD_BEHAVIOUR_RE.search(text) or _NEW_SIDE_RE.search(text):
+        return False
+    if _KEPT_BEHAVIOUR_RE.search(text) or _BOTH_SIDES_RE.search(text):
+        return False
+    return True
+
+
 # Observation names may carry claim ids in any case: "c2.x", "C2_x", or several joined ("c1_c2.result").
 _ID_RE = re.compile(r"[A-Za-z]{1,8}\d+")
 
@@ -465,14 +517,30 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             label = label_for(state, claim, name, crashed_both)
             broken = state == "same" and probe_broken(m[0]["v"], p[0]["v"])
             if broken:
-                label = FindingLabel.NOT_TESTABLE.value   # probe broken: advisory only, never a pass or a flag
+                # Both sides raised. That is not "unchanged": the call never reached the change.
+                label = FindingLabel.NOT_TESTABLE.value
+        side_note = None
+        if broken:
+            side_note = ("not unchanged: the same exception or skip value on both sides, so the probe "
+                         "never reached the call")
+        elif (claim and label in _NOT_A_SIDE_FINDING and is_reference_claim(claim)):
+            # "same as" / "behaves like" is a pull-request-side check. It never needs attention on its own.
+            label = FindingLabel.NOT_TESTABLE.value
+            side_note = "checked on the PR side only; a base-versus-PR difference is not this claim"
+        elif (claim and label in _NOT_A_SIDE_FINDING and describes_old_behaviour(claim)
+              and not is_one_side_claim(claim)):
+            # Old-behaviour wording is not a "same" claim. It is checked on the base side only.
+            label = FindingLabel.NOT_TESTABLE.value
+            side_note = "the claim describes the old behaviour and is checked on the base side only"
         res = {"name": name, "state": state, "label": label,
                "claim": claim["id"] if claim else None,
                "main": m[0]["v"], "pr": p[0]["v"]}
         if pr_only:
             res["pr_only"] = pr_only
         if broken:
-            res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
+            res["probe_broken"] = side_note
+        elif side_note:
+            res["note"] = side_note
         if label == FindingLabel.NOT_TESTABLE.value and state == "same" and is_how_claim(claim):
             res["how_claim"] = True
         link = _text_link(spec, name) if label == FindingLabel.UNMENTIONED_CHANGE.value else None

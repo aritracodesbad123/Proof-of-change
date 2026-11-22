@@ -4973,6 +4973,8 @@ def broken_probe_gate(rec: dict) -> dict:
     items = (rec.get("probes") or {}).get("items") or []
     if rec.get("verdict") != Verdict.VERIFIED.value or not items or not all(all_broken(it) for it in items):
         return rec
+    if _proven_by_fail_then_pass(rec):
+        return rec
     out = dict(rec)
     out.setdefault("verdict_before_broken_probe_gate", rec["verdict"])
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
@@ -5012,6 +5014,8 @@ def inert_probe_gate(rec: dict) -> dict:
         return rec
     if not all(all_inert(it) or all_broken(it) for it in items) or not any(all_inert(it) for it in items):
         return rec
+    if _proven_by_fail_then_pass(rec):
+        return rec
     out = dict(rec)
     out.setdefault("verdict_before_inert_probe_gate", rec["verdict"])
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
@@ -5033,6 +5037,8 @@ def no_evidence_gate(rec: dict) -> dict:
     if rec.get("verdict") != Verdict.VERIFIED.value or not items or _tests_ran_changed_line(rec):
         return rec
     if any(((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0 for it in items):
+        return rec
+    if _proven_by_fail_then_pass(rec):
         return rec
     out = dict(rec)
     out.setdefault("verdict_before_no_evidence_gate", rec["verdict"])
@@ -5091,8 +5097,9 @@ def model_refusal(a) -> str | None:
 
 
 def ai_probe_gate(rec: dict) -> dict:
-    """In modes that use AI-written probes: never 'verified' unless at least one AI-written (model) probe actually
-    executed a changed line (its measured changed-line coverage). Otherwise could_not_verify. Idempotent."""
+    """In modes that use AI-written probes: never 'verified' unless an AI-written probe ran a changed line, or the
+    pull request's own tests already proved the fix. A missing, empty, rejected, crashed or otherwise unusable probe
+    is not evidence, so it does not demote that proof. Otherwise could_not_verify. Idempotent."""
     if rec.get("verdict") != Verdict.VERIFIED.value or not uses(rec.get("baseline"), "claim_probes"):
         return rec
     items = (rec.get("probes") or {}).get("items") or []
@@ -5101,6 +5108,12 @@ def ai_probe_gate(rec: dict) -> dict:
            and not all_broken(it)
            and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
     if ran:
+        return rec
+    # A missing, empty, rejected, crashed or otherwise unusable probe is not evidence. It must not
+    # demote a result that new or changed tests already proved by failing on the base and passing
+    # on the pull request. A probe that did run a changed line is handled above; a real contradiction
+    # never reaches this function as 'verified'.
+    if _proven_by_fail_then_pass(rec):
         return rec
     out = dict(rec)
     out.setdefault("verdict_before_ai_probe_gate", rec["verdict"])
@@ -5538,6 +5551,154 @@ def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
     return out
 
 
+_PLATFORM_SKIP = re.compile(
+    r"(?i)(?:\bwin32only\b|\bwindows(?:-|\s+)only\b|\blinux(?:-|\s+)only\b|\bmacos(?:-|\s+)only\b|"
+    r"\bnot\s+(?:on\s+)?(?:this|the)\s+platform\b|"
+    r"\bskipped\b[^.\n]{0,48}\b(?:win32|windows|linux|darwin|macos|platform)\b|"
+    r"\bplatform\s+skip\b)")
+_ENV_ONLY = re.compile(
+    r"(?i)(?:\berror collecting\b|\bcollection error\b|\binternalerror\b|"
+    r"\bfixture\b[^.\n]{0,40}\bnot found\b|"
+    r"\bmodulenotfounderror\b|\bimporterror\b|\bno module named\b|"
+    r"\bsetup (?:failed|error)\b)")
+_UNBOUND_PRESERVATION = re.compile(
+    r"(?i)\b(?:untouched|unchanged|left\s+unchanged|returned\s+unchanged|exactly\s+as\s+before)\b")
+
+
+def _not_visible_on_platform(note: str) -> bool:
+    """A Windows-only or otherwise platform-skipped test is not visible here, so it is not proof."""
+    text = note or ""
+    if _PLATFORM_SKIP.search(text):
+        return True
+    return bool(re.match(r"(?i)^skip(?:ped)?\b", text.strip())) and bool(
+        re.search(r"(?i)\b(?:win32|windows|linux|darwin|macos|platform)\b", text))
+
+
+def _env_only_failure(note: str) -> bool:
+    """A base failure that is collection, import or setup, not an assertion and not the changed code."""
+    if not note or _is_assertion(note, note):
+        return False
+    return bool(_ENV_ONLY.search(note))
+
+
+def _renamed_fixed_ids(cmp: dict, files: dict | None) -> set[str]:
+    """Fixed ids that are a rename, not a new failure of the old code.
+
+    A parametrize id that replaced another id of the same test, a fixed id whose base name is a
+    removed test, or the single new id in a file that removed exactly one differently named test.
+    """
+    out: set[str] = set()
+    for row in cmp.get("reparametrized") or []:
+        if isinstance(row, dict):
+            out.update(str(x) for x in row.get("added_ids") or [])
+    removed = [str(t) for t in cmp.get("removed_tests") or []]
+    removed_bases = {base_name(t) for t in removed}
+    fixed = [str(t) for t in cmp.get("fixed") or []]
+    for tid in fixed:
+        if base_name(tid) in removed_bases:
+            out.add(tid)
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    by_removed: dict[str, list[str]] = {}
+    by_fixed: dict[str, list[str]] = {}
+    for tid in removed:
+        found = _edited_test_file(tid, edited)
+        if found:
+            by_removed.setdefault(found, []).append(tid)
+    for tid in fixed:
+        found = _edited_test_file(tid, edited)
+        if found:
+            by_fixed.setdefault(found, []).append(tid)
+    for found, gone in by_removed.items():
+        gained = by_fixed.get(found) or []
+        if len(gone) == 1 and len(gained) == 1 and base_name(gone[0]) != base_name(gained[0]):
+            out.add(gained[0])
+    return out
+
+
+def _passed_on_base_ids(cmp: dict) -> set[str]:
+    info = cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else None
+    if not info:
+        return set()
+    return {str(node) for node in info.get("passed_on_base") or [] if str(node).strip()}
+
+
+def fail_then_pass_ids(cmp: dict | None, files: dict | None) -> list[str]:
+    """New or changed tests that fail on the base and pass on the pull request, on every run.
+
+    ``fixed`` already means the recorded runs agreed (failed on the base, passed on the pull
+    request). A test that also passes on the base, a failure that is only an environment, setup
+    or collection error, a platform skip, or a renamed test does not prove a fix. The absence of
+    a probe is not read here and is not evidence either way.
+    """
+    if not isinstance(cmp, dict):
+        return []
+    renamed = _renamed_fixed_ids(cmp, files)
+    passed = _passed_on_base_ids(cmp)
+    passed_resolved = {resolve_test_id(node) for node in passed}
+    notes = cmp.get("base_messages") if isinstance(cmp.get("base_messages"), dict) else {}
+    out = []
+    for tid in cross_run_test_ids(cmp, files):
+        if tid in renamed or tid in passed or resolve_test_id(tid) in passed_resolved:
+            continue
+        note = str(notes.get(tid) or "")
+        if _not_visible_on_platform(note):
+            continue
+        if note and _TB_FRAME.search(note) and not _base_failure_counts("failed", note, note, files):
+            continue
+        if note and not _TB_FRAME.search(note) and _env_only_failure(note):
+            continue
+        out.append(tid)
+    return out
+
+
+def _proven_by_fail_then_pass(rec: dict) -> bool:
+    """True when the pull request's own tests already prove the fix. A missing probe does not."""
+    return bool(fail_then_pass_ids(rec.get("comparison") if isinstance(rec, dict) else None,
+                                   rec.get("files") if isinstance(rec, dict) else None))
+
+
+TESTS_ONLY_NOTE = "The claimed fix is proven by tests. Other inputs were not checked."
+
+
+def _probe_is_adequate(item: dict) -> bool:
+    """A probe that ran and reached a changed line. A crashed, rejected or not_adequate probe is not one."""
+    if not isinstance(item, dict):
+        return False
+    if item.get("status") in ("crashed", "error", "uninformative", "not_run", "rejected"):
+        return False
+    if all_broken(item):
+        return False
+    cov = item.get("probe_changed_line_coverage") or {}
+    if cov.get("adequacy") == "not_adequate":
+        return False
+    if cov.get("adequacy") == "adequate":
+        return True
+    return (cov.get("changed_lines_covered") or 0) > 0
+
+
+def tests_only_verified_note(rec: dict | None) -> str | None:
+    """The plain sentence for a verified result that rests only on fail-then-pass tests.
+
+    None when the verdict is not verified, when no such test proves the fix, or when an adequate
+    probe also backs the result. Display only: it does not change the verdict."""
+    if not isinstance(rec, dict) or rec.get("verdict") != Verdict.VERIFIED.value:
+        return None
+    if not _proven_by_fail_then_pass(rec) or any(
+            _probe_is_adequate(it) for it in (rec.get("probes") or {}).get("items") or []):
+        return None
+    return TESTS_ONLY_NOTE
+
+
+def _unbound_preservation(claims: list | None) -> bool:
+    """True when every behaviour claim is an untouched/unchanged claim with no tighter wording.
+
+    Used only when no probe observation is covering the claim. An adequate probe that contradicts
+    a claim does not reach this check: that verdict is already needs attention."""
+    if not claims:
+        return False
+    return all(_UNBOUND_PRESERVATION.search(str(c.get("quote") or "")) for c in claims)
+
+
 def _crash_value(value) -> bool:
     """A probe value that is a crash or a timeout, not a normal result."""
     return isinstance(value, dict) and ("crash" in value or value.get("timeout") is True)
@@ -5733,11 +5894,15 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
             probe_results):
-        q = claims[0]["quote"]
-        more = f" (+{len(claims) - 1} more)" if len(claims) > 1 else ""
-        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
-                         f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
-                         fl + ["unverified_claim"])
+        # An untouched/unchanged claim with no observation is not evidence against tests that
+        # already fail on the base and pass on the pull request. Any other preservation claim
+        # still needs a probe. A contradiction from an adequate probe is needs attention above.
+        if not (_unbound_preservation(claims) and fail_then_pass_ids(cmp, files)):
+            q = claims[0]["quote"]
+            more = f" (+{len(claims) - 1} more)" if len(claims) > 1 else ""
+            v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                             f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
+                             fl + ["unverified_claim"])
     if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
         v = Verdict.VERIFIED.value
         reason = ("docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction")
@@ -6208,7 +6373,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             d = diff_probes.derive(item.get("diff", ""), coverage_gate.python_sources(item["files"]), base_root,
                                    pr_roots)
             if d["targets"]:
-                path = diff_probes.write(d["targets"], prdir / "diff-probes" / "diff-api.py", f"{repo}#{item['pr']}")
+                path = diff_probes.write(d["targets"], prdir / "diff-probes" / "diff-api.py", f"{repo}#{item['pr']}",
+                                         d.get("seed_literals"))
                 plan.append({"path": path, "source": "diff",
                              "freeze": freeze.freeze(path, freeze.generator("diff"), d["inputs"])})
             note["diff_targets"] = [".".join(t) for t in d["targets"]]
@@ -10543,6 +10709,9 @@ def _subject_of(rec: dict) -> str:
 
 def _reason_of(rec: dict) -> str:
     reason = str(rec.get("reason") or "no reason recorded").strip()
+    note = tests_only_verified_note(rec)
+    if note and note not in reason:
+        reason = f"{note} {reason}".strip()
     return reason[0].upper() + reason[1:] if reason else reason
 
 

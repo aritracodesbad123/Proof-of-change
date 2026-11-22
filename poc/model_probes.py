@@ -1037,6 +1037,25 @@ def _usable(resp, claim_ids: set) -> list:
             and not validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))), claim_ids)]
 
 
+def _base_seed_literals(base_files: dict | None) -> list:
+    """Literal call arguments and formatter round-trip strings from the base files this probe may read.
+
+    The paths are the ones already checked as base-side. A missing file adds nothing. No model call."""
+    from poc.probe_inputs import seed_literals
+    found = []
+    for raw in (base_files or {}).values():
+        try:
+            text = Path(raw).read_text(errors="replace")
+        except OSError:
+            continue
+        for item in seed_literals(text):
+            if item not in found:
+                found.append(item)
+            if len(found) >= 12:
+                return found
+    return found
+
+
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
              base_root: Path, pr_roots: list, outdir: Path, product: bool = False,
              python_version: str | None = None, diff: str | None = None) -> dict:
@@ -1186,6 +1205,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     if "retried" not in out:
         resp = _repair_missing_names(provider, probes_prompt, user, ctx, resp, base_root, out, product, layout)
     draft_probes: list = []
+    seed_values = _base_seed_literals(base_files)
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
         if isinstance(p, dict) and isinstance(p.get("id"), str):
@@ -1258,6 +1278,12 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             continue
         if filled_ids:
             out.setdefault("claims_filled", []).append({"id": p["id"], "claims": filled_ids})
+        if seed_values:
+            from poc.probe_inputs import inject_seeds
+            seeded, added = inject_seeds(p.get("code") or "", seed_values)
+            if added:
+                p["code"] = seeded
+                out.setdefault("seeded_inputs", []).append({"id": p.get("id"), "added": added})
         if out.get("boundary_rule"):
             # An edited existing pattern: do not rely on the model alone for inputs just past the old match boundary.
             from poc import boundary_claims
