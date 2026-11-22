@@ -367,8 +367,12 @@ def test_required_parameter_before_star_is_still_required(tmp_path):
     assert again == empty
 
 
-def test_unchecked_calls_and_unreadable_inheritance_are_not_run(tmp_path):
-    """A base call whose arguments cannot be checked is not run. A readable call is unchanged."""
+def test_kwargs_calls_run_and_a_star_without_varargs_does_not(tmp_path):
+    """A keyword passed to **kwargs is a real call. A starred call is not judged when there is no *args.
+
+    Child(1) uses Parent.__init__ from the other file. Child.run is not defined on Child, so its
+    parameters are not read and the probe is still run. Child(nope=1) names a parameter Parent does
+    not have and has no **kwargs, so that probe is not run."""
     root = tmp_path / "base"
     _write(root, {
         "pkg/__init__.py": "",
@@ -383,17 +387,18 @@ def test_unchecked_calls_and_unreadable_inheritance_are_not_run(tmp_path):
         "pkg/flex.py": "def bag(**kwargs):\n    return kwargs\n",
     })
     star = "import pkg.flex as flex\nprint(flex.bag(width=1))\n"
-    _same, notes, reason = probe_names.prepare_calls(star, root)
-    assert reason and "**kwargs" in reason and "not run" in reason and notes == []
+    same, notes, reason = probe_names.prepare_calls(star, root)
+    assert reason is None and notes == [] and same == star
     spread = "import pkg.flex as flex\nprint(flex.bag(*[1]))\n"
-    # *args on a **kwargs function is also unchecked. A visible call of a required function is not.
     assert probe_names.prepare_calls(spread, root)[2]
     hidden = "import pkg.child as child\nprint(child.Child(1).left)\n"
-    reason = probe_names.prepare_calls(hidden, root)[2]
-    assert reason and "not run" in reason and "cannot check" in reason
+    assert probe_names.prepare_calls(hidden, root)[2] is None
+    assert probe_names.problems(hidden, root) == []
     method = "import pkg.child as child\nprint(child.Child.run(None, 1))\n"
-    reason = probe_names.prepare_calls(method, root)[2]
-    assert reason and "cannot check" in reason
+    assert probe_names.prepare_calls(method, root)[2] is None
+    bad = "import pkg.child as child\nprint(child.Child(nope=1))\n"
+    reason = probe_names.prepare_calls(bad, root)[2]
+    assert reason and "not run" in reason and "nope" in reason and "left" in reason
 
 
 # Verbatim from pyinvoke/invoke 0da941e176f4e0b28d8a69b8ac089cdbac2874e4.
