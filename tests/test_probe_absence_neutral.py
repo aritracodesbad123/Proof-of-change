@@ -151,34 +151,67 @@ def test_raises_do_not_hide_a_real_regression():
     assert v == "needs_attention"
 
 
-def test_unbound_unchanged_claim_does_not_cancel_test_proof():
+def test_97_same_as_claim_is_checked_on_the_pr_side_only():
+    """Fix 97: 'same as' / 'behaves like' is not a base-versus-PR finding and never needs attention alone."""
+    for text in ("the result is the same as the standard formatter",
+                 "the parser behaves like the standard formatter"):
+        claims = [{"id": "C1", "text": text, "covers": ["r"], "expect": "same"}]
+        item = _model(claims, {"r": "base-value"}, {"r": "pr-value"})
+        obs = item["observations"][0]
+        assert obs["label"] == FindingLabel.NOT_TESTABLE.value
+        assert obs["label"] not in (FindingLabel.FALSE_CLAIM.value, FindingLabel.NEEDS_HUMAN.value)
+        assert "PR side only" in obs["note"]
+        v, _, _ = verdict_for(_runs({"tests/test_mod.py::test_old": ("passed", "")},
+                                    {"tests/test_mod.py::test_old": ("passed", "")}),
+                              None, None, FILES, {"items": [item]}, baseline="full")
+        assert v != "needs_attention"
+
+
+def test_75_old_behaviour_claim_is_never_typed_same():
+    """Fix 75: a claim that only describes the base is not typed 'same' and is checked on the base side only."""
+    from poc import claim_hygiene
+    text = "Previously the parser raised ValueError on a short offset."
+    assert probes.describes_old_behaviour({"text": text})
+    kept = claim_hygiene.apply({"items": [{
+        "id": "model-1", "source": "model", "target": "o/r#1", "about": "old behaviour",
+        "claims": [{"id": "C1", "text": text, "covers": ["r"], "expect": "differs"}],
+        "runs": {"main": [{"r": "ValueError"}] * 3, "pr": [{"r": "offset"}] * 3},
+        "observations": []}]})
+    claim = kept["items"][0]["claims"][0]
+    assert claim["expect"] != "same"
+    assert "retyped_same" not in (kept.get("claim_hygiene") or {}) or not kept["claim_hygiene"].get("retyped_same")
+    judged = _model([{"id": "C1", "text": text, "covers": ["r"], "expect": "same"}],
+                    {"r": "ValueError"}, {"r": "short-offset"})
+    obs = judged["observations"][0]
+    assert obs["label"] == FindingLabel.NOT_TESTABLE.value
+    assert obs["label"] != FindingLabel.PROVEN.value
+    assert "base side only" in obs["note"]
+    v, _, _ = verdict_for(_runs({"tests/test_mod.py::test_old": ("passed", "")},
+                                {"tests/test_mod.py::test_old": ("passed", "")}),
+                          None, None, FILES, {"items": [judged]}, baseline="full")
+    assert v != "needs_attention"
+
+
+def test_113_unbound_unchanged_claim_does_not_cancel_fail_then_pass():
+    """Fix 113: an unbound untouched/unchanged claim does not cancel fail-then-pass proof."""
     cmp = _runs({"tests/test_mod.py::test_new": ("failed", ASSERTION),
                  "tests/test_mod.py::test_old": ("passed", "")},
                 {"tests/test_mod.py::test_new": ("passed", ""),
                  "tests/test_mod.py::test_old": ("passed", "")})
+    assert fail_then_pass_ids(cmp, FILES) == ["tests/test_mod.py::test_new"]
     claims = [{"source": "body", "quote": "Existing results are left unchanged.", "pattern": "left unchanged"}]
     v, reason, _ = verdict_for(cmp, None, None, FILES, {"items": []}, claims, baseline="full")
     assert v == "verified"
     assert "unverified behaviour claim" not in reason
+    contradicted = _model(
+        [{"id": "C1", "text": "existing results stay unchanged", "covers": ["r"], "expect": "same"}],
+        {"r": "old"}, {"r": "new"})
+    blocked, why, _ = verdict_for(cmp, None, None, FILES, {"items": [contradicted]}, claims, baseline="full")
+    assert blocked == "needs_attention"
+    assert "differs although the claim says it does not" in why
     other = [{"source": "body", "quote": "The change is backwards compatible.", "pattern": "backwards compatible"}]
     held, why, _ = verdict_for(cmp, None, None, FILES, {"items": []}, other, baseline="full")
     assert held == "could_not_verify" and "backwards compatible" in why
-
-
-def test_reference_and_old_behaviour_claims_do_not_need_attention_on_their_own():
-    ref = [{"id": "C1", "text": "the parser behaves like the standard formatter", "covers": ["r"], "expect": "same"}]
-    item = _model(ref, {"r": "a"}, {"r": "b"})
-    assert item["observations"][0]["label"] == FindingLabel.NOT_TESTABLE.value
-    assert "PR side only" in item["observations"][0]["note"]
-    old = [{"id": "C1", "text": "Previously the parser raised ValueError on a short offset.",
-            "covers": ["r"], "expect": "same"}]
-    judged = _model(old, {"r": "ValueError"}, {"r": "2020-01-02T03:04:05+05:00"})
-    assert judged["observations"][0]["label"] == FindingLabel.NOT_TESTABLE.value
-    assert "base side only" in judged["observations"][0]["note"]
-    v, _, _ = verdict_for(_runs({"tests/test_mod.py::test_old": ("passed", "")},
-                                {"tests/test_mod.py::test_old": ("passed", "")}),
-                          None, None, FILES, {"items": [item, judged]}, baseline="full")
-    assert v != "needs_attention"
 
 
 def test_formatter_round_trip_and_literal_args_are_seeded():
