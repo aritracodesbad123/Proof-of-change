@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-22 on ef12096
 
-8 report(s) in this folder: 0 need attention, 6 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+9 report(s) in this folder: 0 need attention, 7 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -10,6 +10,7 @@
 - **COULD NOT VERIFY**: PyCQA/isort#2803: Add optional wrapping for long from-import module paths. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 37 test(s) fail on main and pass on the PR; 172 test(s) ran on main, 173 on the PR; 1 new test(s) pass, 136 unchanged (1 of them skipped on both sides)
 - **COULD NOT VERIFY**: PyCQA/isort#2804: Add an option to sort absolute imports before relative imports. Could not verify: probe line coverage after the setup rerun does not show a changed line ran
 - **COULD NOT VERIFY**: prettytable/prettytable#554: Speed up row height calculation in `get_string()`. Unverified behaviour claim: "The output does not change."; needs a probe (218 test(s) ran on main, 218 on the PR; 0 new test(s) pass, 218 unchanged)
+- **COULD NOT VERIFY**: prettytable/prettytable#555: feat: add header_align option for independent header alignment. Unverified behaviour claim: "Only `align` set:** Applies to both the column headers and column body (preserves full backwards compatibility)." (+1 more); needs a probe (7 test(s) fail on main and pass on the PR; 291 test(s) ran on main, 295 on the PR; 4 new test(s) pass, 284 unchanged)
 
 ## All reports
 
@@ -21,5 +22,6 @@
 | COULD NOT VERIFY | PyCQA/isort#2803: Add optional wrapping for long from-import module paths | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 37 test(s) fail on main and pass on the PR; 172 test(s) ran on main, 173 on the PR; 1 new test(s) pass, 136 unchanged (1 of them skipped on both sides) | [PDF](isort-2803/REPORT.pdf) |
 | COULD NOT VERIFY | PyCQA/isort#2804: Add an option to sort absolute imports before relative imports | Could not verify: probe line coverage after the setup rerun does not show a changed line ran | [PDF](isort-2804/REPORT.pdf) |
 | COULD NOT VERIFY | prettytable/prettytable#554: Speed up row height calculation in `get_string()` | Unverified behaviour claim: "The output does not change."; needs a probe (218 test(s) ran on main, 218 on the PR; 0 new test(s) pass, 218 unchanged) | [PDF](prettytable-554/REPORT.pdf) |
+| COULD NOT VERIFY | prettytable/prettytable#555: feat: add header_align option for independent header alignment | Unverified behaviour claim: "Only `align` set:** Applies to both the column headers and column body (preserves full backwards compatibility)." (+1 more); needs a probe (7 test(s) fail on main and pass on the PR; 291 test(s) ran on main, 295 on the PR; 4 new test(s) pass, 284 unchanged) | [PDF](prettytable-555/REPORT.pdf) |
 | VERIFIED | encode/httpx#3856: Raise ProtocolError on malformed Digest auth challenges | 6 test(s) fail on main and pass on the PR; 93 test(s) ran on main, 93 on the PR; 0 new test(s) pass, 88 unchanged (1 of them skipped on both sides); probe: claim(s) C1, C2 proven | [PDF](httpx-3856/REPORT.pdf) |
 | VERIFIED | pyinvoke/invoke#1104: Honor selected collections during shell completion | 8 test(s) fail on main and pass on the PR; 156 test(s) ran on main, 156 on the PR; 0 new test(s) pass, 150 unchanged (2 of them skipped on both sides); probe: claim(s) C2, C3, C4 proven; probe model-probe1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count | [PDF](invoke-1104/REPORT.pdf) |
