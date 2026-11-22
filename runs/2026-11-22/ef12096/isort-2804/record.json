@@ -1,0 +1,2439 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2804-bdf5031c515b-2026-11-22",
+ "date_ist": "2026-11-22 11:30 IST",
+ "run_date": "2026-11-22",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2804,
+  "url": "https://github.com/PyCQA/isort/pull/2804",
+  "title": "Add an option to sort absolute imports before relative imports",
+  "base_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "bdf5031c515bfd3765b18ca1c8ebf1bdb3931d76",
+  "merge_commit": "4c37c00843d790fd3ef9c8c29c7ff073f41391f8",
+  "tested_main_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "wozhenbang2004",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-22T02:00:47Z",
+ "updated_at_ist": "2026-11-22 07:30 IST",
+ "ci_state": "passing",
+ "ci_detail": "1 check runs completed without failure",
+ "tested_at_ist": "2026-11-22 11:30 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "docs/configuration/options.md",
+   "isort/main.py",
+   "isort/settings.py",
+   "isort/sorting.py",
+   "tests/unit/test_absolute_imports_first.py"
+  ],
+  "package_py": [
+   "isort/main.py",
+   "isort/settings.py",
+   "isort/sorting.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "docs/configuration/options.md",
+   "tests/unit/test_absolute_imports_first.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_absolute_imports_first.py, tests/unit/test_main.py, tests/unit/test_settings.py, tests/unit/test_importable.py, tests/unit/test_isort.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 347,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.6,
+   "pytest_summary": "2 failed, 347 passed, 2 skipped in 2.67s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 368,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.7,
+   "pytest_summary": "2 failed, 368 passed, 2 skipped in 2.76s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 347,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.8,
+   "pytest_summary": "2 failed, 347 passed, 2 skipped in 1.87s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 368,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.7,
+   "pytest_summary": "2 failed, 368 passed, 2 skipped in 1.86s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 347,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.9,
+   "pytest_summary": "2 failed, 347 passed, 2 skipped in 2.08s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 368,
+   "failed": 2,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.8,
+   "pytest_summary": "2 failed, 368 passed, 2 skipped in 1.87s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2804/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 15,
+  "changed_lines_covered": 15,
+  "files": [
+   {
+    "file": "isort/main.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   },
+   {
+    "file": "isort/settings.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "isort/sorting.py",
+    "changed_lines_total": 12,
+    "changed_lines_covered": 12
+   }
+  ],
+  "seconds": 4.5,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "bdf5031c515bfd3765b18ca1c8ebf1bdb3931d76",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 4.9 GB (of 15.6 GB).",
+   "Setup check: free disk 89.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort - PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: THIRDPARTY module detected as FIRSTPARTY in 5.0 \u00b7 Issue #1696 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1696",
+   "Source: isort/docs/configuration/github_action.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/configuration/github_action.md",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Installed hypothesis 6.170.17 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: could_not_verify: not fully verified: the changed code's test module(s) tests.unit.test_main failed to load on both sides, so they did not run: 20 test(s) fail on main and pass on the PR; 334 test(s) ran on main, 335 on the PR; 1 new test(s) pass, 314 unchanged (2 of them skipped on both sides); 2 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_main), so their tests did not run",
+   "After rerun: could_not_verify: could not verify: probe line coverage after the setup rerun does not show a changed line ran"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis>=6.140.3",
+    "version": "6.170.17",
+    "versions": {
+     "main": "6.170.17",
+     "pr": "6.170.17"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: the changed code's test module(s) tests.unit.test_main failed to load on both sides, so they did not run: 20 test(s) fail on main and pass on the PR; 334 test(s) ran on main, 335 on the PR; 1 new test(s) pass, 314 unchanged (2 of them skipped on both sides); 2 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_main), so their tests did not run"
+    },
+    {
+     "round": 2,
+     "verdict": "could_not_verify",
+     "reason": "could not verify: probe line coverage after the setup rerun does not show a changed line ran"
+    }
+   ],
+   "installed": [
+    {
+     "package": "hypothesis",
+     "requirement": "hypothesis>=6.140.3",
+     "version": "6.170.17",
+     "versions": {
+      "main": "6.170.17",
+      "pr": "6.170.17"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "pr_sha": "4c37c00843d790fd3ef9c8c29c7ff073f41391f8",
+  "merge_commit": "4c37c00843d790fd3ef9c8c29c7ff073f41391f8",
+  "merge_parents": [
+   "f5b5649f3ed445717aa327152a582193bed2269f",
+   "bdf5031c515bfd3765b18ca1c8ebf1bdb3931d76"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ f5b5649f3ed4 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 4c37c00843d7 (refs/pull/2804/merge) of head bdf5031c515b"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p1' rejected: cannot bind isort.settings.Config: Config() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Add an option to sort absolute imports before relative imports",
+    "source_quote": "Add an option to sort absolute imports before relative imports",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "An absolute module placed in `LOCALFOLDER` with `known_local_folder` currently sorts after relative modules.",
+    "source_quote": "An absolute module placed in `LOCALFOLDER` with `known_local_folder` currently sorts after relative modules.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "Add the opt-in `absolute_imports_first` setting and `--absolute-imports-first` CLI flag so callers can keep those imports in one section and choose the requested order:",
+    "source_quote": "Add the opt-in `absolute_imports_first` setting and `--absolute-imports-first` CLI flag so callers can keep those imports in one section and choose the requested order:",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The option applies to the existing module sorting keys, including `force_sort_within_sections` and lazy import groups.",
+    "source_quote": "The option applies to the existing module sorting keys, including `force_sort_within_sections` and lazy import groups.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "Existing import-style grouping and explicit priorities remain in place;",
+    "source_quote": "Existing import-style grouping and explicit priorities remain in place;",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "`reverse_sort` reverses this ordering as well.",
+    "source_quote": "`reverse_sort` reverses this ordering as well.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "The default remains unchanged.",
+    "source_quote": "The default remains unchanged.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C8",
+    "text": "On Python 3.12, the full unit suite passes with 799 tests and two skips, meeting the 99% coverage gate; `uv run tox -e lint` also passes.",
+    "source_quote": "On Python 3.12, the full unit suite passes with 799 tests and two skips, meeting the 99% coverage gate; `uv run tox -e lint` also passes.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C9",
+    "text": "The new regression file gives 20 unsupported-option failures and one default control on the original base, then 21 passes on this branch.",
+    "source_quote": "The new regression file gives 20 unsupported-option failures and one default control on the original base, then 21 passes on this branch.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C10",
+    "text": "Actual API/CLI checks confirm repeat formatting, configuration loading, unchanged defaults and execution of a formatted package.",
+    "source_quote": "Actual API/CLI checks confirm repeat formatting, configuration loading, unchanged defaults and execution of a formatted package.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "P1",
+    "error": {
+     "message": "unterminated string literal (detected at line 89)",
+     "line": 89,
+     "offset": 1,
+     "code_line": "\"}]}}]}"
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 6,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 7,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "isort.sorting.module_key",
+   "isort.sorting.section_key",
+   "isort.sorting.sort"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "becf08a65ce268e10ffb82626c1633cb15077699bc5da6308099f51bf8eb03c0",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-22T06:07:20.950141+00:00",
+    "inputs_sha256": "099fa768a0e82474213c8a019139f594b943ebf5c53223b64ddaafb6cebbb1bd",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "isort/main.py": "c2672c3d4470f561fc38cf6963f192986b62f3fb3e83cef3336119c06e80890a",
+      "isort/settings.py": "b54d6e6aaaba2dba4760394e53661e0b711bb78ee55f0ddeed0904dfacc8ca23",
+      "isort/sorting.py": "f7f54263108b542cb89e8ab4731c3909fcc0613acf46a88278fe2455161dcbff"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-22T06:07:21.084259+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_main.py",
+   "tests/unit/test_settings.py",
+   "tests/unit/test_importable.py",
+   "tests/unit/test_isort.py"
+  ],
+  "pr": [
+   "tests/unit/test_absolute_imports_first.py",
+   "tests/unit/test_main.py",
+   "tests/unit/test_settings.py",
+   "tests/unit/test_importable.py",
+   "tests/unit/test_isort.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "f5b5649f3ed445717aa327152a582193bed2269f",
+   "installed": "f5b5649f3ed445717aa327152a582193bed2269f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "4c37c00843d790fd3ef9c8c29c7ff073f41391f8",
+   "installed": "4c37c00843d790fd3ef9c8c29c7ff073f41391f8",
+   "ok": true
+  }
+ },
+ "base_head_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+ "comparison": {
+  "same": 351,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_comments_and_names[False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_comments_and_names[True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_config_and_cli",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[False-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[False-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[True-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[True-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_lazy_groups[False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_lazy_groups[True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-False-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-False-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-True-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-True-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-False-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-False-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-True-False]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-True-True]",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_explicit_priorities",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_only_sections",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_style_grouping"
+  ],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_default"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.unit.test_isort::test_settings_path_skip_issue_909",
+   "tests.unit.test_isort::test_skip_paths_issue_938"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.unit.test_isort::test_settings_path_skip_issue_909": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "FileNotFoundError"
+    ]
+   },
+   "tests.unit.test_isort::test_skip_paths_issue_938": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "FileNotFoundError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 369,
+   "pr": 370
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_comments_and_names[False]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_comments_and_names[True]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_config_and_cli": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[False-False]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[False-True]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[True-False]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_issue_2146[True-True]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_lazy_groups[False]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_lazy_groups[True]": "settings_file: str = \"\",",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-False-False]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-False-True]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-True-False]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[False-True-True]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-False-False]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-False-True]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-True-False]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_length_and_reverse[True-True-True]": "force_sort: bool, length_sort: bool, reverse_sort: bool",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_explicit_priorities": "AssertionError: assert (",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_only_sections": "AssertionError: assert (",
+   "tests.unit.test_absolute_imports_first::test_absolute_imports_first_preserves_style_grouping": "AssertionError: assert ("
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 2 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "uninformative",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "becf08a65ce268e10ffb82626c1633cb15077699bc5da6308099f51bf8eb03c0",
+    "target": "PyCQA/isort#2804",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "isort.sorting.module_key.input0": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input1": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input10": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input11": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input2": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input3": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.module_key.input5": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input6": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input7": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input8": {
+        "raises": "TypeError"
+       },
+       "isort.sorting.module_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.section_key.input9": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input0": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input1": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input2": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input3": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input7": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input8": {
+        "raises": "AttributeError"
+       },
+       "isort.sorting.sort.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "isort.sorting.module_key.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.sorting.module_key.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.sorting.module_key.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.sorting.module_key.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.sorting.module_key.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.sorting.module_key.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.sorting.module_key.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.sorting.module_key.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.sorting.module_key.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.sorting.module_key.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.sorting.module_key.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.sorting.module_key.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.sorting.module_key.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.sorting.module_key.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.sorting.module_key.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.sorting.module_key.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.sorting.module_key.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.sorting.module_key.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.sorting.module_key.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.sorting.module_key.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.sorting.module_key.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.sorting.module_key.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.sorting.module_key.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.module_key.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.sorting.module_key.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.sorting.module_key.input9\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"isort.sorting.section_key.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"isort.sorting.section_key.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"isort.sorting.section_key.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"isort.sorting.section_key.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"isort.sorting.section_key.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"isort.sorting.section_key.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"isort.sorting.section_key.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"isort.sorting.section_key.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"isort.sorting.section_key.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"isort.sorting.section_key.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"isort.sorting.section_key.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"isort.sorting.section_key.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"isort.sorting.section_key.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"isort.sorting.section_key.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"isort.sorting.section_key.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"isort.sorting.section_key.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"isort.sorting.section_key.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"isort.sorting.section_key.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"isort.sorting.section_key.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"isort.sorting.section_key.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"isort.sorting.section_key.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"isort.sorting.section_key.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.section_key.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"isort.sorting.section_key.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"isort.sorting.section_key.input9\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 25,
+        "quote": "\"observation\": \"isort.sorting.sort.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 25,
+        "quote": "\"observation\": \"isort.sorting.sort.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 26,
+        "quote": "\"observation\": \"isort.sorting.sort.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 26,
+        "quote": "\"observation\": \"isort.sorting.sort.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 27,
+        "quote": "\"observation\": \"isort.sorting.sort.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 27,
+        "quote": "\"observation\": \"isort.sorting.sort.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 28,
+        "quote": "\"observation\": \"isort.sorting.sort.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 28,
+        "quote": "\"observation\": \"isort.sorting.sort.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 29,
+        "quote": "\"observation\": \"isort.sorting.sort.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 29,
+        "quote": "\"observation\": \"isort.sorting.sort.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 30,
+        "quote": "\"observation\": \"isort.sorting.sort.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 30,
+        "quote": "\"observation\": \"isort.sorting.sort.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 31,
+        "quote": "\"observation\": \"isort.sorting.sort.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 31,
+        "quote": "\"observation\": \"isort.sorting.sort.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 32,
+        "quote": "\"observation\": \"isort.sorting.sort.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 32,
+        "quote": "\"observation\": \"isort.sorting.sort.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 33,
+        "quote": "\"observation\": \"isort.sorting.sort.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 33,
+        "quote": "\"observation\": \"isort.sorting.sort.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 34,
+        "quote": "\"observation\": \"isort.sorting.sort.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 34,
+        "quote": "\"observation\": \"isort.sorting.sort.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 35,
+        "quote": "\"observation\": \"isort.sorting.sort.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 35,
+        "quote": "\"observation\": \"isort.sorting.sort.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.sorting.sort.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 36,
+        "quote": "\"observation\": \"isort.sorting.sort.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 36,
+        "quote": "\"observation\": \"isort.sorting.sort.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "becf08a65ce268e10ffb82626c1633cb15077699bc5da6308099f51bf8eb03c0",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-22T06:07:20.950141+00:00",
+     "inputs_sha256": "099fa768a0e82474213c8a019139f594b943ebf5c53223b64ddaafb6cebbb1bd",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "isort/main.py": "c2672c3d4470f561fc38cf6963f192986b62f3fb3e83cef3336119c06e80890a",
+       "isort/settings.py": "b54d6e6aaaba2dba4760394e53661e0b711bb78ee55f0ddeed0904dfacc8ca23",
+       "isort/sorting.py": "f7f54263108b542cb89e8ab4731c3909fcc0613acf46a88278fe2455161dcbff"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-22T06:07:21.084259+00:00"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 8,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "isort/main.py",
+       "changed_lines_total": null,
+       "changed_lines_covered": null,
+       "note": "file not measured by coverage"
+      },
+      {
+       "file": "isort/settings.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "isort/sorting.py",
+       "changed_lines_total": 6,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json",
+     "changed_lines_touched": 6
+    }
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 8,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: probe line coverage after the setup rerun does not show a changed line ran",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: probe line coverage after the setup rerun does not show a changed line ran",
+ "changed_lines_total": 15,
+ "changed_lines_covered": 15,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "15 of 15 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/main.py",
+   "isort/settings.py",
+   "isort/sorting.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "docs/configuration/options.md",
+   "tests/unit/test_absolute_imports_first.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 448.6,
+  "tests": 18.5
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 0,
+  "input_tokens": 47455,
+  "output_tokens": 41949,
+  "thinking_tokens": 33307,
+  "cost_usd": 0.051991,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.051991,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 448.6,
+   "tests": 18.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.029907,
+  "total_cost_usd": 0.081898,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-22/ef12096/isort-2804"
+ }
+}
