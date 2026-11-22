@@ -26,6 +26,7 @@ import re
 from pathlib import Path
 
 from poc import coverage_gate, freeze
+from poc.probe_inputs import seed_literals
 
 MAX_FUNCTIONS = 12
 HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@", re.M)
@@ -72,7 +73,7 @@ def derive(diff: str, py_files: list, base_root: Path, pr_roots: list, rel_prefi
     """py_files: repo-relative changed Python files. Paths are resolved under base_root (rel_prefix stripped for
     installed packages is not needed: base_root is the folder the repo-relative paths resolve against)."""
     ranges = old_ranges(diff)
-    files, targets = {}, []
+    files, targets, seeds = {}, [], []
     for rel in py_files:
         if coverage_gate.is_test(rel) or rel not in ranges:
             continue
@@ -82,13 +83,19 @@ def derive(diff: str, py_files: list, base_root: Path, pr_roots: list, rel_prefi
             continue
         files[rel] = p
         try:
-            fns = touched_functions(p.read_text(errors="replace"), ranges[rel])
+            src = p.read_text(errors="replace")
+            fns = touched_functions(src, ranges[rel])
         except SyntaxError:
             continue
+        except OSError:
+            continue
+        for item in seed_literals(src):
+            if item not in seeds:
+                seeds.append(item)
         targets += [(mod, f) for f in fns]
     inputs = freeze.base_inputs("", "", files, base_root, pr_roots)
     inputs["old_ranges"] = {k: v for k, v in sorted(ranges.items()) if k in files}
-    return {"targets": targets[:MAX_FUNCTIONS], "inputs": inputs}
+    return {"targets": targets[:MAX_FUNCTIONS], "inputs": inputs, "seed_literals": seeds}
 
 
 PROBE_BODY = r'''
@@ -101,6 +108,8 @@ import random
 import re
 
 CANDIDATES = [1, 0, -1, 2.5, "abc", [1, 2, 3], None, True, False, "", [], {}]
+# Literal arguments and formatter round-trip strings from the base source. Empty unless write() fills them.
+SEED_LITERALS = []
 
 
 def typed_candidates():
@@ -251,6 +260,9 @@ for mod, fn in TARGETS:
     if plan == "candidates":
         n = sum(1 for p in params if p.default is inspect.Parameter.empty)
         pool = typed_candidates()
+        for extra in SEED_LITERALS:
+            if extra not in pool:
+                pool.append(extra)
         calls = [[copy.deepcopy(c) for _ in range(n)] for c in (pool if n else pool[:1])]
     else:
         calls = plan
@@ -265,11 +277,14 @@ print(json.dumps({"observations": obs}, sort_keys=True, default=str))
 '''
 
 
-def write(targets: list, path: Path, target: str) -> Path:
+def write(targets: list, path: Path, target: str, seed_literals: list | None = None) -> Path:
     spec = {"id": "diff-api", "target": target,
             "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
             "claims": [], "timeout_s": 60, "generator": freeze.DIFF}
     Path(path).parent.mkdir(parents=True, exist_ok=True)
+    body = PROBE_BODY
+    if seed_literals:
+        body = body.replace("SEED_LITERALS = []", "SEED_LITERALS = " + repr(list(seed_literals)), 1)
     Path(path).write_text('"""Differential probe (model-free baseline, poc/diff_probes.py)."""\n'
-                          f"PROBE = {spec!r}\nTARGETS = {[list(t) for t in targets]!r}\n" + PROBE_BODY)
+                          f"PROBE = {spec!r}\nTARGETS = {[list(t) for t in targets]!r}\n" + body)
     return Path(path)
