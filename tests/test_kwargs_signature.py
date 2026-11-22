@@ -123,7 +123,7 @@ _TREE = {
         "import attr\n"
         "\n"
         "@attr.define\n"
-        "class Box:\n"
+        "class Crate:\n"
         "    width: int\n"
         "    height: int = 1\n"
         "\n"
@@ -277,9 +277,9 @@ def test_dataclass_and_attrs_fields_are_checked_when_they_can_be_read(tmp_path):
     _bad("import pkg.settings as settings\nprint(settings._Config(not_a_field=1))\n", root,
          "not_a_field", "line_length")
     _ok("import pkg.settings as settings\nprint(settings.Config(line_length=100))\n", root)
-    _ok("import pkg.boxes as boxes\nprint(boxes.Box(width=2))\n", root)
-    _bad("import pkg.boxes as boxes\nprint(boxes.Box(nope=1))\n", root, "nope", "width")
-    _bad("import pkg.boxes as boxes\nprint(boxes.Box())\n", root, "width")
+    _ok("import pkg.boxes as boxes\nprint(boxes.Crate(width=2))\n", root)
+    _bad("import pkg.boxes as boxes\nprint(boxes.Crate(nope=1))\n", root, "nope", "width")
+    _bad("import pkg.boxes as boxes\nprint(boxes.Crate())\n", root, "width")
     _ok("import pkg.boxes as boxes\nprint(boxes.Legacy(width=2, height=3))\n", root)
     _bad("import pkg.boxes as boxes\nprint(boxes.Legacy(height=3))\n", root, "width")
     _ok("import pkg.records as records\nprint(records.Row(name='p'))\n", root)
