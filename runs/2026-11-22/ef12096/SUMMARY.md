@@ -1,9 +1,10 @@
 # Proof-of-Change go/no-go: 2026-11-22 on ef12096
 
-12 report(s) in this folder: 0 need attention, 9 could not be verified, 3 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+13 report(s) in this folder: 1 need attention, 9 could not be verified, 3 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
+- **NEEDS ATTENTION**: urllib3/urllib3#5278: HTTP/2 prototype. 827 new test(s) fail on the PR; 6 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 118 test(s) re-parametrized (352 -> 694 ids); 937 test(s) ran on main, 1447 on the PR; 35 new test(s) pass, 344 unchanged (21 of them skipped on both sides); 262 test failure(s) pre-existing and identical on both sides
 - **COULD NOT VERIFY**: mahmoud/boltons#821: fix parse_timedelta dropping units in compact strings like 1h30m. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged
 - **COULD NOT VERIFY**: mahmoud/boltons#822: fix SpooledStringIO.read(None) raising TypeError. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 97 test(s) ran on main, 97 on the PR; 0 new test(s) pass, 96 unchanged
 - **COULD NOT VERIFY**: mahmoud/boltons#824: Keep FunctionBuilder custom attributes independent. Could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
@@ -18,6 +19,7 @@
 
 | Verdict | Subject | Why | Report |
 |---|---|---|---|
+| NEEDS ATTENTION | urllib3/urllib3#5278: HTTP/2 prototype | 827 new test(s) fail on the PR; 6 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 118 test(s) re-parametrized (352 -> 694 ids); 937 test(s) ran on main, 1447 on the PR; 35 new test(s) pass, 344 unchanged (21 of them skipped on both sides); 262 test failure(s) pre-existing and identical on both sides | [PDF](urllib3-5278/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#821: fix parse_timedelta dropping units in compact strings like 1h30m | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged | [PDF](boltons-821/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#822: fix SpooledStringIO.read(None) raising TypeError | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 97 test(s) ran on main, 97 on the PR; 0 new test(s) pass, 96 unchanged | [PDF](boltons-822/REPORT.pdf) |
 | COULD NOT VERIFY | mahmoud/boltons#824: Keep FunctionBuilder custom attributes independent | Could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 25 test(s) ran on main, 25 on the PR; 0 new test(s) pass, 23 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](boltons-824/REPORT.pdf) |
