@@ -5239,6 +5239,211 @@ def _failure_signature(results: dict, test_id: str) -> dict:
             "exception": sorted(next(iter(types))) if len(types) == 1 else []}
 
 
+_BIND_RE = re.compile(
+    r"failed to bind|eaddrinuse|address already in use|address(?: is)? in use|cannot assign requested address",
+    re.I)
+_RESOLVE_RE = re.compile(
+    r"temporary failure in name resolution|name or service not known|nodename nor servname|no address associated",
+    re.I)
+_SETUP_RE = re.compile(r"failed on setup\b", re.I)
+_TEARDOWN_RE = re.compile(r"failed on teardown\b", re.I)
+_ASSERTION_RE = re.compile(r"\bAssertionError\b|\bassert\b", re.I)
+_DECIDING_LISTS = ("new_tests_failing", "regressions", "pr_unstable", "pr_unstable_noisy")
+
+
+def environment_signature(message: str) -> str | None:
+    """A stable label for an environment error, or None when the message is a behaviour failure.
+
+    Bind, address-in-use and name-resolution errors are one family, whatever test raised them. A setup or
+    teardown failure is included, except an assertion: that is the test checking a result. Ports, thread
+    numbers and paths are not part of the label. Nothing here names a project or a package."""
+    text = message or ""
+    if not text.strip():
+        return None
+    families = []
+    if _BIND_RE.search(text):
+        families.append("bind")
+    if _RESOLVE_RE.search(text):
+        families.append("resolve")
+    if _SETUP_RE.search(text):
+        families.append("setup")
+    elif _TEARDOWN_RE.search(text):
+        families.append("teardown")
+    if not families:
+        return None
+    if _ASSERTION_RE.search(text) and not (set(families) & {"bind", "resolve"}):
+        return None
+    types = ",".join(sorted(exception_types(text)))
+    return "+".join(families) + "|" + types
+
+
+def _signature_parts(signature: str) -> tuple[set[str], set[str]]:
+    head, _, tail = signature.partition("|")
+    return {p for p in head.split("+") if p}, {p for p in tail.split(",") if p}
+
+
+def _signatures_match(left: str, right: str) -> bool:
+    """True when two environment labels are the same problem.
+
+    A bind error matches another bind error even when one of them also says setup. A setup failure matches
+    another setup failure only when they name the same exception, or one of them names none."""
+    if left == right:
+        return True
+    left_f, left_t = _signature_parts(left)
+    right_f, right_t = _signature_parts(right)
+    if left_f & right_f & {"bind", "resolve"}:
+        return True
+    if left_f & right_f & {"setup", "teardown"} and (not left_t or not right_t or left_t & right_t):
+        return True
+    return False
+
+
+def _signature_on_base(signature: str, base_signatures: set[str], base_types: set[str], untyped: bool,
+                       typed_fallback: bool) -> bool:
+    """Whether this environment error was already seen on the base side.
+
+    A saved comparison often keeps the base exception type and not the message. Then a bind or setup error
+    counts when that exception type is on the base, and a teardown that only says ``Exception in thread``
+    counts when the base recorded a failure with no exception type. A live comparison passes the real base
+    labels and does not use that fallback."""
+    if any(_signatures_match(signature, other) for other in base_signatures):
+        return True
+    if not typed_fallback:
+        return False
+    families, types = _signature_parts(signature)
+    if families & {"bind", "resolve"}:
+        return bool(types & base_types)
+    if families & {"setup", "teardown"}:
+        if types & base_types:
+            return True
+        if types <= {"Exception"} and untyped:
+            return True
+    return False
+
+
+def _base_type_sets(cmp: dict) -> tuple[set[str], bool]:
+    types, untyped = set(), False
+    for raw in (cmp.get("failure_signatures") or {}).values():
+        if not isinstance(raw, dict):
+            continue
+        found = {str(t) for t in (raw.get("exception") or []) if t}
+        if found:
+            types |= found
+        else:
+            untyped = True
+    return types, untyped
+
+
+def _first_failure_message(results: dict, side: str, test_id: str) -> str:
+    for run in results.get(side) or []:
+        row = run.get(test_id)
+        if isinstance(row, tuple) and len(row) >= 2 and row[1]:
+            return str(row[1])
+    return ""
+
+
+def _plain_environment(entries: list[dict]) -> str:
+    """One sentence naming the environment error, without a verdict word."""
+    phrases = []
+    for entry in entries:
+        families, _types = _signature_parts(str(entry.get("signature") or ""))
+        detail = str(entry.get("detail") or "").lower()
+        if "bind" in families:
+            if "address already in use" in detail or "eaddrinuse" in detail:
+                phrase = "could not bind a local socket because the address was already in use"
+            elif "cannot assign requested address" in detail:
+                phrase = "could not assign a local address"
+            else:
+                phrase = "failed to bind a local socket"
+        elif "resolve" in families:
+            phrase = "could not resolve a local name"
+        elif "teardown" in families:
+            phrase = "failed during test teardown"
+        elif "setup" in families:
+            phrase = "failed during test setup"
+        else:
+            phrase = "hit an environment error"
+        if phrase not in phrases:
+            phrases.append(phrase)
+    shown = phrases[0] if phrases else "hit an environment error"
+    if len(phrases) > 1:
+        shown += " and " + " and ".join(phrases[1:3])
+    return (f"could not verify: the tests {shown}, and the base run failed the same way. "
+            "That is the environment, not the pull request")
+
+
+def settle_shared_environment(cmp: dict, results: dict | None = None) -> None:
+    """Move a pull-request failure into ``environment`` when the same error already happens on the base.
+
+    ``results`` is the per-run junit map from a live comparison. A saved comparison has no junit, so the
+    base labels are the ones ``compare_sides`` stored, or, for an older record, the base exception types.
+    When every saved message is that one environment error, failures whose message was not kept (the
+    comparison stores the first few) are the same error. An assertion that only happens on the pull
+    request is left where it is. The saved record is not rewritten here: callers pass the comparison they
+    already copied."""
+    if not isinstance(cmp, dict):
+        return
+    if results is not None:
+        base_signatures = set()
+        for run in results.get("main") or []:
+            for _tid, row in run.items():
+                if isinstance(row, tuple) and len(row) >= 2 and row[0] in ("failed", "error", "load_error"):
+                    sig = environment_signature(str(row[1] or ""))
+                    if sig:
+                        base_signatures.add(sig)
+        cmp["base_error_signatures"] = sorted(base_signatures)
+        typed_fallback = False
+        base_types, untyped = set(), False
+    else:
+        base_signatures = {str(s) for s in (cmp.get("base_error_signatures") or []) if s}
+        for msg in (cmp.get("base_messages") or {}).values():
+            sig = environment_signature(str(msg))
+            if sig:
+                base_signatures.add(sig)
+        # An older record has no base labels. Matching the exception type is the text it did keep.
+        typed_fallback = "base_error_signatures" not in cmp
+        base_types, untyped = _base_type_sets(cmp)
+    messages = dict(cmp.get("messages") or {})
+    deciding = [str(t) for key in _DECIDING_LISTS for t in (cmp.get(key) or [])]
+    stored = []
+    for tid in deciding:
+        if tid in messages:
+            stored.append(environment_signature(str(messages[tid])))
+    inherit = None
+    if (results is None and stored and all(sig and _signature_on_base(sig, base_signatures, base_types, untyped,
+                                                                       typed_fallback) for sig in stored)
+            and len(set(stored)) == 1):
+        inherit = stored[0]
+    already = {str(e.get("test")) for e in (cmp.get("environment") or []) if isinstance(e, dict)}
+    moved = []
+    for key in _DECIDING_LISTS:
+        kept = []
+        for raw in cmp.get(key) or []:
+            tid = str(raw)
+            if results is not None:
+                msg = _first_failure_message(results, "pr", tid) or str(messages.get(tid) or "")
+                sig = environment_signature(msg)
+            elif tid in messages:
+                msg = str(messages[tid])
+                sig = environment_signature(msg)
+            elif inherit and tid not in already:
+                msg = str(messages.get(next(iter(messages)), ""))
+                sig = inherit
+            else:
+                msg, sig = "", None
+            if sig and tid not in already and _signature_on_base(sig, base_signatures, base_types, untyped,
+                                                                 typed_fallback):
+                moved.append({"test": tid, "kind": "shared_error", "signature": sig, "detail": msg[:200]})
+                already.add(tid)
+            else:
+                kept.append(raw)
+        cmp[key] = kept
+    if moved:
+        cmp["environment"] = list(cmp.get("environment") or []) + moved
+    order = [t for t in (list(cmp.get("regressions") or []) + list(cmp.get("new_tests_failing") or [])) if t in messages]
+    cmp["messages"] = {t: messages[t] for t in order[:20]}
+
+
 def compare_sides(results: dict) -> dict:
     """Plain-code comparison of per-test outcomes over the 3 runs per side (poc.diff.confirm).
 
@@ -5365,6 +5570,7 @@ def compare_sides(results: dict) -> dict:
         # The exception type and the first line of its message, for a test that failed on the base and passed
         # on the pull request. The verdict does not read this.
         out["base_messages"] = base_notes
+    settle_shared_environment(out, results)
     return out
 
 
@@ -5738,7 +5944,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
                          f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
                          fl + ["unverified_claim"])
-    if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
+    shared_env = [e for e in ((cmp or {}).get("environment") or [])
+                  if isinstance(e, dict) and e.get("kind") == "shared_error"]
+    if docstring_only and v != Verdict.NEEDS_ATTENTION.value and not shared_env:
         v = Verdict.VERIFIED.value
         reason = ("docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction")
         fl = fl + ["holds_by_construction"]
@@ -5991,9 +6199,13 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
          regression, is could not verify (never verified). A test that is flaky on both sides, or only on the
          base, is listed and does not decide. Those flaky labels are not passed to pr_verdict, because that
          rule treats every amber finding as needs attention;
-      9. otherwise poc.verdict.pr_verdict."""
+      9. otherwise poc.verdict.pr_verdict.
+    A failure whose environment signature also appears on the base (bind, address already in use, name
+    resolution, or the same setup or teardown error) is not a finding. When that is all that remains, the
+    verdict is could not verify, naming the error. It is not verified, and it is not needs attention."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
+    settle_shared_environment(cmp)
     deps = sorted({d["module"] for d in cmp.get("skipped_missing_dependency", [])})
     dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped or blocked because optional "
                 f"dependenc{'y' if len(deps) == 1 else 'ies'} {', '.join(deps)} not installed") if deps else ""
@@ -6041,9 +6253,13 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     if cmp.get("new_tests_skipped"):
         bits.append(f"{len(cmp['new_tests_skipped'])} new test(s) skipped on the PR (they did not exist before; "
                     "listed, not a finding)")
-    env = cmp.get("environment") or []
+    env = [e for e in (cmp.get("environment") or []) if not (isinstance(e, dict) and e.get("kind") == "shared_error")]
+    shared_env = [e for e in (cmp.get("environment") or []) if isinstance(e, dict) and e.get("kind") == "shared_error"]
     if env:
         bits.append(f"{len(env)} test(s) varied only between passed and skipped for a resource limit on both sides "
+                    "(environment, not a pull-request finding)")
+    if shared_env:
+        bits.append(f"{len(shared_env)} failure(s) match an error that also happens on the base "
                     "(environment, not a pull-request finding)")
     backend = cmp.get("backend_same_error") or []
     if backend:
@@ -6110,6 +6326,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     # never decides the verdict (same rule as for probe observations).
     if cmp["flaky"]:
         reason += "; flaky test(s) shown only: their result changes between runs of the same side, so they do not decide the verdict"
+    if shared_env and v == Verdict.VERIFIED.value:
+        # The same environment error on both sides is not a pass. It must not become verified.
+        return (cnv, _plain_environment(shared_env) + (f" ({reason})" if reason else ""), fl)
     return v.value, reason, fl
 
 
