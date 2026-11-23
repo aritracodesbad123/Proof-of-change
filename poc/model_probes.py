@@ -146,10 +146,13 @@ def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False
     every such match. The default is an exact match."""
     text = _norm(title) + " \n " + _norm(body)
     loose_text = (loose_norm(title) + " \n " + loose_norm(body)) if loose else ""
+    from poc.claim_hygiene import correct_extracted_claim
     kept, rejected = [], []
     for c in (raw or {}).get("claims", [])[:20]:
+        if isinstance(c, dict):
+            c = correct_extracted_claim(c)
         q = _norm(c.get("source_quote", ""))
-        valid = c.get("expect") in ("same", "differs") and c.get("id")
+        valid = c.get("expect") in ("same", "differs", "base") and c.get("id")
         ok = bool(q) and q in text and valid
         if not ok and loose and valid:
             lq = loose_quote_ok(c.get("source_quote", ""))

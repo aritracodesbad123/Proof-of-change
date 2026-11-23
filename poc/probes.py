@@ -347,6 +347,24 @@ def _text_link(spec: dict, name: str) -> str | None:
     return "id" if all(i in ids for i in found) else None
 
 
+BASE_DESCRIPTION_NOTE = "describes the pre-PR behaviour, not a promise that it stays the same"
+
+
+def not_a_same_promise(claim: dict | None) -> bool:
+    """True when a claim must not be checked as a promise that the two sides stay the same.
+
+    A sentence that describes the pre-PR behaviour or the bug being fixed is that case, including when the
+    model typed it "same". The narrow "Before the fix, X raises/returns Y" shape keeps its one-side reading."""
+    if not isinstance(claim, dict) or is_one_side_claim(claim):
+        return False
+    if claim.get("expect") == "base" or claim.get("base_description"):
+        return True
+    if claim.get("expect") != "same":
+        return False
+    from poc.claim_hygiene import describes_old_bug
+    return describes_old_bug(str(claim.get("text") or ""))
+
+
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
     if state == "flaky":
         return FindingLabel.FLAKY.value
@@ -354,6 +372,8 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
         return FindingLabel.NOT_TESTABLE.value
     if claim is None:
         return (FindingLabel.NO_DIFFERENCE if state == "same" else FindingLabel.UNMENTIONED_CHANGE).value
+    if not_a_same_promise(claim):
+        return FindingLabel.NOT_TESTABLE.value
     if state == claim["expect"]:
         return FindingLabel.PROVEN.value
     if state == "same" and is_how_claim(claim):
@@ -457,6 +477,8 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                 pr_only, state = "regression", "flaky"
                 if claim is None:
                     label = FindingLabel.UNMENTIONED_CHANGE.value
+                elif not_a_same_promise(claim):
+                    label = FindingLabel.NOT_TESTABLE.value
                 elif claim["expect"] == "same":
                     label = FindingLabel.FALSE_CLAIM.value
                 else:
@@ -475,6 +497,9 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
         if label == FindingLabel.NOT_TESTABLE.value and state == "same" and is_how_claim(claim):
             res["how_claim"] = True
+        if not_a_same_promise(claim):
+            res["base_description"] = True
+            res["note"] = BASE_DESCRIPTION_NOTE
         link = _text_link(spec, name) if label == FindingLabel.UNMENTIONED_CHANGE.value else None
         if link:
             # The name starts with the full id of one of this probe's claims but matches no cover: shown as advisory
@@ -1214,9 +1239,14 @@ def summarize(items: list[dict]) -> dict:
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
     if same:
         bits.append(f"probe: {same} other observation(s) identical on both sides")
-    errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value]
+    errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value and not o.get("base_description")]
     if errors:
         bits.append(f"probe: {len(errors)} probe(s) could not run on either side")
+    base_desc = [o for o in obs if o.get("base_description")]
+    if base_desc:
+        ids = sorted({str(o.get("claim")) for o in base_desc if o.get("claim")})
+        bits.append("probe: claim(s) " + ", ".join(ids)
+                    + " describe the pre-PR behaviour, so a difference is not a broken promise of no change")
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
                                                              for o in flagged],
             "proven_claims": proven, "reason": "; ".join(bits),

@@ -539,11 +539,22 @@ def probes_section(R, rec: dict, rel) -> list[dict]:
             + (f", frozen `{fz['sha256'][:12]}` at {fz.get('frozen_at', '?')}" if fz.get("sha256") else "")
             + f"): {it.get('about', '')}")
         if it.get("claims"):
+            from poc import probes
+            def _expects(c):
+                if c.get("expect") == "base" or probes.not_a_same_promise(c):
+                    return "be read as the pre-PR behaviour, not as a promise of no change"
+                if c.get("expect") == "differs":
+                    return "differ"
+                return "stay the same"
             R.bullets([f"P-{c['id']} ({c.get('source', 'claim')}): {c['text']} Expects the covered observations to "
-                       f"{'differ' if c['expect'] == 'differs' else 'stay the same'}." for c in it["claims"]])
+                       f"{_expects(c)}." for c in it["claims"]])
         rows = []
         for o in it["observations"]:
-            colour, txt = PROBE_RESULT.get(o["label"], ("grey", o["label"]))
+            if o.get("base_description"):
+                colour, txt = ("grey", o.get("note")
+                               or "describes the pre-PR behaviour, not a promise that it stays the same")
+            else:
+                colour, txt = PROBE_RESULT.get(o["label"], ("grey", o["label"]))
             cm, cp = (o.get("citations") or {}).get("main"), (o.get("citations") or {}).get("pr")
             cits += [cm, cp]
             rows.append([f"`{o['name']}`", f"P-{o['claim']}" if o.get("claim") else "-", badge(colour, txt), observed(o),

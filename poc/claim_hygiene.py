@@ -18,8 +18,10 @@ into verified on its own):
    A model probe whose every claim is dropped was planned for a claim the PR does not make, so it is removed from
    the deciding probes. If that probe had flagged anything, the verdict cannot be verified (see
    ``dropped_flagged``), because the flag may still point at something real that nothing else probed.
-2. A claim that says something stays the same ("will NOT bypass", "is preserved", "unchanged", "still",
+2. A claim that says something stays the same ("will NOT bypass", "is preserved", "unchanged",
    "continues to", "as before") is typed expect "same", even when the model typed it "differs".
+   A sentence that only describes the pre-PR behaviour or the bug being fixed is never that kind of claim:
+   words such as "unchanged" or "still" in the problem statement are the old behaviour, not a promise.
 3. A model probe with no claims attached cannot say which differences the PR intended. Its "differs and no claim
    covers it" observations are kept and shown, marked advisory: they do not raise needs attention, but a run with
    one is held at could not verify (never verified). The same applies to a model probe whose claims, after rule 0,
@@ -66,9 +68,112 @@ def is_test_outcome_claim(text: str) -> bool:
     return bool(_TEST_OUTCOME.search(text or ""))
 
 
+# A sentence that only describes what the code did before this pull request, or the bug being fixed.
+# "unchanged" / "still" in that sentence are the defect ("leaves the cache unchanged", "still sized from all
+# columns"), not a promise that the pull request keeps behaviour. A genuine promise ("other inputs are
+# unaffected", "existing behaviour is preserved", "remains unchanged after the fix") is not this.
+_NEW_SIDE = re.compile(
+    r"(?i)\b(?:after(?:wards)?|now|instead|"
+    r"(?:the|this)\s+(?:fix|change|patch|pr|pull\s+request)|"
+    r"with\s+(?:the|this)\s+(?:fix|change|patch))\b")
+_PROMISE = re.compile(
+    r"(?i)\b(?:unchanged|preserved|preserves|preserving|unaffected|not\s+affected|"
+    r"as\s+before|continues?\s+to|will\s+not|won['’]t|"
+    r"(?:does|do|doesn['’]t|don['’]t|will)\s+not\s+change|"
+    r"no\s+(?:behaviou?r|behavior)\s+change|"
+    r"backwards?[-\s]+compatib|"
+    r"untouched|without\s+(?:changing|affecting|breaking)|"
+    r"remains?|stays?|kept|keeps|retain(?:s|ed)?|"
+    r"the\s+same|identically)\b")
+# "still returns / still raises / still works" continues a behaviour. "still sized from" is the bug persisting.
+_STILL_CONTINUES = re.compile(
+    r"(?i)\bstill\s+(?:returns?|raises?|works?|passes?|is|are|be|remains?|"
+    r"recognis(?:e|ed|es)|recogniz(?:e|ed|es)|accepted|uses?|none|the\s+same|unchanged)\b")
+_CONTRAST_LEAVES = re.compile(
+    r"(?i)\b(?:but|yet|however)\b.{0,160}?\b(?:leaves?|leaving|left)\b.{0,80}?\bunchanged\b")
+_CACHED_UNCHANGED = re.compile(
+    r"(?i)\bleaves?\b.{0,60}?\b(?:cached|cache|stale|normali[sz]ed)\b.{0,40}?\bunchanged\b")
+_STILL_BUG = re.compile(
+    r"(?i)\bstill\s+(?:sized|computed|calculated|counted|measured|derived|based|summed|taken|using)\b"
+    r"|\bstill\s+leaves?\b.{0,80}?\b(?:overlong|stale|wrong|incorrect|unescaped|zero|narrow)\b")
+_OLD_MARKER = re.compile(
+    r"(?i)\b(?:previously|used\s+to|"
+    r"in\s+the\s+current\s+(?:code|implementation|version)|"
+    r"currently|"
+    r"without\s+the\s+(?:fix|change|patch)|"
+    r"before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull\s+request)|"
+    r"on\s+(?:the\s+)?(?:current\s+)?(?:main|master|base)(?:\s+branch)?|"
+    r"returned\b[^.]{0,40}?\bbefore\b|"
+    r"\bbefore\b[^.]{0,24}?\b(?:returned|raised))\b")
+_FAULT = re.compile(
+    r"(?i)\b(?:narrower|wider|wrong|incorrect|fails?|failed|raises?|raised|"
+    r"crash(?:es|ed)?|errors?|missing|ignored|unexpected(?:ly)?|broken|"
+    r"instead\s+of|rather\s+than|unescaped|not\s+updated|not\s+escaped|"
+    r"too\s+(?:far|narrow|wide|small|large|big))\b")
+_CAUSE = re.compile(r"(?i)\b(?:because|causing|caused|consequently)\b")
+_PAST_CONTRAST = re.compile(
+    r"(?i)\b(?:summed|counted|computed|calculated|measured|included)\b.{0,100}?\bwhile\b.{0,80}?\balready\b")
+# Words that make the sentence about both sides. "from all columns" is the bug's input, not "in all versions".
+_BOTH_SIDES = re.compile(
+    r"(?i)\b(?:both|either|each|regardless|versions?|identical|equal)\b|\b(?:in|for)\s+all\b")
+
+
+def _has_new_side(text: str) -> bool:
+    """True when the sentence also describes the pull request's new behaviour.
+
+    "before the fix" names the old side, so that phrase is removed before the new-side words are read."""
+    return bool(_NEW_SIDE.search(_OLD_MARKER.sub(" ", text or "")))
+
+
+def describes_old_bug(text: str) -> bool:
+    """True when the sentence describes the pre-PR behaviour or the bug being fixed.
+
+    Such a sentence is not a promise that the pull request leaves behaviour unchanged. The decision is the
+    wording, the tense and the markers (before, previously, used to, currently, still), not a repository name.
+    A promise ("unaffected", "preserved", "remains unchanged after the fix") is false."""
+    t = text or ""
+    if not t.strip():
+        return False
+    new = _has_new_side(t)
+    # "changes X but leaves Y unchanged" is the defect, unless the sentence is the fix speaking.
+    if not new and (_CONTRAST_LEAVES.search(t) or _CACHED_UNCHANGED.search(t)):
+        return True
+    # A sentence about both sides, or a promise, is not a description of the old behaviour alone.
+    if _BOTH_SIDES.search(t) or _PROMISE.search(t) or new:
+        return False
+    if _STILL_BUG.search(t) and not _STILL_CONTINUES.search(t):
+        return True
+    if _OLD_MARKER.search(t):
+        return True
+    if _FAULT.search(t) and _CAUSE.search(t):
+        return True
+    if _PAST_CONTRAST.search(t):
+        return True
+    return False
+
+
 def says_stays_same(text: str) -> bool:
     t = text or ""
+    # A description of the bug is not retyped into a no-change promise, even when it says "unchanged".
+    if describes_old_bug(t):
+        return False
     return bool(_STAYS_SAME.search(t)) and not _SAYS_CHANGE.search(t)
+
+
+def correct_extracted_claim(claim: dict) -> dict:
+    """A parsed claim typed "same" that only describes the old behaviour is kept as a base-side description.
+
+    It is not testable as a comparison and its expect is "base", so a later probe is not asked to treat it as
+    a promise that the two sides stay the same. A claim the model already typed "differs" is left as it is."""
+    if not isinstance(claim, dict):
+        return claim
+    text = str(claim.get("text") or "")
+    quote = str(claim.get("source_quote") or "")
+    old = describes_old_bug(text) or (bool(quote) and quote != text and describes_old_bug(quote)
+                                      and not _PROMISE.search(text))
+    if claim.get("expect") == "base" or (claim.get("expect") == "same" and old):
+        return dict(claim, expect="base", testable=False, base_description=True)
+    return claim
 
 
 # What may follow the claim id in an observation name: "C1.a", "C1-a", "c1_a". A digit or a letter never does, so
@@ -160,7 +265,8 @@ def apply(probe_results: dict | None) -> dict | None:
     # A retyped or dropped claim must never lift that cap, so it is kept and checked again in
     # ops/daily_run.verdict_for.
     held = probes.unmatched_differs_claims(out)
-    notes = {"held_back": list(held), "dropped_claims": [], "retyped_same": [], "dropped_probes": [], "dropped_flagged": [],
+    notes = {"held_back": list(held), "dropped_claims": [], "retyped_same": [], "base_description": [],
+             "dropped_probes": [], "dropped_flagged": [],
              "advisory_probes": [], "relinked": relinked, "unlinked_probes": []}
     kept_items = []
     for it in out["items"]:
@@ -176,7 +282,12 @@ def apply(probe_results: dict | None) -> dict | None:
                 notes["dropped_claims"].append({"probe": it["id"], "claim": c.get("id"), "text": text})
                 changed = True
                 continue
-            if c.get("expect") == "differs" and says_stays_same(text):
+            if (c.get("expect") == "same" and describes_old_bug(text)
+                    and not probes.is_one_side_claim(c)):
+                # Leave expect as stored. Judging reads the text and does not treat this as a no-change promise.
+                notes["base_description"].append({"probe": it["id"], "claim": c.get("id"), "text": text})
+                changed = True
+            elif c.get("expect") == "differs" and says_stays_same(text):
                 c = dict(c, expect="same")
                 notes["retyped_same"].append({"probe": it["id"], "claim": c.get("id"), "text": text})
                 changed = True
@@ -218,6 +329,9 @@ def note_text(notes: dict | None) -> str:
     if notes.get("retyped_same"):
         bits.append("claim(s) " + ", ".join(str(d["claim"]) for d in notes["retyped_same"])
                     + " say behaviour stays the same, so they expect no difference")
+    if notes.get("base_description"):
+        bits.append("claim(s) " + ", ".join(str(d["claim"]) for d in notes["base_description"])
+                    + " describe the pre-PR behaviour, so they are not a promise that it stays the same")
     if notes.get("relinked"):
         bits.append("claim(s) " + ", ".join(sorted({str(d["claim"]) for d in notes["relinked"]}))
                     + " linked to observations by claim id")

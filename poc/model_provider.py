@@ -47,7 +47,11 @@ CLAIMS_SCHEMA = {
         "required": ["id", "text", "source_quote", "testable", "expect"],
         "properties": {"id": {"type": "string"}, "text": {"type": "string"},
                        "source_quote": {"type": "string"}, "testable": {"type": "boolean"},
-                       "expect": {"type": "string", "enum": ["same", "differs"]}}}}}}
+                       "expect": {"type": "string", "enum": ["same", "differs", "base"],
+                                  "description": "differs: the pull request changes this behaviour. "
+                                                 "same: the pull request promises this behaviour stays the same. "
+                                                 "base: the sentence only describes the pre-PR behaviour or the bug "
+                                                 "being fixed. Never use same for a base sentence."}}}}}}
 
 PROBES_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["probes"],
@@ -64,8 +68,17 @@ PROBES_SCHEMA = {
 
 CLAIMS_PROMPT = """You read a pull request's title and description and list its testable claims about behaviour.
 For each claim give: id (C1, C2, ...), text (one sentence), source_quote (copied exactly from the title or description),
-testable (false if it cannot be checked by running code), expect: "differs" if the claim says behaviour changes
-between the base and the PR, "same" if it says behaviour stays the same. Answer with JSON only."""
+testable (false if it cannot be checked by running code), expect:
+"differs" if the claim says behaviour changes between the base and the PR,
+"same" only if the pull request promises that behaviour stays the same,
+"base" if the sentence describes the pre-PR behaviour or the bug being fixed.
+A sentence about the old behaviour or the bug is never "same", even when it says "unchanged", "still", "same" or
+"does not differ". Decide from the sentence and its context: old-behaviour wording, a bug description, the tense,
+markers such as before, previously, used to, currently and still, and whether the sentence is the problem statement
+(for example "leaves X unchanged", "still sized from all columns", "returned [] before"). Use "base" for that
+sentence, or omit it. Do not set testable true for a "base" sentence.
+A genuine promise that something does not change is still "same" (for example "other inputs are unaffected",
+"existing behaviour for X is preserved"). Answer with JSON only."""
 
 PROBES_PROMPT = """You write probes: small deterministic Python scripts that are run, unchanged, on the BASE side and on
 the PR side of a pull request, and whose printed observations are compared by plain code. You see only the PR title

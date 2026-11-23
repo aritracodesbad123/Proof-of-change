@@ -254,6 +254,10 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
                 full = _sentence(text, m.start(), m.end(), width=10**6)
                 if q and (about_tests_or_tools(full) or is_process_aside(full)):
                     continue
+                # "leaves the cache unchanged" in the bug report is the old behaviour, not a preservation claim.
+                from poc.claim_hygiene import describes_old_bug
+                if full and describes_old_bug(full):
+                    continue
                 if q and (source, q) not in seen:
                     seen.add((source, q))
                     out.append({"source": source, "quote": q, "pattern": name,
@@ -283,6 +287,8 @@ def probe_covers(probe_results: dict | None) -> bool:
             continue
         if cov.get("status") != "measured" or not (cov.get("changed_lines_covered") or 0):
             continue
-        if any(c.get("expect") == "same" for c in it.get("claims") or []):
+        from poc.claim_hygiene import describes_old_bug
+        if any(c.get("expect") == "same" and not describes_old_bug(str(c.get("text") or ""))
+               for c in it.get("claims") or []):
             return True
     return False
