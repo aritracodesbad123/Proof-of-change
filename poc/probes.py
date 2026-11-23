@@ -350,19 +350,27 @@ def _text_link(spec: dict, name: str) -> str | None:
 BASE_DESCRIPTION_NOTE = "describes the pre-PR behaviour, not a promise that it stays the same"
 
 
+def _expect_for_judging(claim: dict) -> str:
+    """The expect judging uses. A "base" the old-bug check does not agree with is tested as "same"."""
+    expect = str(claim.get("expect") or "")
+    if expect == "base" and not not_a_same_promise(claim):
+        return "same"
+    return expect
+
+
 def not_a_same_promise(claim: dict | None) -> bool:
     """True when a claim must not be checked as a promise that the two sides stay the same.
 
     A sentence that describes the pre-PR behaviour or the bug being fixed is that case, including when the
-    model typed it "same". The narrow "Before the fix, X raises/returns Y" shape keeps its one-side reading."""
+    model typed it "same" or "base". A "base" the old-bug check does not agree with is not this: it is tested
+    as "same", so a promise the model mislabelled is not dropped. The narrow "Before the fix, X raises/returns
+    Y" shape keeps its one-side reading."""
     if not isinstance(claim, dict) or is_one_side_claim(claim):
         return False
-    if claim.get("expect") == "base" or claim.get("base_description"):
-        return True
-    if claim.get("expect") != "same":
-        return False
     from poc.claim_hygiene import describes_old_bug
-    return describes_old_bug(str(claim.get("text") or ""))
+    if not describes_old_bug(str(claim.get("text") or "")):
+        return False
+    return claim.get("expect") in ("same", "base") or bool(claim.get("base_description"))
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
@@ -374,11 +382,12 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
         return (FindingLabel.NO_DIFFERENCE if state == "same" else FindingLabel.UNMENTIONED_CHANGE).value
     if not_a_same_promise(claim):
         return FindingLabel.NOT_TESTABLE.value
-    if state == claim["expect"]:
+    expect = _expect_for_judging(claim)
+    if state == expect:
         return FindingLabel.PROVEN.value
     if state == "same" and is_how_claim(claim):
         return FindingLabel.NOT_TESTABLE.value
-    return (FindingLabel.FALSE_CLAIM if claim["expect"] == "same" else FindingLabel.NEEDS_HUMAN).value
+    return (FindingLabel.FALSE_CLAIM if expect == "same" else FindingLabel.NEEDS_HUMAN).value
 
 
 def probe_broken(main, pr) -> bool:
@@ -479,7 +488,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                     label = FindingLabel.UNMENTIONED_CHANGE.value
                 elif not_a_same_promise(claim):
                     label = FindingLabel.NOT_TESTABLE.value
-                elif claim["expect"] == "same":
+                elif _expect_for_judging(claim) == "same":
                     label = FindingLabel.FALSE_CLAIM.value
                 else:
                     label = FindingLabel.NEEDS_HUMAN.value

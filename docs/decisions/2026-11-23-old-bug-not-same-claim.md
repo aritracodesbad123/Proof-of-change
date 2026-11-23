@@ -35,6 +35,12 @@ that a verified result needs a probe that ran a changed line.
 
 The narrow shape "Before the fix, X raises/returns Y" keeps the reading it already had.
 
+A model answer of `base` is not trusted on its own. It stands only when the sentence is the old bug, or when the
+sentence has no promise word. Otherwise it is put back to `same` and is still tested. `keep` is a promise word, and
+so are "keep working", "keeps working" and "still work" or "still works", even beside "currently" or "previously".
+"Previously valid", "previously accepted" and "previously supported" are compatibility promises. The check leans
+towards leaving a claim as `same`, because a `base` claim is never tested and a slip would hide a real break.
+
 ## Alternatives and tradeoffs
 
 Dropping the sentence entirely, and then treating the probe's difference as unclaimed, would still flag the fix.
@@ -79,3 +85,7 @@ broken promise, and two other findings remain.
 Held-out records did not move. mahmoud/boltons #751 and #758 stay `verified`. #752 stays `could_not_verify`. #803
 has no probe items, so it was not re-judged; its stored verdict stays `could_not_verify`. The two known misses named
 in the narrow cross-run note (mlxtend #1229 and skrub #2319) are not in these saved records.
+
+Tightening the promise words, so a model `base` is kept only when the sentence really is the old bug, was replayed
+the same way. The numbers did not move: still 170 judged, 167 unchanged, 3 changed, 0 errors, and the same three
+pull requests.

@@ -83,8 +83,15 @@ _PROMISE = re.compile(
     r"no\s+(?:behaviou?r|behavior)\s+change|"
     r"backwards?[-\s]+compatib|"
     r"untouched|without\s+(?:changing|affecting|breaking)|"
-    r"remains?|stays?|kept|keeps|retain(?:s|ed)?|"
+    r"remains?|stays?|kept|keeps?|retain(?:s|ed)?|"
     r"the\s+same|identically)\b")
+# "keep working" and "still works" are promises even next to "currently" or "previously".
+# "still sized" is not: that is the bug persisting.
+_KEEP_WORKING = re.compile(r"(?i)\bkeeps?\s+working\b|\bstill\s+works?\b")
+# "previously valid/accepted/supported" is a compatibility promise, not a description of the bug.
+_PREVIOUSLY_KEPT = re.compile(
+    r"(?i)\bpreviously\s+(?:valid|accepted|supported)\b"
+    r"|\b(?:were|was)\s+previously\s+(?:valid|accepted|supported)\b")
 # "still returns / still raises / still works" continues a behaviour. "still sized from" is the bug persisting.
 _STILL_CONTINUES = re.compile(
     r"(?i)\bstill\s+(?:returns?|raises?|works?|passes?|is|are|be|remains?|"
@@ -118,6 +125,15 @@ _BOTH_SIDES = re.compile(
     r"(?i)\b(?:both|either|each|regardless|versions?|identical|equal)\b|\b(?:in|for)\s+all\b")
 
 
+def _is_promise(text: str) -> bool:
+    """True when the sentence promises that some behaviour is kept.
+
+    "keep", "keep(s) working" and "still work(s)" count, and so does "previously valid/accepted/supported".
+    "still sized from all columns" does not."""
+    t = text or ""
+    return bool(_PROMISE.search(t) or _KEEP_WORKING.search(t) or _PREVIOUSLY_KEPT.search(t))
+
+
 def _has_new_side(text: str) -> bool:
     """True when the sentence also describes the pull request's new behaviour.
 
@@ -139,7 +155,8 @@ def describes_old_bug(text: str) -> bool:
     if not new and (_CONTRAST_LEAVES.search(t) or _CACHED_UNCHANGED.search(t)):
         return True
     # A sentence about both sides, or a promise, is not a description of the old behaviour alone.
-    if _BOTH_SIDES.search(t) or _PROMISE.search(t) or new:
+    # A promise wins over an old-side word in the same sentence ("currently ... keep working").
+    if _BOTH_SIDES.search(t) or _is_promise(t) or new:
         return False
     if _STILL_BUG.search(t) and not _STILL_CONTINUES.search(t):
         return True
@@ -160,18 +177,43 @@ def says_stays_same(text: str) -> bool:
     return bool(_STAYS_SAME.search(t)) and not _SAYS_CHANGE.search(t)
 
 
+def _sentence_is_old_bug(text: str, quote: str) -> bool:
+    """The claim text decides. A quote is used only when the text itself is not a promise."""
+    if text and describes_old_bug(text):
+        return True
+    if quote and quote != text and describes_old_bug(quote) and not _is_promise(text):
+        return True
+    if not text and quote and describes_old_bug(quote):
+        return True
+    return False
+
+
 def correct_extracted_claim(claim: dict) -> dict:
     """A parsed claim typed "same" that only describes the old behaviour is kept as a base-side description.
 
     It is not testable as a comparison and its expect is "base", so a later probe is not asked to treat it as
-    a promise that the two sides stay the same. A claim the model already typed "differs" is left as it is."""
+    a promise that the two sides stay the same. A claim the model already typed "differs" is left as it is.
+
+    A model answer of "base" is not trusted on its own. It stands only when the sentence is the old bug, or
+    when the sentence has no promise word. A promise the model typed "base" ("other inputs are unaffected")
+    is put back to "same" so it is still tested."""
     if not isinstance(claim, dict):
         return claim
     text = str(claim.get("text") or "")
     quote = str(claim.get("source_quote") or "")
-    old = describes_old_bug(text) or (bool(quote) and quote != text and describes_old_bug(quote)
-                                      and not _PROMISE.search(text))
-    if claim.get("expect") == "base" or (claim.get("expect") == "same" and old):
+    old = _sentence_is_old_bug(text, quote)
+    expect = claim.get("expect")
+    if expect == "base":
+        agrees = describes_old_bug(text) if text.strip() else describes_old_bug(quote)
+        has_promise = _is_promise(text) or _is_promise(quote)
+        # Lean towards "same": a promise word, and the old-bug check does not agree, keeps the claim tested.
+        if agrees or not has_promise:
+            return dict(claim, expect="base", testable=False, base_description=True)
+        restored = {k: v for k, v in claim.items() if k != "base_description"}
+        restored["expect"] = "same"
+        restored["testable"] = True
+        return restored
+    if expect == "same" and old:
         return dict(claim, expect="base", testable=False, base_description=True)
     return claim
 

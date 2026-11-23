@@ -97,6 +97,44 @@ def test_broken_unaffected_promise_still_flags():
     assert "although the claim says it does not" not in why
 
 
+def _promise_typed_base_stays_same_and_flags(text):
+    """A promise, even wrapped in an old-side word, stays same and needs attention when it breaks."""
+    assert not claim_hygiene.describes_old_bug(text), text
+    typed_base = claim_hygiene.correct_extracted_claim(
+        {"id": "C1", "text": text, "source_quote": text, "testable": True, "expect": "base"})
+    assert typed_base["expect"] == "same" and typed_base["testable"] is True, text
+    assert not typed_base.get("base_description"), text
+    stayed = claim_hygiene.correct_extracted_claim(
+        {"id": "C1", "text": text, "source_quote": text, "testable": True, "expect": "same"})
+    assert stayed["expect"] == "same" and stayed.get("testable") is True, text
+    item = _judged(text, "kept", "changed")
+    obs = item["observations"][0]
+    assert obs["label"] == probes.FindingLabel.FALSE_CLAIM.value, text
+    assert not obs.get("base_description"), text
+    cmp = _cmp({"m.t::old": ("passed", "")}, {"m.t::old": ("passed", "")})
+    v, reason, _ = daily_run.verdict_for(cmp, None, None, None, {"items": [item]}, baseline="full")
+    assert v == "needs_attention", text
+    assert "although the claim says it does not" in reason, text
+
+
+def test_model_base_on_a_promise_is_put_back_to_same():
+    """A model 'base' is not trusted when the sentence is a promise."""
+    _promise_typed_base_stays_same_and_flags("Other inputs are unaffected.")
+
+
+def test_keep_working_next_to_currently_stays_same():
+    """'keep' is a promise word, and 'keep working' / 'still work' stay promises beside an old-side word."""
+    _promise_typed_base_stays_same_and_flags("Callers that currently pass a str keep working")
+    _promise_typed_base_stays_same_and_flags("Callers that currently still work")
+
+
+def test_previously_accepted_stays_same():
+    """'previously valid/accepted/supported' is a compatibility promise, not the old bug."""
+    _promise_typed_base_stays_same_and_flags("Inputs that were previously accepted are accepted")
+    _promise_typed_base_stays_same_and_flags("Previously valid inputs are still accepted")
+    assert not claim_hygiene.describes_old_bug("Callers that previously used the supported names keep working")
+
+
 def test_a_real_test_regression_still_needs_attention():
     cmp = _cmp({"m.t::old": ("passed", "")}, {"m.t::old": ("failed", "AssertionError: broke")})
     bug = _judged(PRETTY_C1, "wide", "narrow")
