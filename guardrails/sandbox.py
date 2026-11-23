@@ -14,7 +14,9 @@ with only these mounts:
   install     the shared uv cache as a read-only lower layer at /opt/uv-cache with a private, discarded tmpfs layer on
               top (--overlay-src/--tmp-overlay): builds can use it but never write to the shared cache
 Nothing else exists inside: no /home, no other worktrees, no agent data, no /sys. The network is shared only for
-the install/build phase; test, coverage and probe phases have no network (only a loopback interface)."""
+the install/build phase. Test, coverage and probe phases each get a private network namespace: the loopback
+interface is brought up, and localhost resolves to it, so a server the tests start can bind 127.0.0.1 or
+localhost without sharing ports with any other run. Nothing outside that namespace is reachable."""
 from __future__ import annotations
 
 import functools
@@ -71,13 +73,79 @@ def _real(p: str | Path) -> str:
     return str(Path(p).resolve())
 
 
+# Runs inside an isolated network namespace, then replaces itself with the real command.
+# Brings loopback up while it still holds CAP_NET_ADMIN, then drops every capability.
+_LOOPBACK_HELPER = r'''
+import os, socket, struct, sys
+
+def _raise_loopback():
+    import fcntl
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        buf = bytearray(40)
+        struct.pack_into("16s", buf, 0, b"lo")
+        fcntl.ioctl(sock.fileno(), 0x8913, buf)
+        flags = struct.unpack_from("H", buf, 16)[0]
+        if not flags & 1:
+            struct.pack_into("H", buf, 16, flags | 1)
+            fcntl.ioctl(sock.fileno(), 0x8914, buf)
+    except OSError:
+        pass
+    try:
+        import subprocess
+        subprocess.run(["ip", "link", "set", "lo", "up"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except OSError:
+        pass
+
+def _drop_capabilities():
+    import ctypes
+    libc = ctypes.CDLL(None, use_errno=True)
+    class Header(ctypes.Structure):
+        _fields_ = [("version", ctypes.c_uint32), ("pid", ctypes.c_int)]
+    class Data(ctypes.Structure):
+        _fields_ = [("effective", ctypes.c_uint32), ("permitted", ctypes.c_uint32),
+                    ("inheritable", ctypes.c_uint32)]
+    blank = (Data * 2)()
+    rc = libc.capset(ctypes.byref(Header(0x20080522, 0)), blank)
+    if rc != 0:
+        os._exit(1)
+
+_raise_loopback()
+_drop_capabilities()
+argv = sys.argv[1:]
+if not argv:
+    os._exit(127)
+os.execvpe(argv[0], argv, os.environ)
+'''
+
+
+def _loopback_files(home: str) -> tuple[list[tuple[str, str]], str]:
+    """Host files for one isolated network namespace, and the helper that brings loopback up.
+
+    ``/etc/hosts`` names only localhost, so a server can bind it. The resolver is not mounted, so no other
+    name resolves. The helper path is inside the side home, which the sandbox already mounts read-write."""
+    d = Path(home) / ".sandbox-etc"
+    d.mkdir(parents=True, exist_ok=True)
+    hosts = d / "hosts"
+    hosts.write_text("127.0.0.1 localhost\n::1 localhost ip6-localhost ip6-loopback\n")
+    nss = d / "nsswitch.conf"
+    nss.write_text("passwd: files\ngroup: files\nhosts: files\nnetworks: files\n")
+    helper = d / "loopback.py"
+    helper.write_text(_LOOPBACK_HELPER)
+    return [(str(hosts), "/etc/hosts"), (str(nss), "/etc/nsswitch.conf")], str(helper)
+
+
 def bwrap_args(rw: list, ro: list = (), network: bool = False, cache: str | None = None,
                python_dir: str | None = None, cwd: str | Path | None = None, passwd: Path | None = None,
-               binds: list = ()) -> list[str]:
+               binds: list = (), keep_net_admin: bool = False) -> list[str]:
     bw = shutil.which("bwrap")
     if not bw:
         raise SandboxError(f"{UNAVAILABLE}: bwrap not found")
     args = [bw, "--unshare-all", "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--hostname", "sandbox"]
+    if keep_net_admin:
+        # Only long enough for the loopback helper to bring lo up. The helper drops it before the real command.
+        args += ["--cap-add", "CAP_NET_ADMIN"]
     if network:
         args.append("--share-net")
     args += ["--ro-bind", "/usr", "/usr", *_root_links(), *_etc(network),
@@ -136,6 +204,12 @@ def wrap(cmd: list, env: dict, rw: list, ro: list = (), network: bool = False, c
     if "UV_PYTHON_INSTALL_DIR" in env:
         env["UV_PYTHON_INSTALL_DIR"] = INSIDE_PYTHON
     binds = []
+    helper = None
+    if not network and Path("/usr/bin/python3").exists():
+        # Private network namespace: loopback up, and localhost mapped to it. The host network stays shared
+        # only when network=True (installs and builds).
+        extra, helper = _loopback_files(home)
+        binds.extend(extra)
     if cmd and cmd[0] == "uv":   # uv itself: from /usr, or mounted read-only from wherever it is installed
         uv = shutil.which("uv")
         if not uv:
@@ -147,7 +221,9 @@ def wrap(cmd: list, env: dict, rw: list, ro: list = (), network: bool = False, c
             binds.append((uv, "/opt/uv-bin/uv"))
             cmd[0] = "/opt/uv-bin/uv"
     argv = bwrap_args([home, *rw], ro, network=network, cache=cache, python_dir=py, cwd=cwd, passwd=_passwd(home),
-                      binds=binds)
+                      binds=binds, keep_net_admin=helper is not None)
+    if helper:
+        cmd = ["/usr/bin/python3", helper, *cmd]
     return argv + ["--", *cmd], env, None
 
 
