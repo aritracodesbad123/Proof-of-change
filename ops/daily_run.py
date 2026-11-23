@@ -5793,6 +5793,12 @@ def _same_claim_differed(probe_results) -> bool:
         for obs in it.get("observations") or []:
             if obs.get("state") != "differs" or obs.get("pr_only") == "noisy":
                 continue
+            if obs.get("base_description"):
+                continue
+            claim = next((c for c in it.get("claims") or []
+                          if isinstance(c, dict) and c.get("id") == obs.get("claim")), None)
+            if probes.not_a_same_promise(claim):
+                continue
             if obs.get("label") == FindingLabel.FALSE_CLAIM.value or expects.get(obs.get("claim")) == "same":
                 return True
     return False

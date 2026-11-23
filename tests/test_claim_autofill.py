@@ -94,15 +94,19 @@ def test_saved_miss_rejected_three_blank_probes():
 
 def test_three_blank_probes_are_filled_and_get_past_boundary_inputs(tmp_path, monkeypatch):
     out = _gen(tmp_path, [PROBES], monkeypatch)
+    # C2 ("Previously, the regex ... causing adjacent tags to be merged") describes the old bug.
+    # It is not a promise that behaviour stays the same, so it is not attached as a same claim.
     assert not any(model_probes.UNLINKED_PROBE in e for e in out["errors"])
     assert [x["id"] for x in out["claims_filled"]] == ["p1", "p2", "p3"]
-    assert all(x["claims"] == ["C1", "C2", "C3"] for x in out["claims_filled"])
+    assert all(x["claims"] == ["C1", "C3"] for x in out["claims_filled"])
+    c2 = next(c for c in out["claims"] if c["id"] == "C2")
+    assert c2["expect"] == "base" and c2["testable"] is False
     assert set(out["forced_boundary_inputs"]) == {"p1", "p2", "p3"}
     for pid, key in (("p1", "single"), ("p2", "adjacent"), ("p3", "spaced")):
         assert out["forced_boundary_inputs"][pid] == [f"{key}_pb_space", f"{key}_pb_text", f"{key}_pb_newline"]
     specs = [_spec(x["path"]) for x in out["probes"]]
-    assert [[c["id"] for c in s["claims"]] for s in specs] == [["C1", "C2", "C3"]] * 3
-    assert [c["expect"] for c in specs[0]["claims"]] == ["differs", "same", "differs"]
+    assert [[c["id"] for c in s["claims"]] for s in specs] == [["C1", "C3"]] * 3
+    assert [c["expect"] for c in specs[0]["claims"]] == ["differs", "differs"]
 
 
 def test_an_unknown_claim_id_is_still_rejected(tmp_path, monkeypatch):
