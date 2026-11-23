@@ -21,13 +21,13 @@ python -m bench.report bench/results/2026-10-22 --out /tmp/evidence
 
 `--out` writes the two files in another directory. The results folder is only read.
 
-Saved records, including a checkout of the runs branch, use the same rates without a results folder:
+Saved records use the same verdict counts, and the hand-check rates when `data/hand_checks.jsonl` is present:
 
 ```bash
 python -m bench.report --records /path/to/saved-records --out /tmp/saved-report
 ```
 
-That only reads `record.json` files. It does not write inside that directory, and it does not change a stored verdict.
+That only reads `record.json` files. It does not write inside that directory, and it does not change a stored verdict. Hand checks are read only from `data/hand_checks.jsonl` in this repository. A missing file is reported as not available. A row counts only when the repository, pull request, and head commit all match.
 
 ## What it reads
 

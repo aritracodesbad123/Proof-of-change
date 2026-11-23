@@ -76,10 +76,12 @@ It writes `summary.json` and `summary.md`. For each arm it reports, always with 
 regression), bugs caught (overall and on tests-miss cases), false alarms (needs_attention on a safe case),
 verification coverage, the could-not-verify or not-run rate, setup failures, runtime, model calls and cost.
 The case list and n come from `run_meta.json`; a case with no result file counts as not run.
-Under the table, wrong passes repeat the wrong-approval count (a verified result on a known regression).
-False confirmations are verified pull requests whose hand check says the change is a real break
-(`break` or `needs_attention`). A pull request with several records counts once. A verified pull
-request with no hand check is left out of that rate and counted as unchecked. A case that did
+Wrong approvals in the table stay the verified results on a known regression.
+Under the table, hand checks come from `data/hand_checks.jsonl` when that file is present.
+A wrong pass is a verified pull request whose matching row says it really breaks something.
+The false-confirmation rate is those pull requests over the verified pull requests with a matching row.
+A verified pull request with no matching row is unlabelled, not a pass. A missing file is reported
+as hand checks not available. A case that did
 not run or ended could_not_verify is a miss, never a catch. Probe uplift is the number of regression cases that
 tests+probes caught and tests-only did not; the reverse count is shown too. A case is compared only when both
 arms ran on the same commits, both installs succeeded, tests-only reached a decided verdict, and the

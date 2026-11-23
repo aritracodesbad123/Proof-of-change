@@ -842,6 +842,9 @@ def main(argv=None) -> int:
     ap.add_argument("--records", default=None,
                     help="read saved record.json files under this directory and print the rate report. "
                          "The directory is not written.")
+    ap.add_argument("--hand-checks", default=None,
+                    help="hand-check rows (default: data/hand_checks.jsonl in this repository). "
+                         "A missing file is reported, not treated as a pass.")
     args = ap.parse_args(argv)
     if args.records:
         if args.results:
@@ -850,7 +853,7 @@ def main(argv=None) -> int:
         if not source.is_dir():
             print(f"{source} is not a directory", file=sys.stderr)
             return 2
-        text = saved_report(source)
+        text = saved_report(source, checks=Path(args.hand_checks) if args.hand_checks else None)
         if args.out:
             out = Path(args.out)
             if _inside(out, source):

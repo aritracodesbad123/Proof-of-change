@@ -1,37 +1,41 @@
-# False confirmations sit next to wrong passes
+# False confirmations come from the hand-check file
 
 ## What changed
 
-The benchmark summary now states a false-confirmation rate beside the existing wrong-pass count.
-A wrong pass is a verified result on a known regression, the count the summary already calls a wrong
-approval. A false confirmation is a pull request the tool called verified when the hand check says it
-is a real break. The hand check uses labels the records already store: `break` and `needs_attention`.
+The false-confirmation rate and the wrong-pass count read `data/hand_checks.jsonl` in this repository.
+They do not read a label off a saved record. A missing file is reported as hand checks not available.
+A malformed row stops the report.
 
-A pull request with several records counts once in both rates. A verified pull request with no hand
-check is left out of the false-confirmation rate and counted on its own as unchecked. The same note
-is printed for a folder of saved records (`python -m bench.report --records`). That command only reads
-the records.
+A row applies only when the repository, the pull request number, and the head commit all match the
+record. A record at a different head is unlabelled. An older row is not used for a newer head.
+Several records of one pull request at one head count once.
+
+A wrong pass is a verified pull request whose matching row has `broken` set to true. The
+false-confirmation rate is that count over the verified pull requests that have a matching row.
+Verified pull requests with no matching row are listed as unlabelled. They are not counted as passes.
+`tool_verdict` and `score` are notes and do not change the rate.
 
 ## Why
 
-Wrong passes use the benchmark's known-regression label. A hand check can disagree with that label,
-and a saved record often has a hand check without being in the regression list. The rate has to show
-those confirmed mistakes without treating an unchecked verified pull request as a success or a failure.
+Saved records do not carry hand checks, so a rate that looked there was empty. The rows belong in
+this repository so a later run can reproduce the rate without another checkout. Matching the head
+commit stops an older check from labelling a newer commit of the same pull request.
 
 ## Decision
 
-Keep the stored verdict. Do not rewrite a record. Count each pull request once. Use only the hand-check
-labels already on the record. Leave a verified pull request with no hand check out of the denominator
-and report how many were left out.
+Keep the stored verdict. Do not rewrite a record. Do not add the hand-check file in this change.
+Count each pull request once. Leave a verified pull request with no matching row out of the
+denominator and say that it is unlabelled.
 
 ## Alternatives and tradeoffs
 
-Counting every record would make one pull request that was checked twice look like two mistakes.
-Putting unchecked pull requests in the denominator would treat a missing hand check as a pass.
-Inventing a new hand-check label would not match the labels the records already use.
+Reading a label from the record would score nothing until those fields are filled in, and it would
+mix notes from a run with the hand check. Treating a missing row as a pass would hide pull requests
+nobody has checked. Using only the pull request number, without the head commit, would apply an old
+check to a commit it did not cover.
 
 ## What it means for you
 
-The summary table is unchanged. Under it, each arm shows wrong passes, false confirmations, and how
-many verified pull requests had no hand check. For a directory of saved records, the report also lists
-every stored verdict, once per record and once per pull request.
+The benchmark table is unchanged. Under it, the hand-check lines appear when `data/hand_checks.jsonl`
+is present, and the report says hand checks are not available when it is not. For a directory of
+saved records, the report still lists every stored verdict, once per record and once per pull request.
