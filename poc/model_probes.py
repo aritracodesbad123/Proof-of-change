@@ -83,6 +83,39 @@ def rewrite_probe(provider, ctx: dict, code: str, main_error: str, python_versio
     if why:
         return None, f"rewrite rejected: {why}"
     return new, None
+
+
+# One rewrite when a probe ran but its stdout was not observations. Same single call as a crash rewrite:
+# the caller uses this or rewrite_probe, never both, for one probe.
+OUTPUT_RETRY_PROMPT = """A probe you wrote ran, but its printed output could not be read as observations.
+You get the exact parse error and the output contract. Rewrite the probe so the last line of stdout is one
+JSON object {"observations": {"<name>": <JSON value>, ...}} and nothing else. Keep what it checks, the
+observation names it prints, and the claims. Do not print the dict itself, its Python repr, a bare object, or
+a traceback. Answer with JSON only: {"probes": [one probe with the same id, about, claims and the new code]}."""
+
+
+def rewrite_unparsed_probe(provider, ctx: dict, code: str, parse_error: str, raw_stdout: str,
+                           python_version: str | None, product: bool = False) -> tuple[str | None, str | None]:
+    """(new code, None) or (None, why not). One model call. The new code passes the same checks as a first answer."""
+    from poc.probes import OUTPUT_CONTRACT
+    prompt = OUTPUT_RETRY_PROMPT + (PRODUCT_PROBE_RULES if product else "") + (
+        python_rule(python_version) if python_version else "")
+    user = (f"Exact parse error: {parse_error}\n\nExpected output contract: {OUTPUT_CONTRACT}\n\n"
+            f"Probe code:\n{code}\n\nRejected stdout (last part):\n{(raw_stdout or '')[-MAX_ERROR_CHARS:]}")
+    try:
+        resp = provider.complete_json("probes", prompt, user, PROBES_SCHEMA, ctx)
+    except ProviderError as e:
+        return None, f"output retry failed: {e}"
+    got = ((resp or {}).get("probes") or [None])[0]
+    if not isinstance(got, dict):
+        return None, "the output retry answer had no probe"
+    new = _unescape_code(got.get("code"))
+    why = validate_probe({"id": "rewrite", "code": new, "claims": []}, set(), python_version)
+    if why:
+        return None, f"output retry rejected: {why}"
+    return new, None
+
+
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 

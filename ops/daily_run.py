@@ -6352,7 +6352,8 @@ def probe_launcher(venv: Path, path: Path):
 _CONTREE_CHECKOUTS: dict = {}   # "settings": the test settings for this PR's Contree probe runs (product checks)
 
 
-def _contree_probe_once(side: str, path: Path, timeout: int, literal_output: bool = False) -> tuple[dict, str, float]:
+def _contree_probe_once(side: str, path: Path, timeout: int, literal_output: bool = False,
+                        covers=None, raw_path: Path | None = None) -> tuple[dict, str, float]:
     """Run one probe file on a Contree checkpoint (upload probe, disposable run)."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -6371,7 +6372,10 @@ def _contree_probe_once(side: str, path: Path, timeout: int, literal_output: boo
     if code is None:
         code = "error"
     log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
-    return probes.observations_of(out, code, literal_output), log, secs
+    obs = probes.observations_of(out, code, literal_output, covers)
+    if raw_path is not None and probes.output_parse_failure(obs):
+        probes.keep_rejected_stdout(raw_path, out, err)
+    return obs, log, secs
 
 
 def probe_python_version(a) -> str | None:
@@ -6543,9 +6547,60 @@ def _main_error(it: dict, prdir: Path) -> str:
     return json.dumps(runs[0].get(probes.PROBE_ERROR)) if runs and isinstance(runs[0], dict) else ""
 
 
+def _unparsed_both_sides(it: dict) -> str | None:
+    """The exact parse error when every run on both sides printed no observations, else None.
+
+    One side that did parse is left alone: a retry must not replace a real difference. A non-zero exit or a
+    timeout is a crash, handled by the existing rewrite, not this path."""
+    runs = it.get("runs") or {}
+    msgs = []
+    for side in ("main", "pr"):
+        rs = runs.get(side) or []
+        if not rs:
+            return None
+        for obs in rs:
+            msg = probes.output_parse_failure(obs)
+            if not msg:
+                return None
+            msgs.append(msg)
+    uniq = list(dict.fromkeys(msgs))
+    return uniq[0] if len(uniq) == 1 else "; ".join(uniq)
+
+
+def _keep_rejected_probe(path: Path, prdir: Path) -> Path:
+    """Copy the probe that was rejected. The original file is left in place. A second copy is not overwritten."""
+    dest_dir = Path(prdir) / "model-probes"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / f"{path.stem}.rejected.py"
+    if not dest.exists():
+        dest.write_text(path.read_text())
+    return dest
+
+
+def _rejected_stdout(prdir: Path, probe_id) -> str:
+    d = Path(prdir) / "model-probes"
+    if not d.is_dir() or not probe_id:
+        return ""
+    parts = []
+    for p in sorted(d.glob(f"{probe_id}.rejected-*.stdout")):
+        parts.append(p.read_text(errors="replace"))
+    return "\n".join(parts)
+
+
+def _rel_to_run(path: Path, prdir: Path) -> str:
+    try:
+        return str(Path(path).resolve().relative_to(Path(prdir).resolve()))
+    except ValueError:
+        return Path(path).name
+
+
 def rewrite_crashed_probes(items: list, prdir: Path, a, run_one) -> dict | None:
-    """One rewrite for each AI-written probe that crashed on every main-side run (probes.crash_reason), with its
-    main-side error fed back. The rewrite is frozen before its own PR-side runs and replaces the crashed probe in
+    """One rewrite for each AI-written probe that crashed on every main-side run (probes.crash_reason).
+
+    When every run on both sides failed to parse, that one rewrite is told the exact parse error and the output
+    contract, and the rejected probe file and raw stdout are kept under model-probes/. Any other crash uses the
+    existing crash rewrite. A probe gets one of those calls, never both, and never a second call. The re-run uses
+    the same probe timeout. The rewrite is frozen before its own PR-side runs and replaces the crashed probe in
     items. Returns {"before": the items without any rewrite, "probes": notes}, or None when nothing crashed. The
     verdict can only stay or go down: gate() takes the lower of the verdicts with and without the rewrite."""
     crashed = [i for i, it in enumerate(items) if it.get("source") == "model" and probes.crash_reason(it)]
@@ -6565,8 +6620,21 @@ def rewrite_crashed_probes(items: list, prdir: Path, a, run_one) -> dict | None:
         if not sep:
             note["result"] = "not rewritten: the probe file has no harness header"
             continue
-        new_code, why = model_probes.rewrite_probe(a.provider, {"repo": None, "pr": None, "rewrite_of": it.get("id")},
-                                                   code, _main_error(it, prdir), version, product=True)
+        parse_msg = _unparsed_both_sides(it)
+        ctx = {"repo": None, "pr": None, "rewrite_of": it.get("id")}
+        if parse_msg:
+            rejected = _keep_rejected_probe(old, prdir)
+            raw_names = sorted(p.name for p in (Path(prdir) / "model-probes").glob(
+                f"{it.get('id')}.rejected-*.stdout")) if (Path(prdir) / "model-probes").is_dir() else []
+            note["parse_error"] = parse_msg
+            note["rejected_probe"] = _rel_to_run(rejected, prdir)
+            if raw_names:
+                note["rejected_stdout"] = raw_names
+            new_code, why = model_probes.rewrite_unparsed_probe(
+                a.provider, ctx, code, parse_msg, _rejected_stdout(prdir, it.get("id")), version, product=True)
+        else:
+            new_code, why = model_probes.rewrite_probe(a.provider, ctx, code, _main_error(it, prdir), version,
+                                                       product=True)
         if why:
             note["result"] = f"not rewritten: {why}"
             continue
@@ -6582,7 +6650,8 @@ def rewrite_crashed_probes(items: list, prdir: Path, a, run_one) -> dict | None:
             continue
         new["rewrite_of"] = it.get("id")
         items[i] = new
-        note["result"] = "rewritten once" + (" (still crashes on main)" if probes.crash_reason(new) else "")
+        kind = "rewritten once for unparsed output" if parse_msg else "rewritten once"
+        note["result"] = kind + (" (still crashes on main)" if probes.crash_reason(new) else "")
     return {"before": before, "probes": notes}
 
 
@@ -6647,11 +6716,14 @@ def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard, 
     files: dict = {"main": [], "pr": []}
     per_run = []
     timeout = int(spec.get("timeout_s", 120))
+    covers = probes.cover_patterns(spec)
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             if side == "pr" and guard:
                 guard(path)
-            obs, log, secs = _contree_probe_once(side, path, timeout, literal_output)
+            raw = (Path(outdir) / "model-probes" / f"{spec['id']}.rejected-{side}-{i}.stdout"
+                   if source == "model" else None)
+            obs, log, secs = _contree_probe_once(side, path, timeout, literal_output, covers, raw)
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             probes.write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
