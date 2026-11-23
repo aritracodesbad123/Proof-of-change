@@ -1,0 +1,1246 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-prettytable-prettytable-558-8a48dedc04ca-2026-11-23",
+ "date_ist": "2026-11-23 11:54 IST",
+ "run_date": "2026-11-23",
+ "who": "ops/daily_run.py",
+ "repo": "prettytable/prettytable",
+ "library": "prettytable",
+ "pr": {
+  "repo": "prettytable/prettytable",
+  "number": 558,
+  "url": "https://github.com/prettytable/prettytable/pull/558",
+  "title": "Expose a read-only shape property for stored table dimensions",
+  "base_sha": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "8a48dedc04cadfb163718ff0f1e0b530e34a1352",
+  "merge_commit": "c2d1edab5bdd5adc78096c90f30eee364ed930fc",
+  "tested_main_sha": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Aschenbath",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-22T14:43:16Z",
+ "updated_at_ist": "2026-11-22 20:13 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-23 11:54 IST",
+ "files": {
+  "all": [
+   "README.md",
+   "src/prettytable/prettytable.py",
+   "tests/test_shape.py"
+  ],
+  "package_py": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled": [],
+  "other": [
+   "README.md",
+   "tests/test_shape.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_shape.py, tests/test_prettytable.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "218 passed in 0.92s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "221 passed in 0.96s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "218 passed in 0.89s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "221 passed in 0.83s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 218,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "218 passed in 0.84s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 221,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "221 passed in 0.87s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "prettytable-558/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "src/prettytable/prettytable.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 2.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "57cf53720175804af12b2ecc854b98b3b3efc721",
+ "route": "source-pair",
+ "current_head_sha": "8a48dedc04cadfb163718ff0f1e0b530e34a1352",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 89.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: prettytable python setup install instructions https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python documentation install https://github.com/prettytable/prettytable site:github.com/prettytable/prettytable",
+   "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/prettytable/prettytable site:pypi.org",
+   "Source: prettytable/pyproject.toml at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/main/pyproject.toml",
+   "Source: prettytable/README.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/master/README.md",
+   "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: Unable to import prettytable \u00b7 Issue #120 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/issues/120",
+   "Source: prettytable/.gitignore at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/prettytable/prettytable/blob/main/.gitignore",
+   "Setup plan: the PR changes install docs (README.md); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: wcwidth is noted, installed with the project.",
+   "Setup plan: install pytest>=9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-lazy-fixtures (listed in the tests extra) on main and pr.",
+   "Setup plan: install mypy==2.4.0 (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install types-colorama (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install prek (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-lazy-fixtures 1.4.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed mypy 2.4.0 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed types-colorama 0.4.15.20260508 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed prek 0.5.11 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   ".github/workflows/lint.yml",
+   ".github/workflows/require-pr-label.yml",
+   ".github/workflows/release-drafter.yml",
+   ".github/workflows/release.yml",
+   ".github/workflows/labels.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "README.md"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "wcwidth>=0.3.5",
+     "name": "wcwidth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-lazy-fixtures",
+     "name": "pytest-lazy-fixtures",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.4.0",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-colorama",
+     "name": "types-colorama",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "prek",
+     "name": "prek",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest>=9",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "mypy==2.4.0",
+    "types-colorama",
+    "prek"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 7 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest>=9, pytest-cov, pytest-lazy-fixtures, mypy==2.4.0, types-colorama, prek. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 6
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest>=9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-lazy-fixtures",
+    "requirement": "pytest-lazy-fixtures",
+    "version": "1.4.1",
+    "versions": {
+     "main": "1.4.1",
+     "pr": "1.4.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==2.4.0",
+    "version": "2.4.0",
+    "versions": {
+     "main": "2.4.0",
+     "pr": "2.4.0"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-colorama",
+    "requirement": "types-colorama",
+    "version": "0.4.15.20260508",
+    "versions": {
+     "main": "0.4.15.20260508",
+     "pr": "0.4.15.20260508"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "prek",
+    "requirement": "prek",
+    "version": "0.5.11",
+    "versions": {
+     "main": "0.5.11",
+     "pr": "0.5.11"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+  "pr_sha": "c2d1edab5bdd5adc78096c90f30eee364ed930fc",
+  "merge_commit": "c2d1edab5bdd5adc78096c90f30eee364ed930fc",
+  "merge_parents": [
+   "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+   "8a48dedc04cadfb163718ff0f1e0b530e34a1352"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 49c0ecbd0c9e (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit c2d1edab5bdd (refs/pull/558/merge) of head 8a48dedc04ca"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The class/table exposes a read\u2011only property named `shape` that returns a tuple `(row_count, column_count)`.",
+    "source_quote": "Return (row_count, column_count) through a typed read-only shape property.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The value of the `shape` property updates automatically when the number of rows or columns changes, including when the table is empty.",
+    "source_quote": "The value follows the stored data as rows and columns change, including empty tables",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Headers and display filters do not influence the value returned by the `shape` property.",
+    "source_quote": "headers and display filters do not affect it.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The documentation for the `shape` property explains its relationship to the existing `rowcount` and `colcount` attributes.",
+    "source_quote": "Document the relationship to existing rowcount and colcount attributes.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "d8455ab48cc92c7f367732dc58e148ada5102a65b215162548a7f4ca1b284e3f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-23T06:26:05.939979+00:00",
+    "inputs_sha256": "adda88936eeec31241e1775c636f8fecfa805f3dd9d7ab25b16fa24a34ae3396",
+    "inputs": {
+     "title_chars": 61,
+     "body_chars": 582,
+     "base_files": {
+      "src/prettytable/prettytable.py": "b8f66201e2e768c6de499a57bb95235d9b739967107e775a857736e942469649"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest",
+  "pytest-cov",
+  "pytest-lazy-fixtures"
+ ],
+ "pr_side_started_at": "2026-11-23T06:26:06.083737+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_prettytable.py"
+  ],
+  "pr": [
+   "tests/test_shape.py",
+   "tests/test_prettytable.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "prettytable",
+   "expected": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+   "installed": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+   "ok": true
+  },
+  "pr": {
+   "dist": "prettytable",
+   "expected": "c2d1edab5bdd5adc78096c90f30eee364ed930fc",
+   "installed": "c2d1edab5bdd5adc78096c90f30eee364ed930fc",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-lazy-fixtures"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "49c0ecbd0c9edd083081788df68f124dae7fab5d",
+ "comparison": {
+  "same": 218,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_shape::test_shape_describes_stored_data",
+   "tests.test_shape::test_shape_is_read_only",
+   "tests.test_shape::test_shape_tracks_mutations"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 221,
+   "pr": 221
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_shape::test_shape_describes_stored_data": "AttributeError: shape",
+   "tests.test_shape::test_shape_is_read_only": "Failed: DID NOT RAISE AttributeError",
+   "tests.test_shape::test_shape_tracks_mutations": "AttributeError: shape"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "d8455ab48cc92c7f367732dc58e148ada5102a65b215162548a7f4ca1b284e3f",
+    "target": "prettytable/prettytable#558",
+    "about": "Test the shape property and related claims",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The class/table exposes a read\u2011only property named `shape` that returns a tuple `(row_count, column_count)`.",
+      "covers": [
+       "c1.shape_access"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The value of the `shape` property updates automatically when the number of rows or columns changes, including when the table is empty.",
+      "covers": [
+       "c2.shape0",
+       "c2.shape1",
+       "c2.shape2",
+       "c2.shape3"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Headers and display filters do not influence the value returned by the `shape` property.",
+      "covers": [
+       "c3.shape_base",
+       "c3.shape_header_false",
+       "c3.shape_header_true",
+       "c3.shape_fields_set",
+       "c3.shape_slice_set"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The documentation for the `shape` property explains its relationship to the existing `rowcount` and `colcount` attributes.",
+      "covers": [
+       "c4.shape_docstring",
+       "c4.shape_doc_mentions_rowcount",
+       "c4.shape_doc_mentions_colcount"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "c1.shape_access": "AttributeError",
+        "c2.shape0": "AttributeError",
+        "c2.shape1": "AttributeError",
+        "c2.shape2": "AttributeError",
+        "c2.shape3": "AttributeError",
+        "c3.shape_base": "AttributeError",
+        "c3.shape_header_false": "AttributeError",
+        "c3.shape_header_true": "AttributeError",
+        "c3.shape_fields_set": "AttributeError",
+        "c3.shape_slice_set": "AttributeError",
+        "c4.shape_docstring": "TypeError",
+        "c4.shape_doc_mentions_rowcount": "TypeError",
+        "c4.shape_doc_mentions_colcount": "TypeError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.shape_access": "AttributeError",
+        "c2.shape0": "AttributeError",
+        "c2.shape1": "AttributeError",
+        "c2.shape2": "AttributeError",
+        "c2.shape3": "AttributeError",
+        "c3.shape_base": "AttributeError",
+        "c3.shape_header_false": "AttributeError",
+        "c3.shape_header_true": "AttributeError",
+        "c3.shape_fields_set": "AttributeError",
+        "c3.shape_slice_set": "AttributeError",
+        "c4.shape_docstring": "TypeError",
+        "c4.shape_doc_mentions_rowcount": "TypeError",
+        "c4.shape_doc_mentions_colcount": "TypeError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.shape_access": "AttributeError",
+        "c2.shape0": "AttributeError",
+        "c2.shape1": "AttributeError",
+        "c2.shape2": "AttributeError",
+        "c2.shape3": "AttributeError",
+        "c3.shape_base": "AttributeError",
+        "c3.shape_header_false": "AttributeError",
+        "c3.shape_header_true": "AttributeError",
+        "c3.shape_fields_set": "AttributeError",
+        "c3.shape_slice_set": "AttributeError",
+        "c4.shape_docstring": "TypeError",
+        "c4.shape_doc_mentions_rowcount": "TypeError",
+        "c4.shape_doc_mentions_colcount": "TypeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "c1.shape_access": [
+         0,
+         0
+        ],
+        "c2.shape0": [
+         0,
+         0
+        ],
+        "c2.shape1": [
+         0,
+         1
+        ],
+        "c2.shape2": [
+         1,
+         1
+        ],
+        "c2.shape3": [
+         2,
+         1
+        ],
+        "c3.shape_base": [
+         2,
+         1
+        ],
+        "c3.shape_header_false": [
+         2,
+         1
+        ],
+        "c3.shape_header_true": [
+         2,
+         1
+        ],
+        "c3.shape_fields_set": [
+         2,
+         1
+        ],
+        "c3.shape_slice_set": null,
+        "c4.shape_docstring": "Return the number of stored data rows and columns.",
+        "c4.shape_doc_mentions_rowcount": false,
+        "c4.shape_doc_mentions_colcount": false
+       }
+      },
+      {
+       "probe.error": {
+        "c1.shape_access": [
+         0,
+         0
+        ],
+        "c2.shape0": [
+         0,
+         0
+        ],
+        "c2.shape1": [
+         0,
+         1
+        ],
+        "c2.shape2": [
+         1,
+         1
+        ],
+        "c2.shape3": [
+         2,
+         1
+        ],
+        "c3.shape_base": [
+         2,
+         1
+        ],
+        "c3.shape_header_false": [
+         2,
+         1
+        ],
+        "c3.shape_header_true": [
+         2,
+         1
+        ],
+        "c3.shape_fields_set": [
+         2,
+         1
+        ],
+        "c3.shape_slice_set": null,
+        "c4.shape_docstring": "Return the number of stored data rows and columns.",
+        "c4.shape_doc_mentions_rowcount": false,
+        "c4.shape_doc_mentions_colcount": false
+       }
+      },
+      {
+       "probe.error": {
+        "c1.shape_access": [
+         0,
+         0
+        ],
+        "c2.shape0": [
+         0,
+         0
+        ],
+        "c2.shape1": [
+         0,
+         1
+        ],
+        "c2.shape2": [
+         1,
+         1
+        ],
+        "c2.shape3": [
+         2,
+         1
+        ],
+        "c3.shape_base": [
+         2,
+         1
+        ],
+        "c3.shape_header_false": [
+         2,
+         1
+        ],
+        "c3.shape_header_true": [
+         2,
+         1
+        ],
+        "c3.shape_fields_set": [
+         2,
+         1
+        ],
+        "c3.shape_slice_set": null,
+        "c4.shape_docstring": "Return the number of stored data rows and columns.",
+        "c4.shape_doc_mentions_rowcount": false,
+        "c4.shape_doc_mentions_colcount": false
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "differs",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "c1.shape_access": "AttributeError",
+       "c2.shape0": "AttributeError",
+       "c2.shape1": "AttributeError",
+       "c2.shape2": "AttributeError",
+       "c2.shape3": "AttributeError",
+       "c3.shape_base": "AttributeError",
+       "c3.shape_header_false": "AttributeError",
+       "c3.shape_header_true": "AttributeError",
+       "c3.shape_fields_set": "AttributeError",
+       "c3.shape_slice_set": "AttributeError",
+       "c4.shape_docstring": "TypeError",
+       "c4.shape_doc_mentions_rowcount": "TypeError",
+       "c4.shape_doc_mentions_colcount": "TypeError"
+      },
+      "pr": {
+       "c1.shape_access": [
+        0,
+        0
+       ],
+       "c2.shape0": [
+        0,
+        0
+       ],
+       "c2.shape1": [
+        0,
+        1
+       ],
+       "c2.shape2": [
+        1,
+        1
+       ],
+       "c2.shape3": [
+        2,
+        1
+       ],
+       "c3.shape_base": [
+        2,
+        1
+       ],
+       "c3.shape_header_false": [
+        2,
+        1
+       ],
+       "c3.shape_header_true": [
+        2,
+        1
+       ],
+       "c3.shape_fields_set": [
+        2,
+        1
+       ],
+       "c3.shape_slice_set": null,
+       "c4.shape_docstring": "Return the number of stored data rows and columns.",
+       "c4.shape_doc_mentions_rowcount": false,
+       "c4.shape_doc_mentions_colcount": false
+      },
+      "diffs": [
+       {
+        "field": "c1.shape_access",
+        "main": "AttributeError",
+        "pr": [
+         0,
+         0
+        ]
+       },
+       {
+        "field": "c2.shape0",
+        "main": "AttributeError",
+        "pr": [
+         0,
+         0
+        ]
+       },
+       {
+        "field": "c2.shape1",
+        "main": "AttributeError",
+        "pr": [
+         0,
+         1
+        ]
+       },
+       {
+        "field": "c2.shape2",
+        "main": "AttributeError",
+        "pr": [
+         1,
+         1
+        ]
+       },
+       {
+        "field": "c2.shape3",
+        "main": "AttributeError",
+        "pr": [
+         2,
+         1
+        ]
+       },
+       {
+        "field": "c3.shape_base",
+        "main": "AttributeError",
+        "pr": [
+         2,
+         1
+        ]
+       },
+       {
+        "field": "c3.shape_fields_set",
+        "main": "AttributeError",
+        "pr": [
+         2,
+         1
+        ]
+       },
+       {
+        "field": "c3.shape_header_false",
+        "main": "AttributeError",
+        "pr": [
+         2,
+         1
+        ]
+       },
+       {
+        "field": "c3.shape_header_true",
+        "main": "AttributeError",
+        "pr": [
+         2,
+         1
+        ]
+       },
+       {
+        "field": "c3.shape_slice_set",
+        "main": "AttributeError",
+        "pr": null
+       },
+       {
+        "field": "c4.shape_doc_mentions_colcount",
+        "main": "TypeError",
+        "pr": false
+       },
+       {
+        "field": "c4.shape_doc_mentions_rowcount",
+        "main": "TypeError",
+        "pr": false
+       },
+       {
+        "field": "c4.shape_docstring",
+        "main": "TypeError",
+        "pr": "Return the number of stored data rows and columns."
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "d8455ab48cc92c7f367732dc58e148ada5102a65b215162548a7f4ca1b284e3f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-23T06:26:05.939979+00:00",
+     "inputs_sha256": "adda88936eeec31241e1775c636f8fecfa805f3dd9d7ab25b16fa24a34ae3396",
+     "inputs": {
+      "title_chars": 61,
+      "body_chars": 582,
+      "base_files": {
+       "src/prettytable/prettytable.py": "b8f66201e2e768c6de499a57bb95235d9b739967107e775a857736e942469649"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-23T06:26:06.083737+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/prettytable/prettytable.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json",
+     "changed_lines_touched": 1
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 2,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1, C2, C3, C4 expect a difference but no observation matches (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C2, C3, C4 expect a difference but no observation matches (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "README.md",
+   "tests/test_shape.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 86.7,
+  "tests": 9.0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 15014,
+  "output_tokens": 10274,
+  "thinking_tokens": 9084,
+  "cost_usd": 0.013751,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.013751,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 86.7,
+   "tests": 9.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00578,
+  "total_cost_usd": 0.019531,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-23/57cf537/prettytable-558"
+ }
+}
