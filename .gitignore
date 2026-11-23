@@ -9,8 +9,9 @@ build/
 dist/
 node_modules/
 console/web/dist/
-# run outputs: large and machine-specific
-/data/
+# run outputs: large and machine-specific. The hand-check file is the one tracked file here.
+/data/*
+!/data/hand_checks.jsonl
 /runs/
 /cache/
 eval-results*.json

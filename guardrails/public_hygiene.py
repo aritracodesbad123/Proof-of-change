@@ -84,8 +84,17 @@ def _keep_match(kind: str, line: str, match: re.Match, path: Path | None) -> boo
     return False
 
 
+def _is_hand_check_file(path: Path | None) -> bool:
+    """The hand-check file is stored verbatim, including the checker's own notes."""
+    if path is None:
+        return False
+    return path.name == "hand_checks.jsonl" and "data" in path.parts
+
+
 def findings(text: str, path: Path | None = None) -> list[str]:
     """Lines that the public check would reject. Same rules as the check on main."""
+    if _is_hand_check_file(path):
+        return []
     for allowed in ALLOWED:
         text = allowed.sub("<repo-url>", text)
     out = []

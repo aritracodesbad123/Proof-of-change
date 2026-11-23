@@ -6,9 +6,10 @@ The false-confirmation rate and the wrong-pass count read `data/hand_checks.json
 They do not read a label off a saved record. A missing file is reported as hand checks not available.
 A malformed row stops the report.
 
-A row applies only when the repository, the pull request number, and the head commit all match the
-record. A record at a different head is unlabelled. An older row is not used for a newer head.
-Several records of one pull request at one head count once.
+A row applies only when the repository, the pull request number, and the head commit all match that
+record. Every verified record of a pull request is checked, not only the latest. A label for one
+head is not applied to a record at another head. The pull request counts once. The verdict table
+still uses the latest record.
 
 A wrong pass is a verified pull request whose matching row has `broken` set to true. The
 false-confirmation rate is that count over the verified pull requests that have a matching row.
@@ -23,7 +24,7 @@ commit stops an older check from labelling a newer commit of the same pull reque
 
 ## Decision
 
-Keep the stored verdict. Do not rewrite a record. Do not add the hand-check file in this change.
+Keep the stored verdict. Do not rewrite a record. Add `data/hand_checks.jsonl` unchanged.
 Count each pull request once. Leave a verified pull request with no matching row out of the
 denominator and say that it is unlabelled.
 

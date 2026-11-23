@@ -20,9 +20,7 @@ from bench.report import main as report_main
 
 FIXTURE = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "hand_checks" / "sample.jsonl"
 HEAD = "a" * 40
-OLDER = "c" * 40
 OTHER = "e" * 40
-BASE = "b" * 40
 
 
 def rec(repo, number, head, verdict, source):
@@ -51,17 +49,40 @@ def test_different_head_is_unlabelled():
     assert got["unlabelled"] == 1
 
 
-def test_older_check_is_not_borrowed():
+def test_earlier_verified_broken_head_counts_when_the_later_record_does_not():
     labels = load_hand_checks(FIXTURE)
     records = [
-        rec("o/r", 1, OLDER, "verified", "a-old.json"),
-        rec("o/r", 1, "f" * 40, "verified", "b-new.json"),
+        rec("o/r", 1, HEAD, "verified", "a.json"),
+        rec("o/r", 1, "f" * 40, "could_not_verify", "b.json"),
     ]
     got = assess_saved(records, labels)
     assert got["pull_requests"] == 1
+    assert got["pull_request_verdicts"]["could_not_verify"] == 1
+    assert got["pull_request_verdicts"]["verified"] == 0
+    assert got["wrong_passes"] == {"count": 1, "n": 1, "rate": 1.0}
+    assert got["false_confirmations"] == {"count": 1, "n": 1, "rate": 1.0}
+    assert got["unlabelled"] == 0
+    row = {"case_id": "only", "category": "known_safe", "outcome": "ran", "verdict": "could_not_verify"}
+    arm = arm_rates([row], {"only": records}, labels)
+    assert arm["false_confirmations"] == {"count": 1, "n": 1, "rate": 1.0}
+    assert arm["wrong_passes"]["count"] == 1
+
+
+def test_an_earlier_verified_record_does_not_borrow_a_later_head():
+    labels = load_hand_checks(FIXTURE)
+    records = [
+        rec("o/r", 1, "f" * 40, "verified", "a.json"),
+        rec("o/r", 1, HEAD, "could_not_verify", "b.json"),
+    ]
+    got = assess_saved(records, labels)
+    assert got["pull_request_verdicts"]["could_not_verify"] == 1
+    assert got["wrong_passes"]["count"] == 0
     assert got["false_confirmations"] == {"count": 0, "n": 0, "rate": None}
     assert got["unlabelled"] == 1
-    assert got["wrong_passes"]["count"] == 0
+    row = {"case_id": "only", "category": "known_safe", "outcome": "ran", "verdict": "could_not_verify"}
+    arm = arm_rates([row], {"only": records}, labels)
+    assert arm["wrong_passes"]["count"] == 0
+    assert arm["unlabelled"] == 1
 
 
 def test_two_records_at_the_same_head_count_once():
@@ -105,14 +126,13 @@ def test_missing_file_is_reported_and_a_file_beside_the_records_is_ignored(tmp_p
     slot = folder / "lib-1"
     slot.mkdir(parents=True)
     (slot / "record.json").write_text(json.dumps(rec("o/r", 1, HEAD, "verified", "record.json")))
-    (folder / "hand_checks.jsonl").write_text(FIXTURE.read_text())
+    (folder / "hand_checks.jsonl").write_text("not json\n")
     assert DEFAULT_HAND_CHECKS == Path(__file__).resolve().parents[1] / "data" / "hand_checks.jsonl"
-    text = saved_report(folder)
-    assert "Hand checks not available." in text
-    assert "Wrong passes:" not in text
-    assert "False confirmations:" not in text
     text = saved_report(folder, checks=tmp_path / "missing.jsonl")
     assert "Hand checks not available." in text
+    assert "Wrong passes:" not in text
+    text = saved_report(folder)
+    assert "Hand checks not available." not in text
 
 
 def test_malformed_row_is_rejected(tmp_path):

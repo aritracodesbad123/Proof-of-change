@@ -2,7 +2,8 @@
 
 Hand checks are read only from that file in this repository. A row applies to a saved record
 only when the repository, pull request number, and head commit all match. A record at another
-head stays unlabelled. An older row is not used for a newer head.
+head stays unlabelled. Every verified record of a pull request is checked, not only the latest.
+A label for one head is not applied to a record at another head.
 
 A wrong pass is a verified pull request whose matching row says it really breaks something
 (`broken` true). The false-confirmation rate is those pull requests over the verified pull
@@ -24,12 +25,14 @@ from bench.manifest import REGRESSION
 VERDICT_ORDER = ("verified", "needs_attention", "could_not_verify", "no_code_change")
 CHECKER_VERDICTS = frozenset({"verified", "needs_attention", "could_not_verify"})
 FIELDS = (
-    "repo", "pr", "head", "base", "date", "checker_verdict", "tool_verdict", "score",
-    "broken", "poc_commit", "source",
+    "repo", "pr", "head", "base", "date", "checker_verdict", "checker_note", "broken",
+    "tool_verdict", "score", "poc_commit", "source", "also_checked",
 )
 SHA = re.compile(r"^[0-9a-f]{40}$")
+POC_COMMIT = re.compile(r"^[0-9a-f]{7,40}$")
 REPO = re.compile(r"^[^/\s]+/[^/\s]+$")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+SCORES = frozenset({"agree", "false_alarm", "miss", "settled_abstention", "other"})
 DEFAULT_HAND_CHECKS = Path(__file__).resolve().parents[1] / "data" / "hand_checks.jsonl"
 
 
@@ -109,17 +112,24 @@ def _check_row(path: Path, line: int, row) -> tuple[str, int, str]:
         _fail(path, line, "date must be YYYY-MM-DD")
     if row["checker_verdict"] not in CHECKER_VERDICTS:
         _fail(path, line, "checker_verdict must be verified, needs_attention, or could_not_verify")
-    if not isinstance(row["tool_verdict"], str) or not row["tool_verdict"].strip():
-        _fail(path, line, "tool_verdict must be a note")
-    score = row["score"]
-    if isinstance(score, bool) or not isinstance(score, (str, int, float)) or (isinstance(score, str) and not score.strip()):
-        _fail(path, line, "score must be a note")
+    note = row["checker_note"]
+    if note is not None and not isinstance(note, str):
+        _fail(path, line, "checker_note must be text or null")
     if type(row["broken"]) is not bool:
         _fail(path, line, "broken must be true or false")
-    if not isinstance(row["poc_commit"], str) or not SHA.match(row["poc_commit"]):
-        _fail(path, line, "poc_commit must be a 40-character commit")
+    if row["tool_verdict"] is not None and row["tool_verdict"] not in CHECKER_VERDICTS:
+        _fail(path, line, "tool_verdict must be a verdict or null")
+    if row["score"] not in SCORES:
+        _fail(path, line, "score must be agree, false_alarm, miss, settled_abstention, or other")
+    commit = row["poc_commit"]
+    if commit is not None and (not isinstance(commit, str) or not POC_COMMIT.match(commit)):
+        _fail(path, line, "poc_commit must be a commit id or null")
     if not isinstance(row["source"], str) or not row["source"].strip():
         _fail(path, line, "source must be text")
+    earlier = row["also_checked"]
+    if earlier is not None and (
+            not isinstance(earlier, list) or any(not isinstance(item, str) or not DATE.match(item) for item in earlier)):
+        _fail(path, line, "also_checked must be a list of dates or null")
     return repo, pr, head
 
 
@@ -182,22 +192,31 @@ def assess_saved(records: list[dict], labels: dict | None) -> dict:
     record_counts = Counter(shown_verdict(rec) for rec in records)
     prs = collapse(records)
     pr_counts = Counter(row["verdict"] for row in prs)
-    verified = [row for row in prs if row["verified"]]
     available = labels is not None
     labelled = []
     wrong = []
     unlabelled = []
     if available:
-        for row in verified:
-            label = None
-            if row["repo"] and row["pr"] is not None and row["head"]:
-                label = labels.get((row["repo"], row["pr"], row["head"]))
-            if label is None:
-                unlabelled.append(row)
-            else:
-                labelled.append(row)
-                if label["broken"] is True:
-                    wrong.append(row)
+        grouped: dict[tuple, list[dict]] = {}
+        for rec in records:
+            grouped.setdefault(_pull_key(rec), []).append(rec)
+        for key in sorted(grouped):
+            verified_rows = [rec for rec in grouped[key] if shown_verdict(rec) == "verified"]
+            if not verified_rows:
+                continue
+            matched = []
+            for rec in verified_rows:
+                repo, number, head = record_identity(rec)
+                if repo and number is not None and head:
+                    label = labels.get((repo, number, head))
+                    if label is not None:
+                        matched.append((repo, number, label))
+            if not matched:
+                unlabelled.append(key)
+                continue
+            labelled.append(key)
+            if any(label["broken"] is True for _repo, _number, label in matched):
+                wrong.append(matched[0][0] + "#" + str(matched[0][1]))
     return {
         "available": available,
         "record_verdicts": {name: record_counts.get(name, 0) for name in VERDICT_ORDER},
@@ -207,6 +226,7 @@ def assess_saved(records: list[dict], labels: dict | None) -> dict:
         "wrong_passes": rate(len(wrong), len(labelled)) if available else None,
         "false_confirmations": rate(len(wrong), len(labelled)) if available else None,
         "unlabelled": len(unlabelled) if available else None,
+        "wrong_pass_prs": wrong if available else [],
     }
 
 
@@ -235,31 +255,38 @@ def records_by_case(root: Path | None) -> dict[str, list[dict]]:
     return found
 
 
-def _case_label(records: list[dict], labels: dict):
-    """The hand-check row when every record of the case names the same head and that row exists."""
-    identities = []
+def _matched_labels(records: list[dict], labels: dict) -> list[dict]:
+    """Hand-check rows for verified records whose repository, pull request, and head all match."""
+    matched = []
     for rec in records:
+        if shown_verdict(rec) != "verified":
+            continue
         repo, number, head = record_identity(rec)
         if repo and number is not None and head:
-            identities.append((repo, number, head))
-    distinct = set(identities)
-    if len(distinct) != 1:
-        return None
-    return labels.get(identities[0])
+            label = labels.get((repo, number, head))
+            if label is not None:
+                matched.append(label)
+    return matched
 
 
 def arm_rates(rows: list[dict], by_case: dict[str, list[dict]], labels: dict) -> dict:
-    """False confirmations for one arm. Each case is one pull request. Record fields are not labels."""
+    """False confirmations for one arm. Each case is one pull request. Record fields are not labels.
+
+    Every verified record of the case is checked. One matching broken label makes the case a wrong pass.
+    """
     wrong = labelled = unlabelled = 0
     for row in rows:
-        if row.get("outcome") != "ran" or row.get("verdict") != "verified":
+        recs = by_case.get(row.get("case_id"), [])
+        verified_recs = [rec for rec in recs if shown_verdict(rec) == "verified"]
+        result_verified = row.get("outcome") == "ran" and row.get("verdict") == "verified"
+        if not verified_recs and not result_verified:
             continue
-        label = _case_label(by_case.get(row.get("case_id"), []), labels)
-        if label is None:
+        matched = _matched_labels(verified_recs, labels)
+        if not matched:
             unlabelled += 1
             continue
         labelled += 1
-        if label["broken"] is True:
+        if any(label["broken"] is True for label in matched):
             wrong += 1
     return {
         "wrong_passes": rate(wrong, labelled),
@@ -296,8 +323,9 @@ def accuracy_paragraph(accuracy: dict) -> str:
         return "\nHand checks not available.\n"
     lines = [
         "",
-        "Hand checks apply only when the repository, pull request, and head commit all match. "
-        "A different head is unlabelled. An older check is not used for a newer head.",
+        "Every verified record of a pull request is checked. "
+        "A label counts only when that record's repository, pull request, and head commit all match. "
+        "A label for one head is not applied to a record at another head.",
     ]
     for arm, block in accuracy.get("arms", {}).items():
         lines.append(
@@ -330,7 +358,8 @@ def saved_markdown(stats: dict) -> str:
         "Verdicts, one per pull request", stats["pull_request_verdicts"], stats["pull_requests"])
     lines.append(
         "Several records of one pull request count once. "
-        "The pull-request table uses the stored verdict on the last record in path order."
+        "The pull-request table uses the stored verdict on the last record in path order. "
+        "Wrong passes look at every verified record of that pull request."
     )
     lines.append("")
     if not stats["available"]:
@@ -338,8 +367,8 @@ def saved_markdown(stats: dict) -> str:
         lines.append("")
         return "\n".join(lines)
     lines.append(
-        "A hand check counts only when the repository, pull request, and head commit all match. "
-        "A different head is unlabelled. An older check is not used for a newer head."
+        "A hand check counts only for a verified record whose repository, pull request, and head commit all match. "
+        "A label for one head is not applied to a record at another head."
     )
     lines.append("")
     lines.append(f"Wrong passes: {stats['wrong_passes']['count']}.")
