@@ -50,7 +50,11 @@ when tests collected nothing on both sides. The reason names the flagged claim a
 case stays could_not_verify: a differs claim whose only probe used inputs where the old and new code agree
 because it never reached the change. A differs claim whose covered
 observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
-record is already proven: the claim was not shown on these inputs, and a related change was proven. An agreeing
+record is already proven: the claim was not shown on these inputs, and a related change was proven. One agreeing
+result is also advisory when the tests already prove that change (a test in an edited test file fails on the base
+and passes on the pull request, every changed line is covered, and nothing regressed): the probe input may not
+have reached the changed code. That mark does not verify the pull request. An agreeing result with no such test
+proof still needs attention. A result that differs is unchanged. An agreeing
 observation stays needs_attention when that other claim is proven different on the same input (the dotted name
 without its last part): the change was reached there. With no proven differs claim, that case still needs
 attention, unless a cross-run settles it (the pull request's new or
@@ -1335,7 +1339,10 @@ def summarize(items: list[dict]) -> dict:
     noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
     # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
     # "advisory" is only ever set by the product route (poc/claim_hygiene.py) on a model probe with no linked claim.
-    advisory = [o for o in raw_flagged if o.get("advisory")]
+    advisory = [o for o in raw_flagged if o.get("advisory") and o.get("linked_by") != "tests_prove"]
+    # Same value on both sides, for a claim that says the behaviour differs, once the tests already prove that
+    # change. Advisory only: the probe input may not have reached the changed code. It does not raise attention.
+    tests_prove = [o for o in raw_flagged if o.get("linked_by") == "tests_prove"]
     # General rule for any claim that says something changes, checked per input: when one input reports several
     # values ("case1.title", "case1.rel") and at least one of them differs as claimed, the claim is met for that
     # input, and its other values that rightly stayed the same are advisory only. An input on which no value of the
@@ -1404,6 +1411,11 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(unshown)} observation(s) shown as advisory only "
                     "(claim not shown on these inputs; a related change was proven): "
                     + "; ".join(f"{o['name']} ({o['claim']})" for o in unshown[:4]) + more)
+    if tests_prove:
+        more = f" (+{len(tests_prove) - 4} more)" if len(tests_prove) > 4 else ""
+        bits.append(f"probe: {len(tests_prove)} observation(s) shown as advisory only "
+                    "(the probe input may not reach the changed code; the tests already prove the change): "
+                    + "; ".join(f"{o['name']} ({o['claim']})" for o in tests_prove[:4]) + more)
     if invalid:
         more = f" (+{len(invalid) - 4} more)" if len(invalid) > 4 else ""
         bits.append(f"probe: {len(invalid)} observation(s) shown as advisory only "
@@ -1429,6 +1441,7 @@ def summarize(items: list[dict]) -> dict:
             "pr_only_noisy": [o["name"] for o in pr_only_noisy],
             "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub],
             "advisory_agreeing_differs": [o["name"] for o in unshown],
+            "advisory_tests_prove": [o["name"] for o in tests_prove],
             "advisory_invalid_preservation": [o["name"] for o in invalid]}
 
 

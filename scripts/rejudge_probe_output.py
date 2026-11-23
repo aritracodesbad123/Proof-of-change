@@ -172,7 +172,8 @@ def _reason(rec: dict) -> tuple[str, str]:
             apply_execution_evidence_filters(cmp)
         cnv = None if cmp else (record.get("reason") or "no comparison")
         v = verdict_for(cmp, cnv, record.get("exit_check"), record.get("files"), pp, record.get("behaviour_claims"),
-                        record.get("baseline"), docstring_only=bool(record.get("docstring_only")))
+                        record.get("baseline"), docstring_only=bool(record.get("docstring_only")),
+                        coverage=record.get("coverage"))
         v = cap_for_uncollected_file(cmp if isinstance(cmp, dict) else None, v[0], v[1])
         base = {k: x for k, x in record.items() if not str(k).endswith((
             "_before_coverage_gate", "_before_ai_probe_gate", "_before_broken_probe_gate",

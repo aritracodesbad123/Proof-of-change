@@ -5049,7 +5049,9 @@ def advisory_gate(rec: dict) -> dict:
     notes = []
     for it in (rec.get("probes") or {}).get("items") or []:
         for o in it.get("observations") or []:
-            if o.get("advisory"):
+            # tests_prove is a note that the probe may have missed a change the tests already proved.
+            # It does not block a verdict the other gates have already reached.
+            if o.get("advisory") and o.get("linked_by") != "tests_prove":
                 how = {"id": "linked by claim id, check", "shape": o.get("note") or "probably the claimed change, check"}
                 notes.append(f"{it.get('id')} {o.get('name')}: {how.get(o.get('linked_by'), 'no claim covers it, check')}")
     if rec.get("verdict") != Verdict.VERIFIED.value or not notes:
@@ -5827,9 +5829,54 @@ def _cross_run_blocked(cmp, probe_results, files=None) -> bool:
 
 
 def _agreed_observation(obs: dict) -> bool:
-    """Old and new code behaved the same on this probe input, and the claim said they would differ."""
+    """Old and new code behaved the same on this probe input, and the claim said they would differ.
+
+    A mark that the tests already prove the change is still this case: the cross-run may settle it. Any other
+    advisory mark is not."""
+    if obs.get("advisory") and obs.get("linked_by") != "tests_prove":
+        return False
     return (obs.get("state") == "same" and obs.get("label") == FindingLabel.NEEDS_HUMAN.value
-            and not obs.get("advisory") and not obs.get("pr_only") and not obs.get("probe_broken"))
+            and not obs.get("pr_only") and not obs.get("probe_broken"))
+
+
+TESTS_PROVE_NOTE = "the probe input may not reach the changed code; the tests already prove the change"
+
+
+def tests_prove_the_change(cmp: dict | None, files: dict | None, coverage: dict | None) -> bool:
+    """True when the tests already prove the change this probe is about.
+
+    That is three facts together: at least one test fails on the base and passes on the pull request and lives
+    in a test file the pull request edits, every changed line those tests can cover did run, and nothing
+    regressed. A shared test id is not that proof. Wording is not used to bind a claim to a test."""
+    if not isinstance(cmp, dict) or cmp.get("regressions"):
+        return False
+    if not cross_run_test_ids(cmp, files):
+        return False
+    if not isinstance(coverage, dict) or coverage.get("status") != "measured":
+        return False
+    total, covered = coverage.get("changed_lines_total"), coverage.get("changed_lines_covered")
+    if not isinstance(total, int) or not isinstance(covered, int):
+        return False
+    return total > 0 and covered == total
+
+
+def _mark_tests_prove(items: list, cmp, files, coverage) -> None:
+    """An agreeing result for a differs claim is advisory when the tests already prove the change.
+
+    The values stay as recorded. A result that differs, a claim the tests do not prove, and an input where
+    another claim was already proven different are left to flag. The mark does not by itself verify anything."""
+    if not tests_prove_the_change(cmp, files, coverage):
+        return
+    flat = [o for it in items for o in (it.get("observations") or []) if isinstance(o, dict)]
+    for obs in flat:
+        if (obs.get("state") != "same" or obs.get("label") != FindingLabel.NEEDS_HUMAN.value
+                or obs.get("advisory") or obs.get("pr_only") or obs.get("probe_broken") or not obs.get("claim")):
+            continue
+        if probes.other_claim_proven_on_input(flat, obs.get("claim"), obs.get("name")):
+            continue
+        obs["advisory"] = True
+        obs["linked_by"] = "tests_prove"
+        obs["note"] = TESTS_PROVE_NOTE
 
 
 def _expect_of(items: list, cid: str) -> str | None:
@@ -5891,7 +5938,7 @@ def _without_settled_claims(probe_results, claim_ids: set[str]) -> dict:
 
 
 def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_results, claims, baseline,
-                      docstring_only, same_sides):
+                      docstring_only, same_sides, coverage=None):
     """Settle agreeing or never-run differs claims from a cross-run, or leave the verdict as it was.
 
     The rule only raises a held-back verdict to verified. It never lowers one, and it does nothing when there
@@ -5905,7 +5952,7 @@ def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_result
         return v, reason, fl
     alt = _without_settled_claims(probe_results, set(settle))
     v2, reason2, fl2 = verdict_for(cmp, cnv_reason, exits, files, alt, claims, baseline, docstring_only, same_sides,
-                                   _apply_cross_run=False)
+                                   coverage=coverage, _apply_cross_run=False)
     if v2 != Verdict.VERIFIED.value:
         return v, reason, fl
     shown = ", ".join(settle[:4])
@@ -5921,7 +5968,8 @@ def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_result
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None, claims: list | None = None,
                 baseline: str | None = None, docstring_only: bool = False,
-                same_sides: bool = False, *, _apply_cross_run: bool = True) -> tuple[str, str, list[str]]:
+                same_sides: bool = False, *, coverage: dict | None = None,
+                _apply_cross_run: bool = True) -> tuple[str, str, list[str]]:
     """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
     PR whose title or description claims results stay the same, with no probe checking that, becomes
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
@@ -5944,6 +5992,14 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     hygiene = (probe_results or {}).get("claim_hygiene") if isinstance(probe_results, dict) else None
     broad = (probe_results or {}).get("broad_claims") if isinstance(probe_results, dict) else None
     probe_results = probe_items(probe_results, baseline)
+    # The verdict with the agreeing result still flagged. Used only so this note cannot be what verifies
+    # the pull request: if that flag was needs attention and the note would leave verified, the result stays
+    # could not verify. A verdict that was already verified is not read here.
+    plain = None
+    if _apply_cross_run and tests_prove_the_change(cmp, files, coverage):
+        plain, _, _ = verdict_for(cmp, cnv_reason, exits, files, probe_results, claims, baseline, docstring_only,
+                                  same_sides, coverage=None)
+    _mark_tests_prove((probe_results or {}).get("items") or [], cmp, files, coverage)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
             probe_results):
@@ -5965,14 +6021,18 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
                          f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                          fl + ["unmatched_differs_claim"])
+    def _unclaimed_advisory(obs) -> bool:
+        # An agreeing result the tests already prove is a note, not an unclaimed difference.
+        return bool(obs.get("advisory")) and obs.get("linked_by") != "tests_prove"
+
     adv_items = [it for it in (probe_results or {}).get("items") or []
-                 if any(o.get("advisory") for o in it.get("observations") or [])]
+                 if any(_unclaimed_advisory(o) for o in it.get("observations") or [] if isinstance(o, dict))]
     if adv_items and v == Verdict.VERIFIED.value:
         # A probe saw a difference nobody claimed. It does not raise needs attention, but it is unexplained, so the
         # PR cannot be verified either. A probe that links claims is named by its uncovered differences instead.
         bare = sorted(str(it.get("id")) for it in adv_items if not it.get("claims"))
         names = [f"{it.get('id')} {o.get('name')}" for it in adv_items if it.get("claims")
-                 for o in it.get("observations") or [] if o.get("advisory")]
+                 for o in it.get("observations") or [] if isinstance(o, dict) and _unclaimed_advisory(o)]
         bits = ([f"probe(s) {', '.join(bare)} have no linked claims and saw a difference no claim covers"] * bool(bare)
                 + [f"difference(s) no linked claim covers ({', '.join(names[:4])}"
                    + (f" +{len(names) - 4} more" if len(names) > 4 else "") + ")"] * bool(names))
@@ -5995,7 +6055,13 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                          fl + ["broad_claim_few_inputs"])
     if _apply_cross_run:
         v, reason, fl = _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_results, claims,
-                                          baseline, docstring_only, same_sides)
+                                          baseline, docstring_only, same_sides, coverage)
+    if plain == Verdict.NEEDS_ATTENTION.value and v == Verdict.VERIFIED.value:
+        v = Verdict.COULD_NOT_VERIFY.value
+        reason = ("could not verify: an agreeing probe result is advisory (the probe input may not reach the "
+                  "changed code; the tests already prove the change); that note does not verify the pull request ("
+                  + reason + ")")
+        fl = list(dict.fromkeys([*fl, "tests_prove_not_verified"]))
     return v, reason, fl
 
 
@@ -9331,7 +9397,8 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     if same:
         rec["docstring_only"] = False
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
-                               rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")), same_sides=same)
+                               rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")), same_sides=same,
+                               coverage=rec.get("coverage"))
     v, reason = cap_for_review(rec, v, reason)
     own = rec.get("pr_build_failure") or {}
     if own.get("needs_attention") and v == Verdict.COULD_NOT_VERIFY.value:
@@ -11896,7 +11963,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
         from poc import boundary_claims
         pr_probes = boundary_claims.apply(pr_probes, rec, prdir)
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
-                               rec.get("baseline"))
+                               rec.get("baseline"), coverage=rec.get("coverage"))
     v, reason = cap_for_review(rec, v, reason)
     v, reason = cap_for_uncollected_file(cmp, v, reason)
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
