@@ -1,6 +1,7 @@
 """Judge-readable evidence report for one benchmark results folder.
 
     python -m bench.report bench/results/<date> [--out DIR]
+    python -m bench.report --records runs/ [--out DIR]
 
 Reads only the files bench/run.py writes: run_meta.json, one JSON result per case and arm, and the
 check record under ops/<arm>/runs/bench-<case id>/*/record.json when that file is there. Counts and
@@ -17,6 +18,7 @@ import re
 import sys
 from pathlib import Path
 
+from bench.accuracy import attach, saved_report
 from bench.manifest import VERDICTS
 from bench.run import PROBE_RUNS, RED_LABELS, arm_dir_name, find_record, probe_held, redact_all
 from bench.summarize import load, markdown, summarize
@@ -552,7 +554,7 @@ def build(root: Path) -> dict:
     root = Path(root)
     arms = load(root)
     meta = json.loads((root / "run_meta.json").read_text())
-    summary = summarize(arms)
+    summary = attach(root, arms, summarize(arms))
     names = _arm_order(meta, arms)
     index = {arm: {row["case_id"]: row for row in rows} for arm, rows in arms.items()}
     cases = []
@@ -824,11 +826,43 @@ def write_report(root: Path, out: Path | None = None) -> tuple[Path, Path]:
     return md_path, html_path
 
 
+def _inside(path: Path, root: Path) -> bool:
+    """True when path is root or a directory inside it."""
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("results", help="results folder written by bench.run (contains run_meta.json)")
+    ap.add_argument("results", nargs="?", help="results folder written by bench.run (contains run_meta.json)")
     ap.add_argument("--out", default=None, help="directory for evidence.md and evidence.html (default: the results folder)")
+    ap.add_argument("--records", default=None,
+                    help="read saved record.json files under this directory and print the rate report. "
+                         "The directory is not written.")
     args = ap.parse_args(argv)
+    if args.records:
+        if args.results:
+            ap.error("pass a results folder or --records, not both")
+        source = Path(args.records)
+        if not source.is_dir():
+            print(f"{source} is not a directory", file=sys.stderr)
+            return 2
+        text = saved_report(source)
+        if args.out:
+            out = Path(args.out)
+            if _inside(out, source):
+                print("refusing to write the report inside the saved records", file=sys.stderr)
+                return 2
+            out.mkdir(parents=True, exist_ok=True)
+            (out / "evidence.md").write_text(text)
+            print(out / "evidence.md")
+        print(text)
+        return 0
+    if not args.results:
+        ap.error("give a results folder, or --records")
     md_path, html_path = write_report(Path(args.results), Path(args.out) if args.out else None)
     print(md_path)
     print(html_path)

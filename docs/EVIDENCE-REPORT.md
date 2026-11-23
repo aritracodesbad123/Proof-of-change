@@ -21,6 +21,14 @@ python -m bench.report bench/results/2026-10-22 --out /tmp/evidence
 
 `--out` writes the two files in another directory. The results folder is only read.
 
+Saved records, including a checkout of the runs branch, use the same rates without a results folder:
+
+```bash
+python -m bench.report --records /path/to/saved-records --out /tmp/saved-report
+```
+
+That only reads `record.json` files. It does not write inside that directory, and it does not change a stored verdict.
+
 ## What it reads
 
 - `run_meta.json` — the case list, the arms, and the run metadata. `n` comes from this case list.
