@@ -4,8 +4,8 @@
 
 A test run that does not share the host network now gets a private network namespace with the loopback
 interface brought up, and with `localhost` mapped to that interface. The command that brings loopback up
-drops the extra capability before the project's own command runs. Installs and builds still share the host
-network, because that is when packages are downloaded.
+drops the extra capability before the project's own command runs. If that drop fails, the command does not
+run. Installs and builds still share the host network, because that is when packages are downloaded.
 
 A failure whose error is a bind problem (failed to bind, address already in use, could not assign a local
 address), a local name that does not resolve, or the same setup or teardown error, and that same error
@@ -35,9 +35,12 @@ earlier runs.
 - Keep one private network namespace per sandboxed command that does not ask for the network. Bring
   loopback up, then drop capabilities, and mount a hosts file that maps `localhost` to `127.0.0.1` and to
   `::1`. Do not mount the host resolver.
-- Treat an environment error as shared when the same signature appears on the base side. A saved record
-  that kept the exception type, and not every message, uses that type. When every message the record did
-  keep is that one error, the failures whose text was not stored are the same error.
+- Treat an environment error as shared when the same signature appears on the base side. On a live run a
+  setup or teardown error matches only when both sides name the same exception type, or both name none.
+  Bind and name-resolution errors still match as one family. A saved record that kept the exception type,
+  and not every message, may still match on that type. When every message the record did keep is that one
+  error, the failures whose text was not stored are the same error.
+- If dropping the extra capability fails, stop before the project's command runs.
 - Report could not verify, naming the error, when nothing else is wrong. Do not report verified.
 
 ## Alternatives and tradeoffs

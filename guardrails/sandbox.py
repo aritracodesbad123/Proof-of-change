@@ -107,7 +107,9 @@ def _drop_capabilities():
         _fields_ = [("effective", ctypes.c_uint32), ("permitted", ctypes.c_uint32),
                     ("inheritable", ctypes.c_uint32)]
     blank = (Data * 2)()
-    libc.capset(ctypes.byref(Header(0x20080522, 0)), blank)
+    rc = libc.capset(ctypes.byref(Header(0x20080522, 0)), blank)
+    if rc != 0:
+        os._exit(1)
 
 _raise_loopback()
 _drop_capabilities()

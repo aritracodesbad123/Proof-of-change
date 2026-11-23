@@ -88,6 +88,32 @@ def test_setup_error_only_on_the_pr_still_needs_attention():
     assert verdict_from_tests(cmp, None)[0] == "needs_attention"
 
 
+def test_untyped_setup_on_the_base_does_not_cover_a_pr_type_error():
+    untyped = "failed on setup with \"the fixture did not start\""
+    typed = "failed on setup with \"TypeError: cannot add\""
+    main = _passed({OLD: ("error", untyped)})
+    pr = _passed({OLD: ("error", untyped), NEW: ("error", typed)})
+    cmp = compare_sides(_runs(main, pr))
+    assert cmp["new_tests_failing"] == [NEW]
+    assert verdict_from_tests(cmp, None)[0] == "needs_attention"
+    both = _passed({OLD: ("error", untyped), NEW: ("error", untyped)})
+    same = compare_sides(_runs(main, both))
+    assert NEW not in same["new_tests_failing"]
+    assert verdict_from_tests(same, None)[0] == "could_not_verify"
+
+
+def test_capset_failure_does_not_run_the_command(tmp_path):
+    helper = tmp_path / "loopback.py"
+    helper.write_text(sandbox._LOOPBACK_HELPER.replace(
+        "libc.capset(ctypes.byref(Header(0x20080522, 0)), blank)", "1"))
+    marker = tmp_path / "ran"
+    cmd = ["/usr/bin/python3", str(helper), "/usr/bin/python3", "-c",
+           f"open({str(marker)!r}, 'w').write('ran')"]
+    done = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+    assert done.returncode != 0
+    assert not marker.exists()
+
+
 def test_same_setup_error_on_the_base_is_environment():
     main = _passed({OLD: ("error", SETUP_VALUE)})
     pr = _passed({OLD: ("error", SETUP_VALUE), NEW: ("error", SETUP_VALUE)})

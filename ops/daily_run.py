@@ -5283,17 +5283,19 @@ def _signature_parts(signature: str) -> tuple[set[str], set[str]]:
 
 
 def _signatures_match(left: str, right: str) -> bool:
-    """True when two environment labels are the same problem.
+    """True when two environment labels are the same problem on a live run.
 
-    A bind error matches another bind error even when one of them also says setup. A setup failure matches
-    another setup failure only when they name the same exception, or one of them names none."""
+    A bind or name-resolution error matches another of that family even when the exception type differs.
+    A setup or teardown error matches only when both name the same exception type, or both name none.
+    One side with no type does not cover a different type on the other side. Saved records that lack the
+    message use the exception-type fallback in ``_signature_on_base`` instead of this rule."""
     if left == right:
         return True
     left_f, left_t = _signature_parts(left)
     right_f, right_t = _signature_parts(right)
     if left_f & right_f & {"bind", "resolve"}:
         return True
-    if left_f & right_f & {"setup", "teardown"} and (not left_t or not right_t or left_t & right_t):
+    if left_f & right_f & {"setup", "teardown"} and ((not left_t and not right_t) or bool(left_t & right_t)):
         return True
     return False
 
