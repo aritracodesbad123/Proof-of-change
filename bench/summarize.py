@@ -24,6 +24,7 @@ import json
 import sys
 from pathlib import Path
 
+from bench.accuracy import accuracy_paragraph, attach, wrong_approval_rate
 from bench.manifest import REGRESSION
 
 DECIDED = ("verified", "needs_attention")
@@ -45,7 +46,7 @@ def arm_metrics(results: list[dict]) -> dict:
     usd = [r["model"]["cost_usd"] for r in results if isinstance((r.get("model") or {}).get("cost_usd"), (int, float))]
     return {
         "n_cases": n,
-        "wrong_approvals": rate(sum(1 for r in reg if v(r) == "verified"), len(reg)),
+        "wrong_approvals": wrong_approval_rate(results),
         "bugs_caught": rate(len(caught(reg)), len(reg)),
         "bugs_caught_tests_miss": rate(len(caught(miss_cases)), len(miss_cases)),
         "false_alarms": rate(sum(1 for r in safe if v(r) == "needs_attention"), len(safe)),
@@ -164,7 +165,8 @@ def markdown(s: dict) -> str:
         tail += "".join(f"- excluded {cid}: {why}\n" for cid, why in u["excluded"].items())
     note = ("\nA case that did not run or ended could_not_verify counts as a miss, never a catch. Counts, not "
             "significance: no statistical test is claimed.\n")
-    return head + "\n".join(rows) + "\n" + tail + note
+    extra = accuracy_paragraph(s["accuracy"]) if isinstance(s.get("accuracy"), dict) else ""
+    return head + "\n".join(rows) + "\n" + tail + note + extra
 
 
 def main(argv=None) -> int:
@@ -173,7 +175,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=None)
     a = ap.parse_args(argv)
     root = Path(a.results)
-    s = summarize(load(root))
+    arms = load(root)
+    s = attach(root, arms, summarize(arms))
     out = Path(a.out or root)
     out.mkdir(parents=True, exist_ok=True)
     (out / "summary.json").write_text(json.dumps(s, indent=1))

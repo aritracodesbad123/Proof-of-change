@@ -75,7 +75,13 @@ python -m bench.summarize bench/results/X
 It writes `summary.json` and `summary.md`. For each arm it reports, always with n: wrong approvals (verified on a
 regression), bugs caught (overall and on tests-miss cases), false alarms (needs_attention on a safe case),
 verification coverage, the could-not-verify or not-run rate, setup failures, runtime, model calls and cost.
-The case list and n come from `run_meta.json`; a case with no result file counts as not run. A case that did
+The case list and n come from `run_meta.json`; a case with no result file counts as not run.
+Wrong approvals in the table stay the verified results on a known regression.
+Under the table, hand checks come from `data/hand_checks.jsonl` when that file is present.
+A wrong pass is a verified pull request whose matching row says it really breaks something.
+The false-confirmation rate is those pull requests over the verified pull requests with a matching row.
+A verified pull request with no matching row is unlabelled, not a pass. A missing file is reported
+as hand checks not available. A case that did
 not run or ended could_not_verify is a miss, never a catch. Probe uplift is the number of regression cases that
 tests+probes caught and tests-only did not; the reverse count is shown too. A case is compared only when both
 arms ran on the same commits, both installs succeeded, tests-only reached a decided verdict, and the
