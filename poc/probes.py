@@ -20,8 +20,10 @@ A probe is one Python file. It must:
 
 * when run as ``python <file>`` with the side's interpreter (cwd: an empty folder, thread counts pinned to 1,
   no credentials in the environment), print ONE JSON object as its last line:
-  ``{"observations": {"<name>": <any JSON value>, ...}}``. It must be deterministic (fixed seeds, no clock, no
-  network) and must not assert: it reports what it saw.
+  ``{"observations": {"<name>": <any JSON value>, ...}}``. A bare object is also read when its shape is
+  unambiguous: every key is an observation id, or every key is a name this probe was asked to cover, and the
+  object has no wrapper key. It must be deterministic (fixed seeds, no clock, no network) and must not assert:
+  it reports what it saw.
 
 Fixed probes live in ``probes/<owner>/<repo>/<pr>.py`` (more probes for the same PR: ``<pr>-<name>.py``).
 A model-written probe (poc/model_probes.py) is the same kind of file, saved in the run folder with source "model";
@@ -31,8 +33,9 @@ Freeze rule (poc/freeze.py): every probe is frozen before any PR-side execution 
 PR-side run; a probe that fails the check is not run on the PR side.
 
 Output contract (checked for every probe, `observations_of`): stdout at most MAX_OUTPUT_BYTES; the last line one JSON
-object {"observations": {...}} with at most MAX_OBSERVATIONS names, each a string of at most 200 characters. A run
-that breaks the contract becomes one PROBE_ERROR observation saying why.
+object {"observations": {...}}, or a bare object of observation ids, with at most MAX_OBSERVATIONS names, each a
+string of at most 200 characters. A run that breaks the contract becomes one PROBE_ERROR observation saying why.
+Stderr and traceback text are never read. Earlier lines are not merged into the last line.
 
 Judging (``judge``): each observation is compared over 3 alternating runs per side with ``poc.diff.confirm``
 (same / differs / flaky). Field-level differences come from ``poc.diff.compare``. Labels:
@@ -47,7 +50,11 @@ when tests collected nothing on both sides. The reason names the flagged claim a
 case stays could_not_verify: a differs claim whose only probe used inputs where the old and new code agree
 because it never reached the change. A differs claim whose covered
 observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
-record is already proven: the claim was not shown on these inputs, and a related change was proven. An agreeing
+record is already proven: the claim was not shown on these inputs, and a related change was proven. One agreeing
+result is also advisory when the tests already prove that change (a test in an edited test file fails on the base
+and passes on the pull request, every changed line is covered, and nothing regressed): the probe input may not
+have reached the changed code. That mark does not verify the pull request. An agreeing result with no such test
+proof still needs attention. A result that differs is unchanged. An agreeing
 observation stays needs_attention when that other claim is proven different on the same input (the dotted name
 without its last part): the change was reached there. With no proven differs claim, that case still needs
 attention, unless a cross-run settles it (the pull request's new or
@@ -149,11 +156,86 @@ def _json_shaped(v, depth: int = 0) -> bool:
     return False
 
 
-def literal_observations(stdout: str):
-    """Product checks only. The observations object when the probe's last line is a Python literal of exactly
-    {'observations': {...}} (what print(dict) shows) holding only JSON-shaped values; else None.
+# A flat object that uses one of these keys is a wrapper or a status report, not a map of observations.
+# The whole object is rejected. Nothing is taken from the other keys.
+_WRAPPER_KEYS = {"observations", "crash", "timeout", "exit_code", "contract", "error",
+                 "stderr", "traceback", "exception", "message"}
+# Claim-linked ids the probe is asked for (c1.shape_access, c2_rows) or a dotted observation name.
+_OBS_ID = re.compile(
+    r"^(?:c\d+[._][A-Za-z0-9_][A-Za-z0-9_.-]{0,180}"
+    r"|[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+)$")
+OUTPUT_CONTRACT = (
+    "The last line of stdout must be one JSON object "
+    '{"observations": {"<name>": <JSON value>, ...}}. '
+    f"Stdout at most {MAX_OUTPUT_BYTES} bytes, at most {MAX_OBSERVATIONS} names, "
+    "each name a string of 1 to 200 characters. "
+    "A bare JSON object is accepted only when it is unambiguous: every key is an observation id "
+    "(a claim-linked name such as c1.name or c2_name, or a dotted name), or every key matches a name "
+    "this probe was asked to cover, and the object has no wrapper key "
+    "(observations, crash, timeout, exit_code, contract, error, stderr, traceback, exception, message). "
+    "Earlier lines are not merged in. Stderr and traceback text are not read."
+)
 
-    Fails closed: any other shape, any extra key, a value JSON cannot hold as is, or a line that is not a plain
+
+def _observation_id(key: str) -> bool:
+    return isinstance(key, str) and bool(_OBS_ID.match(key)) and len(key) <= 200
+
+
+def _selective_cover(pat: str) -> bool:
+    """A cover that names real observation ids. A pattern that matches almost every string does not."""
+    if not isinstance(pat, str) or not pat:
+        return False
+    if not any(ch in pat for ch in "*?["):
+        return True
+    head = re.split(r"[*?\[\]]", pat, maxsplit=1)[0]
+    return len(head) >= 2
+
+
+def _keys_match_covers(keys, covers) -> bool:
+    """True when every key matches a cover the probe was asked for. One unknown key rejects the whole object."""
+    pats = [p for p in covers or [] if _selective_cover(p)]
+    if not pats or not keys:
+        return False
+    return all(any(fnmatch.fnmatchcase(k, p) for p in pats) for k in keys)
+
+
+def cover_patterns(spec: dict | None) -> list[str]:
+    """Observation-name patterns the probe's claims say it will print."""
+    out = []
+    for c in (spec or {}).get("claims") or []:
+        if not isinstance(c, dict):
+            continue
+        for pat in c.get("covers") or []:
+            if isinstance(pat, str) and pat not in out:
+                out.append(pat)
+    return out
+
+
+def flat_observations(obj, covers=None):
+    """The object when it is an unambiguous map of observations; else None.
+
+    Accepted only when every key is an observation id, or every key is a name the probe was asked to cover,
+    and no key is a wrapper key. A mix is rejected whole. Nothing is invented and nothing is copied out of
+    a subset of the keys."""
+    if type(obj) is not dict or not obj:
+        return None
+    if any(k in _WRAPPER_KEYS for k in obj):
+        return None
+    if not all(isinstance(k, str) for k in obj):
+        return None
+    if not _json_shaped(obj):
+        return None
+    keys = list(obj)
+    if all(_observation_id(k) for k in keys) or _keys_match_covers(keys, covers):
+        return obj
+    return None
+
+
+def literal_observations(stdout: str, covers=None):
+    """The observations object when the probe's last line is a Python literal the output contract accepts; else None.
+
+    The accepted shapes are exactly ``{'observations': {...}}`` or a bare map that `flat_observations` accepts.
+    Values must be JSON-shaped. Any other shape, a wrapper key on a bare map, or a line that is not a plain
     literal stays unparsed. The line is read with ast.literal_eval, never run."""
     lines = [ln for ln in (stdout or "").strip().splitlines() if ln.strip()]
     if not lines:
@@ -165,35 +247,115 @@ def literal_observations(stdout: str):
         obj = ast.literal_eval(last)
     except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
         return None
-    if type(obj) is not dict or set(obj) != {"observations"} or type(obj["observations"]) is not dict:
+    if type(obj) is not dict or not _json_shaped(obj):
         return None
-    if not _json_shaped(obj):
+    if set(obj) == {"observations"} and type(obj["observations"]) is dict:
+        return obj
+    flat = flat_observations(obj, covers)
+    if flat is None:
         return None
-    return obj
+    return {"observations": flat}
 
 
-def observations_of(stdout: str, exit_code, literal_output: bool = False) -> dict:
-    """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation.
-
-    literal_output: when the last line is not JSON, also accept a Python literal of the same
-    {"observations": {...}} object (see literal_observations). Study runs and product checks both pass True.
-    The default stays off, so a caller that does not ask still accepts JSON only."""
-    if len(stdout.encode(errors="replace")) > MAX_OUTPUT_BYTES:
-        return {PROBE_ERROR: {"contract": f"output larger than {MAX_OUTPUT_BYTES} bytes", "exit_code": exit_code}}
-    obj = parse_probe_output(stdout, exit_code)
-    if literal_output and obj.get("crash") == "non-json output":
-        lit = literal_observations(stdout)
-        if lit is not None:
-            obj = lit if exit_code in (0, "0") else dict(lit, exit_code=exit_code)
-    obs = obj.get("observations") if isinstance(obj, dict) else None
-    if not isinstance(obs, dict) or "crash" in obj or "timeout" in obj:
-        return {PROBE_ERROR: {k: v for k, v in obj.items() if k != "observations"} or {"crash": "no observations"}}
+def _finish_observations(obs: dict, exit_code) -> dict:
     if len(obs) > MAX_OBSERVATIONS or not all(isinstance(k, str) and 0 < len(k) <= 200 for k in obs):
         return {PROBE_ERROR: {"contract": f"observations must be at most {MAX_OBSERVATIONS} names of 1-200 characters",
                               "exit_code": exit_code}}
     if exit_code not in (0, "0"):
         obs = dict(obs, **{PROBE_ERROR: {"exit_code": exit_code}})
     return obs
+
+
+def _observations_from(obj, exit_code, covers) -> dict | None:
+    """Observations from a parsed object, or None when the object is not that shape."""
+    if not isinstance(obj, dict) or "crash" in obj or "timeout" in obj:
+        return None
+    wrapped = obj.get("observations")
+    if isinstance(wrapped, dict):
+        return _finish_observations(wrapped, exit_code)
+    body = {k: v for k, v in obj.items() if k != "exit_code"}
+    flat = flat_observations(body, covers)
+    if flat is None:
+        return None
+    return _finish_observations(flat, exit_code)
+
+
+def _ambiguous_reason(obj) -> str:
+    if not isinstance(obj, dict) or not obj:
+        return "the last line is not a JSON object of observations"
+    if any(k in _WRAPPER_KEYS for k in obj):
+        return "the JSON object mixes wrapper keys with other keys, or it is a status object"
+    return "the JSON object's keys are not observation ids"
+
+
+def _unreadable(obj, exit_code) -> dict:
+    """One PROBE_ERROR for output that is not observations. The payload is the parse error, not invented values."""
+    if isinstance(obj, dict) and obj.get("timeout"):
+        return {PROBE_ERROR: {"timeout": True}}
+    if isinstance(obj, dict) and obj.get("crash") == "non-json output":
+        return {PROBE_ERROR: {k: v for k, v in obj.items() if k != "observations"}}
+    err = {"crash": "ambiguous output", "reason": _ambiguous_reason(obj if isinstance(obj, dict) else None)}
+    if exit_code not in (None,):
+        err["exit_code"] = exit_code
+    return {PROBE_ERROR: err}
+
+
+def observations_of(stdout: str, exit_code, literal_output: bool = False, covers=None) -> dict:
+    """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation.
+
+    literal_output: when the last line is not JSON, also accept a Python literal of the same shape
+    (see literal_observations). Study runs and product checks both pass True.
+    The default stays off, so a caller that does not ask still accepts JSON only.
+    covers: observation-name patterns the probe was asked to print. They can make a bare object unambiguous.
+    Only stdout is read, and only its last non-empty line. Stderr is ignored. Lines are not merged."""
+    if len((stdout or "").encode(errors="replace")) > MAX_OUTPUT_BYTES:
+        return {PROBE_ERROR: {"contract": f"output larger than {MAX_OUTPUT_BYTES} bytes", "exit_code": exit_code}}
+    obj = parse_probe_output(stdout, exit_code)
+    if literal_output and isinstance(obj, dict) and obj.get("crash") == "non-json output":
+        lit = literal_observations(stdout, covers)
+        if lit is not None:
+            obj = lit if exit_code in (0, "0") else dict(lit, exit_code=exit_code)
+    got = _observations_from(obj, exit_code, covers)
+    if got is not None:
+        return got
+    return _unreadable(obj, exit_code)
+
+
+def output_parse_failure(obs: dict) -> str | None:
+    """The exact parse error when a run printed no observations, or None.
+
+    A timeout, a non-zero exit, or a run that also recorded observations is not a parse failure. Those stay
+    on the existing crash path. The text is what a single retry shows the model."""
+    if not isinstance(obs, dict) or PROBE_ERROR not in obs:
+        return None
+    if any(k != PROBE_ERROR for k in obs):
+        return None
+    err = obs.get(PROBE_ERROR)
+    if not isinstance(err, dict) or err.get("timeout"):
+        return None
+    code = err.get("exit_code", 0)
+    if code not in (0, "0", None):
+        return None
+    if "contract" in err:
+        return f"output contract: {err['contract']}"
+    crash = err.get("crash")
+    if crash == "non-json output":
+        return "non-json output: the last line of stdout is not one JSON object"
+    if crash == "ambiguous output":
+        return "ambiguous output: " + str(err.get("reason") or "the JSON object is not observations")
+    if crash == "no observations":
+        return "no observations: " + str(err.get("reason") or "the JSON object has no observations")
+    if crash is None:
+        return "no observations: the last line is a JSON object without an observations object"
+    return None
+
+
+def keep_rejected_stdout(path: Path, stdout: str, stderr: str = "") -> None:
+    """Save the stdout that could not be parsed. Stderr is saved beside it and is never parsed."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(stdout or "")
+    if stderr:
+        path.with_suffix(".stderr").write_text(stderr)
 
 
 def output_lines(obs: dict) -> list[str]:
@@ -780,8 +942,10 @@ def link_across_probes(items: list[dict]) -> list[dict]:
 
 
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
-             literal_output: bool = False) -> tuple[dict, str, float]:
-    """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
+             literal_output: bool = False, covers=None, raw_path: Path | None = None) -> tuple[dict, str, float]:
+    """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py).
+
+    raw_path: when the stdout cannot be parsed, write it there. Stderr is saved beside it and is not parsed."""
     t0 = time.time()
     argv = [str(python), str(path)]
     if launch:
@@ -795,9 +959,12 @@ def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launc
             code = "timeout"
         out, err = _head(fo, MAX_OUTPUT_BYTES + 1), _head(fe, 8000)
     if code == "timeout":
-        return observations_of("", code), f"timed out after {timeout}s", round(time.time() - t0, 1)
+        return observations_of("", code, covers=covers), f"timed out after {timeout}s", round(time.time() - t0, 1)
     log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
-    return observations_of(out, code, literal_output), log, round(time.time() - t0, 1)
+    obs = observations_of(out, code, literal_output, covers)
+    if raw_path is not None and output_parse_failure(obs):
+        keep_rejected_stdout(raw_path, out, err)
+    return obs, log, round(time.time() - t0, 1)
 
 
 FILE_LIMIT_BYTES = 64_000_000   # RLIMIT_FSIZE of a probe: caps its stdout/stderr files and anything it writes
@@ -824,12 +991,15 @@ def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: d
     got: dict = {"main": [], "pr": []}
     files: dict = {"main": [], "pr": []}
     per_run = []
+    covers = cover_patterns(spec)
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             if side == "pr" and guard:
                 guard(path)
+            raw = (outdir / "model-probes" / f"{spec['id']}.rejected-{side}-{i}.stdout"
+                   if source == "model" else None)
             obs, log, secs = run_once(path, pythons[side], cwds[side], envs[side], int(spec["timeout_s"]),
-                                         (launchers or {}).get(side), literal_output)
+                                         (launchers or {}).get(side), literal_output, covers, raw)
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
@@ -1169,7 +1339,10 @@ def summarize(items: list[dict]) -> dict:
     noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
     # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
     # "advisory" is only ever set by the product route (poc/claim_hygiene.py) on a model probe with no linked claim.
-    advisory = [o for o in raw_flagged if o.get("advisory")]
+    advisory = [o for o in raw_flagged if o.get("advisory") and o.get("linked_by") != "tests_prove"]
+    # Same value on both sides, for a claim that says the behaviour differs, once the tests already prove that
+    # change. Advisory only: the probe input may not have reached the changed code. It does not raise attention.
+    tests_prove = [o for o in raw_flagged if o.get("linked_by") == "tests_prove"]
     # General rule for any claim that says something changes, checked per input: when one input reports several
     # values ("case1.title", "case1.rel") and at least one of them differs as claimed, the claim is met for that
     # input, and its other values that rightly stayed the same are advisory only. An input on which no value of the
@@ -1238,6 +1411,11 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(unshown)} observation(s) shown as advisory only "
                     "(claim not shown on these inputs; a related change was proven): "
                     + "; ".join(f"{o['name']} ({o['claim']})" for o in unshown[:4]) + more)
+    if tests_prove:
+        more = f" (+{len(tests_prove) - 4} more)" if len(tests_prove) > 4 else ""
+        bits.append(f"probe: {len(tests_prove)} observation(s) shown as advisory only "
+                    "(the probe input may not reach the changed code; the tests already prove the change): "
+                    + "; ".join(f"{o['name']} ({o['claim']})" for o in tests_prove[:4]) + more)
     if invalid:
         more = f" (+{len(invalid) - 4} more)" if len(invalid) > 4 else ""
         bits.append(f"probe: {len(invalid)} observation(s) shown as advisory only "
@@ -1263,6 +1441,7 @@ def summarize(items: list[dict]) -> dict:
             "pr_only_noisy": [o["name"] for o in pr_only_noisy],
             "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub],
             "advisory_agreeing_differs": [o["name"] for o in unshown],
+            "advisory_tests_prove": [o["name"] for o in tests_prove],
             "advisory_invalid_preservation": [o["name"] for o in invalid]}
 
 

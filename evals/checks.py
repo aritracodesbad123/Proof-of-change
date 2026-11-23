@@ -366,7 +366,7 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
         apply_execution_evidence_filters(cmp)
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline,
-                    docstring_only=bool(rec.get("docstring_only")))
+                    docstring_only=bool(rec.get("docstring_only")), coverage=rec.get("coverage"))
     v = cap_for_uncollected_file(cmp if isinstance(cmp, dict) else None, v[0], v[1])
     base = {k: x for k, x in rec.items() if not k.endswith(("_before_coverage_gate", "_before_ai_probe_gate",
                                                               "_before_broken_probe_gate",

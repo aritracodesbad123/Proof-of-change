@@ -549,10 +549,18 @@ def probes_section(R, rec: dict, rel) -> list[dict]:
             R.bullets([f"P-{c['id']} ({c.get('source', 'claim')}): {c['text']} Expects the covered observations to "
                        f"{_expects(c)}." for c in it["claims"]])
         rows = []
+        advised = [o for o in it["observations"] if o.get("linked_by") == "tests_prove"]
+        if advised:
+            R.p("Advisory: " + "; ".join(
+                f"`{o['name']}` — the probe input may not reach the changed code; the tests already prove the change"
+                for o in advised[:6]) + ("." if len(advised) <= 6 else f" (+{len(advised) - 6} more)."))
         for o in it["observations"]:
             if o.get("base_description"):
                 colour, txt = ("grey", o.get("note")
                                or "describes the pre-PR behaviour, not a promise that it stays the same")
+            elif o.get("linked_by") == "tests_prove":
+                colour, txt = ("grey", o.get("note")
+                               or "the probe input may not reach the changed code; the tests already prove the change")
             else:
                 colour, txt = PROBE_RESULT.get(o["label"], ("grey", o["label"]))
             cm, cp = (o.get("citations") or {}).get("main"), (o.get("citations") or {}).get("pr")
