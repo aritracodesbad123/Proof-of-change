@@ -58,6 +58,11 @@ def test_empty_probe_is_regenerated(tmp_path):
 
 def test_empty_probe_twice_writes_no_probe_file(tmp_path):
     empty = {"id": "p1", "about": "f", "claims": CLAIMS, "code": ""}
-    out = _gen(tmp_path, Sequence([[empty], [empty]]))
+    # The existing unusable retry, then one regeneration. Both stay empty, so nothing is run.
+    prov = Sequence([[empty], [empty], [empty]])
+    out = _gen(tmp_path, prov)
+    assert prov.probe_calls == 3
     assert out["probes"] == []
     assert any("empty probe" in e for e in out["errors"])
+    assert (tmp_path / "out" / "p1.rejected.py").is_file()
+    assert (tmp_path / "out" / "rejected-reply.json").is_file()

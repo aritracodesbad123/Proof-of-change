@@ -329,8 +329,50 @@ def diff_new_lines(diff: str) -> dict[str, set[int]]:
     return out
 
 
+# A directory with one of these names is tests, fixtures, or docs. It is not the package, including when it
+# sits under src/ or its name starts with an underscore (_fixtures, testing). A module inside a real package
+# may still be named fixtures.py: only the package directory itself is skipped.
+_NOT_PACKAGE_DIRS = {"tests", "test", "testing", "docs", "doc", "fixtures", "fixture", "testdata"}
+
+
+def _package_dir_name(name: str) -> bool:
+    """True when ``name`` can be an import package, including a private name such as ``_pytest``.
+
+    A testing, fixture, or docs directory is not a package. A dunder directory (``__pycache__``) is not either."""
+    if not name or not _PKG_IDENT.fullmatch(name):
+        return False
+    if name.startswith("__") and name.endswith("__"):
+        return False
+    bare = name.lower().lstrip("_")
+    return name.lower() not in _NOT_PACKAGE_DIRS and bare not in _NOT_PACKAGE_DIRS
+
+
+def _layout_package(path: str) -> bool:
+    """True when ``path`` lives in a src layout or a private package directory.
+
+    ``src/<package>/...`` and ``src/<module>.py`` are package code, and so is ``<_package>/...`` at the
+    repository root. The package directory may start with an underscore. ``src/testing/``, ``src/fixtures/``,
+    and a top-level ``testing/`` directory are not package code. This does not look at a checkout and does
+    not name any repository."""
+    rel = str(path).replace("\\", "/").lstrip("./")
+    parts = PurePosixPath(rel).parts
+    if parts[:1] == ("src",) and len(parts) >= 2:
+        head = parts[1]
+        if len(parts) == 2 and head.endswith((".py", ".pyi")):
+            head = head.rsplit(".", 1)[0]
+        return _package_dir_name(head)
+    if len(parts) >= 2 and parts[0].startswith("_"):
+        return _package_dir_name(parts[0])
+    return False
+
+
 def classify_files(files: list[str], pkg: str) -> dict:
-    in_pkg = [f for f in files if f.startswith((pkg + "/", f"src/{pkg}/"))]   # flat or src layout
+    """Split changed paths into package Python, compiled package code, and everything else.
+
+    A file counts as package code when it sits in the named package (``pkg/`` or ``src/pkg/``) or in a src
+    layout or private package directory (see ``_layout_package``). A testing or fixture directory is not
+    package code, so a change that only touches those directories is still not a package change."""
+    in_pkg = [f for f in files if f.startswith((pkg + "/", f"src/{pkg}/")) or _layout_package(f)]
     py = [f for f in in_pkg if f.endswith((".py", ".pyi"))]
     compiled = [f for f in in_pkg if f.endswith(COMPILED_EXT) or os.path.basename(f) in COMPILED_NAMES]
     build_cfg = [f for f in files if os.path.basename(f) in COMPILED_NAMES and "/" not in f.strip("/")]
@@ -1018,6 +1060,24 @@ def _name_matches(name: str, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatchcase(name, pat) for pat in patterns)
 
 
+def _matches_python_file(rel: str, patterns: list[str]) -> bool:
+    """True when ``rel`` matches a pytest ``python_files`` glob.
+
+    A pattern with no slash matches the file name, which is pytest's usual ``test_*.py``. A pattern that
+    contains a directory (``testing/python/*.py``) matches the path relative to the checkout. Nothing here
+    is special to one repository."""
+    rel = str(rel).replace("\\", "/")
+    name = rel.rsplit("/", 1)[-1]
+    for pat in patterns:
+        pat = str(pat).replace("\\", "/")
+        if "/" in pat:
+            if fnmatch.fnmatchcase(rel, pat):
+                return True
+        elif fnmatch.fnmatchcase(name, pat):
+            return True
+    return False
+
+
 # xunit hooks are not tests. A spec-style class (its name ends with "_") still needs a real method.
 _NOT_TEST_METHODS = {
     "setup_module", "setup_function", "setup_class", "setup_method",
@@ -1102,7 +1162,7 @@ def _is_mapped_test(path: str, patterns: list[str], checkout: Path | None = None
     if not name.endswith(".py") or name in {"conftest.py", "__init__.py"}:
         return False
     specific = [p for p in patterns if p not in _CATCH_ALL_PYTHON_FILES]
-    if specific and _name_matches(name, specific):
+    if specific and _matches_python_file(rel, specific):
         return True
     broad = [p for p in patterns if p in _CATCH_ALL_PYTHON_FILES]
     if broad and _name_matches(name, broad):
@@ -6642,7 +6702,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["rewritten_imports"] = res["rewritten_imports"]
             # repair and retry trail, and inputs forced past an edited pattern's old boundary, shown on the record
             for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule", "forced_boundary_inputs",
-                      "claims_filled", "claims_timeout_retry", "name_checks", "call_bindings"):
+                      "claims_filled", "claims_timeout_retry", "name_checks", "call_bindings",
+                      "unparseable_regeneration"):
                 if res.get(k):
                     note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
