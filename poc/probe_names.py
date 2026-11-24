@@ -73,9 +73,147 @@ def problems(code: str, base_root) -> list[str]:
 
     base_root: the base checkout or its site-packages. None checks only undefined names in the
     probe itself (a name the probe uses and never binds). Imports of modules that are not in
-    that tree (the standard library, or a third-party package) are left alone."""
+    that tree (the standard library, or a third-party package) are left alone. A probe that
+    defines a stand-in for a name it should import is reported here too."""
     checker = _analyze(code, base_root)
-    return checker.messages() if checker is not None else []
+    out = checker.messages() if checker is not None else []
+    stand = stand_in_problem(code, base_root)
+    if stand and stand not in out:
+        out.append(stand)
+    return out
+
+
+def _handler_catches_import(handler: ast.ExceptHandler) -> bool:
+    names = _exc_names(handler.type)
+    if not names:
+        return False
+    return bool(names & _IMPORT_EXC)
+
+
+def _imported_bindings(stmts) -> set[str]:
+    """Names an import statement binds in this block."""
+    bound = set()
+    for stmt in stmts or []:
+        if isinstance(stmt, ast.Import):
+            for alias in stmt.names:
+                bound.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(stmt, ast.ImportFrom):
+            for alias in stmt.names:
+                if alias.name != "*":
+                    bound.add(alias.asname or alias.name)
+        elif isinstance(stmt, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+            bound |= _imported_bindings(getattr(stmt, "body", []))
+            bound |= _imported_bindings(getattr(stmt, "orelse", []))
+    return bound
+
+
+def _defines_substitute(stmts, imported: set[str]) -> bool:
+    """True when a handler builds a class or function, or replaces an imported name with one."""
+    for stmt in stmts or []:
+        if isinstance(stmt, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            return True
+        if isinstance(stmt, ast.Assign):
+            targets = set()
+            for target in stmt.targets:
+                targets |= _assigned(target)
+            value = stmt.value
+            if isinstance(value, (ast.Lambda, ast.ClassDef)):
+                return True
+            if isinstance(value, ast.Call):
+                func = value.func
+                fname = func.id if isinstance(func, ast.Name) else func.attr if isinstance(func, ast.Attribute) else ""
+                if fname == "type":
+                    return True
+            if targets & imported and not isinstance(value, ast.Constant):
+                return True
+        elif isinstance(stmt, ast.AnnAssign) and stmt.value is not None:
+            if _assigned(stmt.target) & imported and not isinstance(stmt.value, ast.Constant):
+                return True
+        elif isinstance(stmt, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+            if _defines_substitute(getattr(stmt, "body", []), imported):
+                return True
+            if _defines_substitute(getattr(stmt, "orelse", []), imported):
+                return True
+            if isinstance(stmt, ast.Try) and _defines_substitute(
+                    [s for h in stmt.handlers for s in h.body], imported):
+                return True
+    return False
+
+
+def _module_definitions(tree: ast.AST) -> set[str]:
+    return {stmt.name for stmt in getattr(tree, "body", [])
+            if isinstance(stmt, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))}
+
+
+def _import_modules(tree: ast.AST) -> list[tuple[str, set[str]]]:
+    """(dotted module, names imported from it) for every import in the probe.
+
+    A plain ``import pkg.mod`` imports no symbol from that module. ``from pkg.mod import Name`` does."""
+    found = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module and not node.level:
+            names = {alias.name for alias in node.names if alias.name != "*"}
+            found.append((node.module, names))
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                found.append((alias.name, set()))
+    return found
+
+
+def _type_names(path: Path) -> set[str]:
+    try:
+        tree = ast.parse(path.read_text(errors="replace"))
+    except (OSError, SyntaxError):
+        return set()
+    return {stmt.name for stmt in tree.body
+            if isinstance(stmt, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))}
+
+
+def stand_in_problem(code: str, base_root=None) -> str | None:
+    """Why this probe tests a substitute instead of the real target, or None.
+
+    A try/except ImportError (or ModuleNotFoundError) that defines a class or function, or that
+    binds an imported name to anything other than a constant, is a stand-in. So is a class or
+    function defined with a name the probe imported, and a class or function whose name is defined
+    in a project module the probe imports but does not import that name. A constant fallback
+    (None, False, 0) is an absence check and is not this. The standard library is not a project
+    module: only a module found under base_root counts."""
+    try:
+        tree = ast.parse(code or "")
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try):
+            continue
+        imported = _imported_bindings(node.body)
+        for handler in node.handlers:
+            if not _handler_catches_import(handler):
+                continue
+            if _defines_substitute(handler.body, imported):
+                return ("defines a stand-in where importing the real target fails; "
+                        "import the real object instead of defining a substitute")
+    defined = _module_definitions(tree)
+    imported_names: set[str] = set()
+    for _module, names in _import_modules(tree):
+        imported_names |= names
+    shadowed = sorted(defined & imported_names)
+    if shadowed:
+        shown = ", ".join(shadowed[:6])
+        return f"defines {shown} instead of importing the real target"
+    if base_root is None:
+        return None
+    clashes = []
+    for module, imported in _import_modules(tree):
+        loc = locate(base_root, module)
+        if loc is None or loc.path is None or not loc.path.is_file():
+            continue
+        for name in sorted(defined & _type_names(loc.path) - imported):
+            if name not in clashes:
+                clashes.append(name)
+    if not clashes:
+        return None
+    return ("defines " + ", ".join(clashes[:6])
+            + " instead of importing it from the real module")
 
 
 def _strip_probe_assign(tree: ast.AST) -> ast.AST:
