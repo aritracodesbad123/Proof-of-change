@@ -106,6 +106,20 @@ def test_every_observation_from_a_broken_call_is_broken_and_does_not_need_attent
     assert "does not differ although the claim says it does" not in reason
 
 
+def test_a_differing_field_on_a_broken_call_is_still_evidence():
+    claims = [{"id": "C2", "text": "the body stays the same", "covers": ["c2.*"], "expect": "same"}]
+    item = _item({"c2.exception_type": "MaxRetryError", "c2.body_type": "generator"},
+                 {"c2.exception_type": "MaxRetryError", "c2.body_type": "guard"}, claims)
+    by_name = {o["name"]: o for o in item["observations"]}
+    assert by_name["c2.exception_type"].get("probe_broken")
+    assert not by_name["c2.body_type"].get("probe_broken")
+    assert by_name["c2.body_type"]["state"] == "differs"
+    assert by_name["c2.body_type"]["label"] == "false_claim"
+    v, _reason, _fl = verdict_for(_compared(), None, None, {"all": ["pkg/widget.py", "tests/test_widget.py"]},
+                                  {"status": "ran", "items": [item]})
+    assert v == "needs_attention"
+
+
 def test_a_different_call_that_really_differs_still_needs_attention():
     claims = [{"id": "C1", "text": "the result stays", "covers": ["c1.*"], "expect": "same"}]
     item = _item({"c2.error_type": "AttributeError", "c2.task_values": None, "c1.value": 1},
