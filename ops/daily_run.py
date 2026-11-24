@@ -6608,6 +6608,18 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
     return plan
 
 
+def resend_crashed_probes(a) -> bool:
+    """Whether a crashed AI probe is sent back once, inside the existing rewrite budget.
+
+    Product checks already do this. A daily run does too: it has a model and no single pull request.
+    A study run (``bench`` is set) does not. A one-off check that is not a product check is unchanged."""
+    if getattr(a, "provider", None) is None or getattr(a, "bench", None):
+        return False
+    if product_route(a):
+        return True
+    return not getattr(a, "pr", None)
+
+
 def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, plan: list | None = None,
                pr_started: str | None = None) -> dict:
     """Run the frozen probes of this PR (plan_probes) on both sides, 3 alternating runs each, in the sides' own
@@ -6674,7 +6686,7 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         if it is not None:
             items.append(it)
     rewrite = None
-    if product_route(a) and getattr(a, "provider", None) is not None:
+    if resend_crashed_probes(a):
         rewrite = rewrite_crashed_probes(items, prdir, a, run_one)
     out = {"status": "ran" if items else "error", "items": items, "summary": probes.summarize(items)}
     if rewrite:
