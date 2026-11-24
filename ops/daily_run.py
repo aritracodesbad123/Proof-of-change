@@ -4959,7 +4959,8 @@ def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
         return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(rec)))))
-    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec)))))))
+    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(
+        hold_when_ai_unavailable(ai_probe_gate(coverage_gate.apply(rec))))))))
 
 
 def all_broken(item: dict) -> bool:
@@ -5154,6 +5155,61 @@ def ai_probe_gate(rec: dict) -> dict:
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
     out["reason"] = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
                      "exercised by a probe; " + (rec.get("reason") or ""))
+    return out
+
+
+_AI_GATE_PREFIX = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
+                   "exercised by a probe; ")
+# A stored "HTTPError" with no status is the failure this retry was added for. A status is kept when the
+# provider sent one, and a 4xx other than 429 is the request, not an outage.
+_AI_UNAVAILABLE_ERROR = re.compile(
+    r"(?:claims|probes) request failed: (?:"
+    r"HTTPError(?! \d)|HTTPError (?:429|5\d\d)|TimeoutError|URLError|JSONDecodeError|"
+    r"ConnectionResetError|ConnectionAbortedError|BrokenPipeError|RemoteDisconnected)"
+)
+
+
+def _model_probe_written(rec: dict) -> bool:
+    items = (rec.get("probes") or {}).get("items") or []
+    return any(isinstance(it, dict) and it.get("source") == "model" for it in items)
+
+
+def _ai_request_unavailable(rec: dict) -> bool:
+    """True when claims extraction or probe generation failed because the model request did not complete.
+
+    A probe the model did write, and that was then rejected, is not this case. The changed-line rule still
+    applies to that run.
+    """
+    errors = (rec.get("probe_plan") or {}).get("errors") or []
+    if any("rejected:" in str(item) for item in errors):
+        return False
+    text = "\n".join(str(item) for item in errors)
+    if model_provider.AI_UNAVAILABLE in text:
+        return True
+    return _AI_UNAVAILABLE_ERROR.search(text) is not None
+
+
+def hold_when_ai_unavailable(rec: dict) -> dict:
+    """Say 'AI unavailable' when the model request failed, and do not lower the verdict for that alone.
+
+    The AI-probe gate is unchanged. A probe that was written and did not run a changed line still lowers a
+    verified result. This only puts that result back when no model probe was written because the request
+    itself failed. A needs-attention result stays needs attention.
+    """
+    if not isinstance(rec, dict) or not _ai_request_unavailable(rec):
+        return rec
+    verdict, reason = rec.get("verdict"), rec.get("reason") or ""
+    if (verdict == Verdict.COULD_NOT_VERIFY.value and rec.get("verdict_before_ai_probe_gate") == Verdict.VERIFIED.value
+            and reason.startswith(_AI_GATE_PREFIX) and not _model_probe_written(rec)):
+        verdict = Verdict.VERIFIED.value
+        reason = reason[len(_AI_GATE_PREFIX):]
+    if model_provider.AI_UNAVAILABLE not in reason:
+        reason = f"{reason}; {model_provider.AI_UNAVAILABLE}" if reason else model_provider.AI_UNAVAILABLE
+    if verdict == rec.get("verdict") and reason == (rec.get("reason") or ""):
+        return rec
+    out = dict(rec)
+    out["verdict"] = verdict
+    out["reason"] = reason
     return out
 
 
@@ -5608,9 +5664,15 @@ def compare_sides(results: dict) -> dict:
     removed_by_base: dict = {}
     for t in removed:
         removed_by_base.setdefault(base_name(t), []).append(t)
+
+    def _ran(tid: str) -> bool:
+        return any(run.get(tid, ("absent", ""))[0] in EXECUTED for run in results["pr"])
+
     for b, gone in sorted(removed_by_base.items()):
-        if b in added_by_base:
-            out["reparametrized"].append({"test": b, "removed_ids": gone, "added_ids": added_by_base[b]})
+        siblings = added_by_base.get(b) or []
+        # A skipped parameter id did not run, so it does not show that the old test still exists.
+        if any(_ran(tid) for tid in siblings):
+            out["reparametrized"].append({"test": b, "removed_ids": gone, "added_ids": siblings})
         else:
             out["removed_tests"].extend(gone)
     out["executed"] = executed_counts(results)
@@ -5620,7 +5682,63 @@ def compare_sides(results: dict) -> dict:
         # on the pull request. The verdict does not read this.
         out["base_messages"] = base_notes
     settle_shared_environment(out, results)
+    absorb_parametrized_removals(out)
     return out
+
+
+# Outcomes of a test that actually ran. A skip is not one of them: a removed test whose only sibling was skipped
+# is still removed.
+_RAN_IDS = ("fixed", "regressions", "new_tests_failing", "new_tests_passing_ids", "preexisting_failures",
+            "flaky", "pr_unstable", "pr_unstable_noisy")
+
+
+def absorb_parametrized_removals(cmp: dict) -> None:
+    """Treat ``test_x`` and ``test_x[param]`` as the same test when the parametrized id ran.
+
+    A test that was not parametrized on the base and is parametrized on the pull request disappears as
+    ``test_x`` and comes back as ``test_x[param]``. When that new id failed on the base and passed on the
+    pull request, it is already under ``fixed`` and the added-id match never sees it, so ``test_x`` looked
+    removed. It is the same test. A removed id with no parametrized id that ran stays removed. A skipped
+    id did not run, so it does not clear a removal.
+    """
+    if not isinstance(cmp, dict):
+        return
+    ran: dict[str, list[str]] = {}
+    for key in _RAN_IDS:
+        for raw in cmp.get(key) or []:
+            tid = str(raw)
+            if "[" not in tid:
+                continue
+            ran.setdefault(base_name(tid), []).append(tid)
+    if not ran:
+        return
+    kept, gone_by = [], {}
+    for raw in cmp.get("removed_tests") or []:
+        tid = str(raw)
+        siblings = [item for item in ran.get(base_name(tid), []) if item != tid]
+        if siblings:
+            gone_by.setdefault(base_name(tid), []).append(tid)
+        else:
+            kept.append(raw)
+    if not gone_by:
+        return
+    cmp["removed_tests"] = kept
+    entries = []
+    for entry in cmp.get("reparametrized") or []:
+        if not isinstance(entry, dict) or entry.get("test") not in gone_by:
+            entries.append(entry)
+            continue
+        test = entry["test"]
+        gone = gone_by.pop(test)
+        entries.append({
+            "test": test,
+            "removed_ids": list(dict.fromkeys([*(entry.get("removed_ids") or []), *gone])),
+            "added_ids": list(dict.fromkeys([*(entry.get("added_ids") or []), *ran[test]])),
+        })
+    for test, gone in sorted(gone_by.items()):
+        entries.append({"test": test, "removed_ids": list(dict.fromkeys(gone)),
+                        "added_ids": list(dict.fromkeys(ran[test]))})
+    cmp["reparametrized"] = entries
 
 
 def failing_ids(run_result: dict) -> set:
@@ -8421,6 +8539,7 @@ def apply_execution_evidence_filters(cmp: dict) -> None:
     All three run it before ``verdict_for``. The saved record's own objects are not replaced here."""
     if not isinstance(cmp, dict):
         return
+    absorb_parametrized_removals(cmp)
     _drop_unexecuted_shared(cmp)
     _drop_gap_new_passes(cmp)
     _drop_environment_fixed(cmp)
