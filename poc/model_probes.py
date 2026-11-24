@@ -237,7 +237,8 @@ def has_test_code(tree: ast.AST) -> bool:
 
 def validate_probe(p: dict, claim_ids: set, python_version: str | None = None) -> str | None:
     """None if the model's probe is acceptable, else why not. python_version: the Python that will run the probe;
-    the code must also parse with that version's grammar (poc/probe_python.py)."""
+    the code must also parse with that version's grammar (poc/probe_python.py). The code is compiled, not only
+    parsed: ast.parse accepts a module-level nonlocal, and compile rejects it."""
     if not ID_RE.match(str(p.get("id", ""))):
         return f"bad probe id {p.get('id')!r}"
     code = p.get("code") or ""
@@ -247,6 +248,11 @@ def validate_probe(p: dict, claim_ids: set, python_version: str | None = None) -
         tree = ast.parse(code)
     except SyntaxError as e:
         return f"code does not parse: {e.msg} (line {e.lineno})"
+    # ast.parse accepts a module-level nonlocal. The interpreter that runs the probe does not.
+    try:
+        compile(code, str(p.get("id") or "<probe>"), "exec")
+    except SyntaxError as e:
+        return f"code does not compile: {e.msg} (line {e.lineno})"
     if python_version:
         from poc import probe_python
         why = probe_python.grammar_error(code, python_version)

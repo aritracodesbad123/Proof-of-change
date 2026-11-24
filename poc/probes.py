@@ -688,7 +688,37 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     _link_split_raise_value(spec, out)
     _shape_link(out)
     _dangling_cover_link(spec, out)
+    _mark_broken_call(out)
     return out
+
+
+def _mark_broken_call(out: list[dict]) -> None:
+    """A same-valued observation from a broken call is broken, and is not same or differs evidence.
+
+    The call is the dotted name without its last part. One observation that is the same exception
+    or skip on both sides means that field never ran. Another field of that call that also came out
+    the same (often None) did not observe the target either, so it is marked broken. A field that
+    differs is a real result and is left as it was. A different call, whose name has a different
+    prefix, is left as it was."""
+    broken = set()
+    for obs in out:
+        if obs.get("probe_broken"):
+            inp = _input_of(str(obs.get("name") or ""))
+            if inp:
+                broken.add(inp)
+    if not broken:
+        return
+    for obs in out:
+        inp = _input_of(str(obs.get("name") or ""))
+        if not inp or inp not in broken or obs.get("probe_broken") or obs.get("state") != "same":
+            continue
+        obs["probe_broken"] = ("the same exception or skip value on both sides: "
+                               "the probe never reached the call")
+        obs["label"] = FindingLabel.NOT_TESTABLE.value
+        obs.pop("diffs", None)
+        obs.pop("advisory", None)
+        obs.pop("linked_by", None)
+        obs.pop("note", None)
 
 
 DANGLING_NOTE = "the probe's only claim names none of its observations, so this difference is probably that claim, check"
