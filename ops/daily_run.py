@@ -5092,16 +5092,61 @@ def model_refusal(a) -> str | None:
             "(--baseline tests, tests+diff or tests+probes).")
 
 
+def _line_count_missing(item: dict) -> bool:
+    """True when this probe has no changed-line measurement, rather than a measurement of zero.
+
+    A stored zero, including one written when coverage was cleared, is a miss. A missing block is not."""
+    cov = item.get("probe_changed_line_coverage")
+    if not isinstance(cov, dict):
+        return True
+    covered = cov.get("changed_lines_covered")
+    if isinstance(covered, int):
+        return False
+    return cov.get("status") != "measured"
+
+
+def _showed_claimed_difference(item: dict) -> bool:
+    """True when this probe recorded a difference a claim said would happen."""
+    for obs in item.get("observations") or []:
+        if not isinstance(obs, dict):
+            continue
+        if (obs.get("label") == FindingLabel.PROVEN.value and obs.get("state") == "differs"
+                and not obs.get("advisory") and not obs.get("pr_only") and not obs.get("probe_broken")):
+            return True
+    return False
+
+
+def _tests_covered_every_change(rec: dict) -> bool:
+    cov = rec.get("coverage") if isinstance(rec.get("coverage"), dict) else {}
+    if cov.get("status") != "measured":
+        return False
+    total, covered = cov.get("changed_lines_total"), cov.get("changed_lines_covered")
+    return isinstance(total, int) and isinstance(covered, int) and total > 0 and covered == total
+
+
+def _model_probe_exercised(item: dict, rec: dict) -> bool:
+    """True when an AI-written probe exercised the change.
+
+    A measured changed line counts. So does a probe whose line count was never taken, when it recorded a
+    claimed difference and the tests ran every changed line. A measured zero does not count."""
+    if item.get("source") != "model" or item.get("status") in ("crashed", "error", "uninformative", "not_run", "rejected"):
+        return False
+    if all_broken(item):
+        return False
+    covered = ((item.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0)
+    if isinstance(covered, int) and covered > 0:
+        return True
+    return (_line_count_missing(item) and _showed_claimed_difference(item) and _tests_covered_every_change(rec))
+
+
 def ai_probe_gate(rec: dict) -> dict:
     """In modes that use AI-written probes: never 'verified' unless at least one AI-written (model) probe actually
-    executed a changed line (its measured changed-line coverage). Otherwise could_not_verify. Idempotent."""
+    executed a changed line (its measured changed-line coverage, or a claimed difference when that count was never
+    taken and the tests ran every changed line). Otherwise could_not_verify. Idempotent."""
     if rec.get("verdict") != Verdict.VERIFIED.value or not uses(rec.get("baseline"), "claim_probes"):
         return rec
     items = (rec.get("probes") or {}).get("items") or []
-    ran = [it.get("id") for it in items if it.get("source") == "model"
-           and it.get("status") not in ("crashed", "error", "uninformative", "not_run", "rejected")
-           and not all_broken(it)
-           and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
+    ran = [it.get("id") for it in items if _model_probe_exercised(it, rec)]
     if ran:
         return rec
     out = dict(rec)
@@ -5842,6 +5887,43 @@ def _agreed_observation(obs: dict) -> bool:
 TESTS_PROVE_NOTE = "the probe input may not reach the changed code; the tests already prove the change"
 
 
+def _proven_by_other_evidence(items: list, claim_id, own_names: set) -> bool:
+    """True when this claim is already proven by an observation other than its agreeing controls.
+
+    Proven here means labelled proven, the two sides differ, and the observation is not advisory, not unstable
+    only on the pull request, and not broken. The claim's own agreeing or control results are not this evidence."""
+    if not claim_id:
+        return False
+    for it in items:
+        for obs in it.get("observations") or []:
+            if not isinstance(obs, dict) or str(obs.get("claim") or "") != str(claim_id):
+                continue
+            if obs.get("name") in own_names:
+                continue
+            if (obs.get("label") == FindingLabel.PROVEN.value and obs.get("state") == "differs"
+                    and not obs.get("advisory") and not obs.get("pr_only") and not obs.get("probe_broken")):
+                return True
+    return False
+
+
+def _agreeing_note_blocks(items: list) -> bool:
+    """True when the agreeing-probe note would be what verifies a claim nothing else has proved.
+
+    Each claim that the note marks advisory must already be proven by a different observation. One claim that
+    is not is enough to keep the verdict at could not verify."""
+    groups: dict[str, set] = {}
+    for it in items:
+        for obs in it.get("observations") or []:
+            if not isinstance(obs, dict) or not obs.get("advisory") or obs.get("linked_by") != "tests_prove":
+                continue
+            cid = obs.get("claim")
+            if cid:
+                groups.setdefault(str(cid), set()).add(obs.get("name"))
+    if not groups:
+        return True
+    return any(not _proven_by_other_evidence(items, cid, names) for cid, names in groups.items())
+
+
 def tests_prove_the_change(cmp: dict | None, files: dict | None, coverage: dict | None) -> bool:
     """True when the tests already prove the change this probe is about.
 
@@ -5994,7 +6076,8 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     probe_results = probe_items(probe_results, baseline)
     # The verdict with the agreeing result still flagged. Used only so this note cannot be what verifies
     # the pull request: if that flag was needs attention and the note would leave verified, the result stays
-    # could not verify. A verdict that was already verified is not read here.
+    # could not verify, unless every claim the note marks is already proven by a different observation.
+    # A verdict that was already verified is not read here.
     plain = None
     if _apply_cross_run and tests_prove_the_change(cmp, files, coverage):
         plain, _, _ = verdict_for(cmp, cnv_reason, exits, files, probe_results, claims, baseline, docstring_only,
@@ -6056,7 +6139,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     if _apply_cross_run:
         v, reason, fl = _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_results, claims,
                                           baseline, docstring_only, same_sides, coverage)
-    if plain == Verdict.NEEDS_ATTENTION.value and v == Verdict.VERIFIED.value:
+    if (plain == Verdict.NEEDS_ATTENTION.value and v == Verdict.VERIFIED.value
+            and _agreeing_note_blocks((probe_results or {}).get("items") or [])):
+        # The note stays advisory. It does not demote a claim that another observation already proved, and it
+        # does not let a claim with no such proof become verified.
         v = Verdict.COULD_NOT_VERIFY.value
         reason = ("could not verify: an agreeing probe result is advisory (the probe input may not reach the "
                   "changed code; the tests already prove the change); that note does not verify the pull request ("
