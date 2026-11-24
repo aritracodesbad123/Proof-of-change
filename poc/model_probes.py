@@ -1073,6 +1073,65 @@ def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, re
     return dict(resp or {}, probes=fixed_list)
 
 
+def _empty_or_unparseable(why: str | None) -> bool:
+    """True when the probe has no test code or its code does not parse.
+
+    A compile failure, a missing name, or a bad claim id is not this case. Those already have their own retry."""
+    return bool(why) and (why == EMPTY_PROBE or why.startswith("code does not parse:"))
+
+
+def _probe_for_check(p: dict) -> dict:
+    pid = _tidy_id(p.get("id")) if isinstance(p.get("id"), str) else p.get("id")
+    return dict(p, id=pid, code=_unescape_code(p.get("code")))
+
+
+def _regenerate_empty_or_unparseable(provider, probes_prompt: str, user: str, ctx: dict, resp, claim_ids: set,
+                                     out: dict, outdir: Path, python_version: str | None, product: bool,
+                                     testable: list):
+    """One new probe when every probe is empty or still does not parse after the existing repairs.
+
+    The discarded code and the model reply are kept under the probe directory. A reply that already has a
+    usable probe is left as it is. An empty probes list is the existing retry, not this one. One call, then stop.
+    The first failure is not kept as a probe, so it is not scored. The new probe is judged by the usual checks."""
+    probes = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)]
+    if not probes:
+        return resp
+    reasons = []
+    for p in probes:
+        why = validate_probe(_probe_for_check(p), claim_ids, python_version)
+        if not _empty_or_unparseable(why):
+            return resp
+        reasons.append(why)
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    rejected = []
+    for p in probes:
+        pid = _tidy_id(p.get("id")) if isinstance(p.get("id"), str) else ""
+        if not ID_RE.match(pid):
+            pid = "probe"
+        name = f"{pid}.rejected.py"
+        path = outdir / name
+        if not path.exists():
+            code = _unescape_code(p.get("code"))
+            path.write_text(code if isinstance(code, str) else "")
+        if name not in rejected:
+            rejected.append(name)
+    reply_name = "rejected-reply.json"
+    reply_path = outdir / reply_name
+    if not reply_path.exists():
+        reply_path.write_text(json.dumps(resp, indent=1, default=str))
+    out["unparseable_regeneration"] = {"why": reasons[:5], "rejected": rejected, "reply": reply_name}
+    ask = (user + "\n\nYour previous probe was discarded because it was empty or did not parse as Python ("
+           + "; ".join(dict.fromkeys(reasons[:3]))
+           + "). Write a new probe. Do not return the discarded code.")
+    try:
+        again = provider.complete_json("probes", probes_prompt, ask, PROBES_SCHEMA, ctx)
+    except ProviderError as ex:
+        out["errors"].append(f"regenerate: {ex}")
+        return resp
+    return scrub_blank_claim_entries(again, product, testable)
+
+
 def _usable(resp, claim_ids: set) -> list:
     """The probes of a reply that pass validate_probe (after tidying ids and unescaping code)."""
     return [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
@@ -1227,6 +1286,10 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     # There is no second call. A probe that is still missing a required name is rejected below.
     if "retried" not in out:
         resp = _repair_missing_names(provider, probes_prompt, user, ctx, resp, base_root, out, product, layout)
+    # One fresh probe when the repairs and the existing retry left only an empty or unparseable probe.
+    # The discarded file and the raw reply stay under model-probes/. The new probe is judged normally.
+    resp = _regenerate_empty_or_unparseable(
+        provider, probes_prompt, user, ctx, resp, set(by_id), out, outdir, python_version, product, testable)
     draft_probes: list = []
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe

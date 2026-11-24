@@ -30,13 +30,14 @@ def test_repair_feeds_the_exact_error_and_keeps_the_fix(tmp_path):
 
 
 def test_repair_is_capped_and_every_attempt_recorded(tmp_path):
-    answers = [BROKEN] * (model_probes.PARSE_REPAIR_TRIES + 1) + [BROKEN]
+    # first answer, the capped repairs, the usual unusable retry, then one regeneration of what is still unparseable
+    answers = [BROKEN] * (model_probes.PARSE_REPAIR_TRIES + 1) + [BROKEN, BROKEN]
     prov, out = _run(tmp_path, answers)
     reps = out["parse_repairs"]
     assert [r["attempt"] for r in reps] == list(range(1, model_probes.PARSE_REPAIR_TRIES + 1))
     assert all(r["outcome"].startswith("still fails: unexpected character") for r in reps)
-    # claims + first probes + the capped repairs + the usual one "no usable probe" retry, and no more
-    assert len(prov.prompts) == 2 + model_probes.PARSE_REPAIR_TRIES + 1
+    assert len(prov.prompts) == 2 + model_probes.PARSE_REPAIR_TRIES + 2
+    assert out["unparseable_regeneration"]["why"]
 
 
 def test_no_repair_when_code_parses(tmp_path):
