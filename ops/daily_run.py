@@ -5664,9 +5664,15 @@ def compare_sides(results: dict) -> dict:
     removed_by_base: dict = {}
     for t in removed:
         removed_by_base.setdefault(base_name(t), []).append(t)
+
+    def _ran(tid: str) -> bool:
+        return any(run.get(tid, ("absent", ""))[0] in EXECUTED for run in results["pr"])
+
     for b, gone in sorted(removed_by_base.items()):
-        if b in added_by_base:
-            out["reparametrized"].append({"test": b, "removed_ids": gone, "added_ids": added_by_base[b]})
+        siblings = added_by_base.get(b) or []
+        # A skipped parameter id did not run, so it does not show that the old test still exists.
+        if any(_ran(tid) for tid in siblings):
+            out["reparametrized"].append({"test": b, "removed_ids": gone, "added_ids": siblings})
         else:
             out["removed_tests"].extend(gone)
     out["executed"] = executed_counts(results)
@@ -5676,7 +5682,63 @@ def compare_sides(results: dict) -> dict:
         # on the pull request. The verdict does not read this.
         out["base_messages"] = base_notes
     settle_shared_environment(out, results)
+    absorb_parametrized_removals(out)
     return out
+
+
+# Outcomes of a test that actually ran. A skip is not one of them: a removed test whose only sibling was skipped
+# is still removed.
+_RAN_IDS = ("fixed", "regressions", "new_tests_failing", "new_tests_passing_ids", "preexisting_failures",
+            "flaky", "pr_unstable", "pr_unstable_noisy")
+
+
+def absorb_parametrized_removals(cmp: dict) -> None:
+    """Treat ``test_x`` and ``test_x[param]`` as the same test when the parametrized id ran.
+
+    A test that was not parametrized on the base and is parametrized on the pull request disappears as
+    ``test_x`` and comes back as ``test_x[param]``. When that new id failed on the base and passed on the
+    pull request, it is already under ``fixed`` and the added-id match never sees it, so ``test_x`` looked
+    removed. It is the same test. A removed id with no parametrized id that ran stays removed. A skipped
+    id did not run, so it does not clear a removal.
+    """
+    if not isinstance(cmp, dict):
+        return
+    ran: dict[str, list[str]] = {}
+    for key in _RAN_IDS:
+        for raw in cmp.get(key) or []:
+            tid = str(raw)
+            if "[" not in tid:
+                continue
+            ran.setdefault(base_name(tid), []).append(tid)
+    if not ran:
+        return
+    kept, gone_by = [], {}
+    for raw in cmp.get("removed_tests") or []:
+        tid = str(raw)
+        siblings = [item for item in ran.get(base_name(tid), []) if item != tid]
+        if siblings:
+            gone_by.setdefault(base_name(tid), []).append(tid)
+        else:
+            kept.append(raw)
+    if not gone_by:
+        return
+    cmp["removed_tests"] = kept
+    entries = []
+    for entry in cmp.get("reparametrized") or []:
+        if not isinstance(entry, dict) or entry.get("test") not in gone_by:
+            entries.append(entry)
+            continue
+        test = entry["test"]
+        gone = gone_by.pop(test)
+        entries.append({
+            "test": test,
+            "removed_ids": list(dict.fromkeys([*(entry.get("removed_ids") or []), *gone])),
+            "added_ids": list(dict.fromkeys([*(entry.get("added_ids") or []), *ran[test]])),
+        })
+    for test, gone in sorted(gone_by.items()):
+        entries.append({"test": test, "removed_ids": list(dict.fromkeys(gone)),
+                        "added_ids": list(dict.fromkeys(ran[test]))})
+    cmp["reparametrized"] = entries
 
 
 def failing_ids(run_result: dict) -> set:
@@ -8477,6 +8539,7 @@ def apply_execution_evidence_filters(cmp: dict) -> None:
     All three run it before ``verdict_for``. The saved record's own objects are not replaced here."""
     if not isinstance(cmp, dict):
         return
+    absorb_parametrized_removals(cmp)
     _drop_unexecuted_shared(cmp)
     _drop_gap_new_passes(cmp)
     _drop_environment_fixed(cmp)
