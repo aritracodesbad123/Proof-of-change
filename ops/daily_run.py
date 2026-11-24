@@ -4959,7 +4959,8 @@ def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
         return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(rec)))))
-    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec)))))))
+    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(
+        hold_when_ai_unavailable(ai_probe_gate(coverage_gate.apply(rec))))))))
 
 
 def all_broken(item: dict) -> bool:
@@ -5154,6 +5155,61 @@ def ai_probe_gate(rec: dict) -> dict:
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
     out["reason"] = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
                      "exercised by a probe; " + (rec.get("reason") or ""))
+    return out
+
+
+_AI_GATE_PREFIX = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
+                   "exercised by a probe; ")
+# A stored "HTTPError" with no status is the failure this retry was added for. A status is kept when the
+# provider sent one, and a 4xx other than 429 is the request, not an outage.
+_AI_UNAVAILABLE_ERROR = re.compile(
+    r"(?:claims|probes) request failed: (?:"
+    r"HTTPError(?! \d)|HTTPError (?:429|5\d\d)|TimeoutError|URLError|JSONDecodeError|"
+    r"ConnectionResetError|ConnectionAbortedError|BrokenPipeError|RemoteDisconnected)"
+)
+
+
+def _model_probe_written(rec: dict) -> bool:
+    items = (rec.get("probes") or {}).get("items") or []
+    return any(isinstance(it, dict) and it.get("source") == "model" for it in items)
+
+
+def _ai_request_unavailable(rec: dict) -> bool:
+    """True when claims extraction or probe generation failed because the model request did not complete.
+
+    A probe the model did write, and that was then rejected, is not this case. The changed-line rule still
+    applies to that run.
+    """
+    errors = (rec.get("probe_plan") or {}).get("errors") or []
+    if any("rejected:" in str(item) for item in errors):
+        return False
+    text = "\n".join(str(item) for item in errors)
+    if model_provider.AI_UNAVAILABLE in text:
+        return True
+    return _AI_UNAVAILABLE_ERROR.search(text) is not None
+
+
+def hold_when_ai_unavailable(rec: dict) -> dict:
+    """Say 'AI unavailable' when the model request failed, and do not lower the verdict for that alone.
+
+    The AI-probe gate is unchanged. A probe that was written and did not run a changed line still lowers a
+    verified result. This only puts that result back when no model probe was written because the request
+    itself failed. A needs-attention result stays needs attention.
+    """
+    if not isinstance(rec, dict) or not _ai_request_unavailable(rec):
+        return rec
+    verdict, reason = rec.get("verdict"), rec.get("reason") or ""
+    if (verdict == Verdict.COULD_NOT_VERIFY.value and rec.get("verdict_before_ai_probe_gate") == Verdict.VERIFIED.value
+            and reason.startswith(_AI_GATE_PREFIX) and not _model_probe_written(rec)):
+        verdict = Verdict.VERIFIED.value
+        reason = reason[len(_AI_GATE_PREFIX):]
+    if model_provider.AI_UNAVAILABLE not in reason:
+        reason = f"{reason}; {model_provider.AI_UNAVAILABLE}" if reason else model_provider.AI_UNAVAILABLE
+    if verdict == rec.get("verdict") and reason == (rec.get("reason") or ""):
+        return rec
+    out = dict(rec)
+    out["verdict"] = verdict
+    out["reason"] = reason
     return out
 
 

@@ -19,11 +19,16 @@ missing, so a caller can see why. Only an explicit `none` is a run with the AI o
 """
 from __future__ import annotations
 
+import errno
 import json
+import logging
 import os
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+logger = logging.getLogger("poc.model_provider")
 
 BASE_URL = "https://api.tokenfactory.nebius.com/v1"
 KEY_ENV = "NEBIUS_API_KEY"
@@ -39,6 +44,12 @@ HELPER_FALLBACK = "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B"
 RECORDED_DIR = Path(__file__).resolve().parent.parent / "evals" / "fixtures" / "model_responses"
 FIXTURE_MARK = "TEST FIXTURE"
 PROVIDERS = ("nebius", "recorded", "none")
+# Claims extraction and probe generation only. A judge, helper, or summary call is not retried.
+TRANSIENT_TASKS = frozenset({"claims", "probes"})
+TRANSIENT_RETRIES = 2
+TRANSIENT_BACKOFF_S = (1.0, 2.0)
+AI_UNAVAILABLE = "AI unavailable"
+_RESET_ERRNOS = frozenset({errno.ECONNRESET, errno.ETIMEDOUT, errno.EPIPE, errno.ECONNABORTED})
 
 CLAIMS_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["claims"],
@@ -137,6 +148,40 @@ def _auth_status(exc: BaseException) -> int | None:
     return None
 
 
+def _transient_model_error(exc: BaseException) -> bool:
+    """True for a failure worth sending again: 5xx, 429, a timeout, a dropped connection, or a cut-off JSON body.
+
+    Any other HTTP status, including a 4xx that is not 429, is the request itself and is not sent again.
+    """
+    if isinstance(exc, urllib.error.HTTPError):
+        code = getattr(exc, "code", None)
+        return code == 429 or (isinstance(code, int) and code >= 500)
+    if isinstance(exc, json.JSONDecodeError):
+        return True
+    if isinstance(exc, (TimeoutError, ConnectionResetError, ConnectionAbortedError, BrokenPipeError)):
+        return True
+    if isinstance(exc, urllib.error.URLError) and isinstance(exc.reason, BaseException):
+        return _transient_model_error(exc.reason)
+    return isinstance(exc, OSError) and getattr(exc, "errno", None) in _RESET_ERRNOS
+
+
+def _failure_label(exc: BaseException) -> str:
+    """Exception name, plus the HTTP status when the provider sent one. The key is never included."""
+    code = getattr(exc, "code", None)
+    name = type(exc).__name__
+    if isinstance(code, int):
+        return f"{name} {code}"
+    return name
+
+
+def _log_model_failure(task: str, exc: BaseException, attempt: int, retrying: bool) -> None:
+    """One line per failed claims or probe request. The status code is included when the provider sent one."""
+    code = getattr(exc, "code", None)
+    status = f"HTTP {code}" if isinstance(code, int) else type(exc).__name__
+    again = "; retrying" if retrying else ""
+    logger.warning("model %s request failed: %s (%s), attempt %s%s", task, status, type(exc).__name__, attempt, again)
+
+
 class Provider:
     name = "base"
     blind = False
@@ -191,50 +236,63 @@ class NebiusProvider(Provider):
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "response_format": {"type": "json_schema",
                                     "json_schema": {"name": task, "schema": schema, "strict": True}}}
-        req = urllib.request.Request(f"{self.base_url}/chat/completions", data=json.dumps(body).encode(),
-                                     headers={"Content-Type": "application/json",
-                                              "Authorization": f"Bearer {self._key}"},
-                                     method="POST")  # br-allow-external: model inference call, creates nothing
         from poc import run_limits
         run_limits.before_call(task, body["model"], system, user, body["max_tokens"])   # refuses before sending
         raw_dir = os.environ.get("POC_RAW_DIR")
         data, err = None, None
-        import time as _tm
-        _call_t0 = _tm.time()
+        _call_t0 = time.time()
+        tries = 1 + (TRANSIENT_RETRIES if task in TRANSIENT_TASKS else 0)
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
-                data = json.loads(r.read())
-            ch = data["choices"][0]
-            if ch["message"].get("content") is None:
-                # Nemotron reasons before answering; if reasoning uses the whole token budget the answer is empty
-                err = f"no answer (finish_reason={ch.get('finish_reason')}, usage={data.get('usage')})"
-                raise ProviderError(f"{self.name} {task}: model returned no answer "
-                                    f"(finish_reason={ch.get('finish_reason')}; token limit {body['max_tokens']})")
-            return json.loads(ch["message"]["content"])
-        except ProviderRejected:
-            raise
-        except ProviderError:
-            raise
-        except Exception as e:  # noqa: BLE001
-            status = _auth_status(e)
-            if status is not None:
-                err = f"HTTP {status}"
-                raise ProviderRejected(status, starting=False) from None
-            err = f"{type(e).__name__}: {e}"
-            raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
+            for attempt in range(tries):
+                req = urllib.request.Request(
+                    f"{self.base_url}/chat/completions", data=json.dumps(body).encode(),
+                    headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._key}"},
+                    method="POST")  # br-allow-external: model inference call, creates nothing
+                try:
+                    with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
+                        data = json.loads(r.read())
+                    ch = data["choices"][0]
+                    if ch["message"].get("content") is None:
+                        # Nemotron reasons before answering; if reasoning uses the whole token budget the answer is empty
+                        err = f"no answer (finish_reason={ch.get('finish_reason')}, usage={data.get('usage')})"
+                        raise ProviderError(f"{self.name} {task}: model returned no answer "
+                                            f"(finish_reason={ch.get('finish_reason')}; token limit {body['max_tokens']})")
+                    parsed = json.loads(ch["message"]["content"])
+                    err = None
+                    return parsed
+                except ProviderRejected:
+                    raise
+                except ProviderError:
+                    raise
+                except Exception as e:  # noqa: BLE001
+                    if isinstance(e, urllib.error.HTTPError):
+                        e.close()
+                    status = _auth_status(e)
+                    if status is not None:
+                        err = f"HTTP {status}"
+                        raise ProviderRejected(status, starting=False) from None
+                    err = f"{type(e).__name__}: {e}"
+                    retry = attempt + 1 < tries and _transient_model_error(e)
+                    if task in TRANSIENT_TASKS:
+                        _log_model_failure(task, e, attempt + 1, retry)
+                    if retry:
+                        time.sleep(TRANSIENT_BACKOFF_S[min(attempt, len(TRANSIENT_BACKOFF_S) - 1)])
+                        continue
+                    label = _failure_label(e)
+                    note = f"; {AI_UNAVAILABLE}" if task in TRANSIENT_TASKS and _transient_model_error(e) else ""
+                    raise ProviderError(f"{self.name} {task} request failed: {label}{note}") from None
         finally:
             self._remember(task, err is None)
             from poc import run_progress as _rp
-            _rp.note_model_call(task, _tm.time() - _call_t0)
+            _rp.note_model_call(task, time.time() - _call_t0)
             from poc import cost as _cost
             _cost.record_call((data or {}).get("model") or body["model"], (data or {}).get("usage"), ok=err is None)
             run_limits.after_call((data or {}).get("model") or body["model"], (data or {}).get("usage"))
             if raw_dir:
-                import time as _t
                 d = Path(raw_dir)
                 d.mkdir(parents=True, exist_ok=True)
                 ch = ((data or {}).get("choices") or [{}])[0]
-                (d / f"{_t.strftime('%H%M%S')}-{task}-{os.getpid()}.json").write_text(json.dumps({
+                (d / f"{time.strftime('%H%M%S')}-{task}-{os.getpid()}.json").write_text(json.dumps({
                     "task": task, "requested_model": body["model"], "max_tokens": body["max_tokens"],
                     "server_model": (data or {}).get("model"), "finish_reason": ch.get("finish_reason"),
                     "usage": (data or {}).get("usage"), "error": err, "raw": data}, indent=1))

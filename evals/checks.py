@@ -342,6 +342,7 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
         broad_gate_for,
         broken_probe_gate,
         cap_for_uncollected_file,
+        hold_when_ai_unavailable,
         lower_verdict,
         no_evidence_gate,
         rejudge_probes,
@@ -376,7 +377,7 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
                                                                          "reason": v[1]})))["verdict"]
     gated = coverage_gate.apply(base | {"probes": pp if pp is not None else rec.get("probes"),
                                         "verdict": v[0], "reason": v[1], "baseline": baseline})
-    return advisory_gate(no_evidence_gate(broken_probe_gate(ai_probe_gate(gated))))["verdict"]
+    return advisory_gate(no_evidence_gate(broken_probe_gate(hold_when_ai_unavailable(ai_probe_gate(gated)))))["verdict"]
 
 
 def check_golden_pr_case(rec: dict, case: dict) -> Result:

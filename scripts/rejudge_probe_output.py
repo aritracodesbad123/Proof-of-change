@@ -154,6 +154,7 @@ def _reason(rec: dict) -> tuple[str, str]:
         broad_gate_for,
         broken_probe_gate,
         cap_for_uncollected_file,
+        hold_when_ai_unavailable,
         lower_verdict,
         no_evidence_gate,
         rejudge_probes,
@@ -183,7 +184,7 @@ def _reason(rec: dict) -> tuple[str, str]:
             out = advisory_gate(no_evidence_gate(broken_probe_gate(payload)))
         else:
             gated = coverage_gate.apply(payload | {"baseline": record.get("baseline")})
-            out = advisory_gate(no_evidence_gate(broken_probe_gate(ai_probe_gate(gated))))
+            out = advisory_gate(no_evidence_gate(broken_probe_gate(hold_when_ai_unavailable(ai_probe_gate(gated)))))
         alt = without_rewrite(record)
         if alt is not None:
             other = derive_verdict(alt, record.get("baseline"))

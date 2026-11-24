@@ -33,8 +33,8 @@ def final(rec: dict) -> dict:
         rec.get("verdict") == "could_not_verify" and "no AI-written probe" in (rec.get("reason") or ""))
     out = coverage_gate.apply(rec)
     if downgraded:
-        from ops.daily_run import ai_probe_gate
-        out = ai_probe_gate(out)
+        from ops.daily_run import ai_probe_gate, hold_when_ai_unavailable
+        out = hold_when_ai_unavailable(ai_probe_gate(out))
     return out
 
 
