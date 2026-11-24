@@ -5935,29 +5935,45 @@ def _junit_node_ids(cmp: dict) -> list[str]:
     return out
 
 
+def _same_test_file(left: str, right: str) -> bool:
+    """True when two relative paths name the same test file."""
+    a, b = left.lstrip("./"), right.lstrip("./")
+    return a == b or a.endswith("/" + b) or b.endswith("/" + a)
+
+
 def ids_that_prove_the_change(cmp: dict | None, files: dict | None) -> list[str]:
     """Fixed tests that show the tests already prove the change.
 
-    Default-named edited tests stay eligible. So does any other file this run actually collected: a changed
-    ``.py`` file a junit id resolves to, or a file named by a junit id or by ``collected_test_files``. A shared
+    The test has to live in a file the pull request edits. A default-named edited file stays eligible.
+    Any other edited file counts too when this run collected it: a junit id resolves to that file, or the
+    file is in ``collected_test_files``. A file that was collected but not edited does not count. A shared
     id does not count. This set is not the cross-run settlement set, which stays on default-named test files."""
     named = list(cross_run_test_ids(cmp, files))
     if not isinstance(cmp, dict):
         return named
-    changed = []
+    edited = []
     for raw in (files or {}).get("all") or []:
         rel = str(raw).lstrip("./")
-        if rel.endswith(".py") and rel not in changed:
-            changed.append(rel)
-    collected = list(_collected_test_files(cmp))
+        if rel.endswith(".py") and rel not in edited:
+            edited.append(rel)
+    if not edited:
+        return named
+    # Collected files that the pull request also edits. An unedited collected file is left out, so a
+    # fail-then-pass in a file this change did not touch cannot prove the change.
+    collected_edited = []
+    for rel in _collected_test_files(cmp):
+        if any(_same_test_file(rel, edited_file) for edited_file in edited) and rel not in collected_edited:
+            collected_edited.append(rel)
+    known = list(dict.fromkeys([*edited, *collected_edited]))
     for node in _junit_node_ids(cmp):
         head = node.split("::", 1)[0].lstrip("./")
-        if head.endswith(".py") and head not in collected:
-            collected.append(head)
-    eligible = list(dict.fromkeys([*changed, *collected]))
-    if not eligible:
+        hit = head if head.endswith(".py") and any(_same_test_file(head, edited_file) for edited_file in edited) else None
+        if hit is None:
+            hit = _edited_test_file(node, edited)
+        if hit and hit not in collected_edited:
+            collected_edited.append(hit)
+    if not collected_edited:
         return named
-    known = list(dict.fromkeys([*eligible, *collected]))
     info = cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else {}
     shared = set(_shared_execution_ids(cmp))
     for node in info.get("shared_ids") or []:
@@ -5965,7 +5981,7 @@ def ids_that_prove_the_change(cmp: dict | None, files: dict | None) -> list[str]
     out, seen = list(named), set(named)
     for raw in cmp.get("fixed") or []:
         tid = str(raw)
-        if tid in seen or not _edited_test_file(tid, eligible):
+        if tid in seen or not _edited_test_file(tid, collected_edited):
             continue
         if resolve_test_id(tid, known=known) in shared:
             continue
@@ -5977,10 +5993,11 @@ def ids_that_prove_the_change(cmp: dict | None, files: dict | None) -> list[str]
 def tests_prove_the_change(cmp: dict | None, files: dict | None, coverage: dict | None) -> bool:
     """True when the tests already prove the change this probe is about.
 
-    That is three facts together: at least one collected test fails on the base and passes on the pull request
-    and lives in a file the pull request edits, every changed line those tests can cover did run, and nothing
-    regressed. The file does not have to be named ``test_*.py``: a file the junit output shows was collected
-    counts. A shared test id is not that proof. Wording is not used to bind a claim to a test."""
+    That is three facts together: at least one test fails on the base and passes on the pull request and lives
+    in a file the pull request edits, every changed line those tests can cover did run, and nothing regressed.
+    The edited file does not have to be named ``test_*.py`` when this run collected it. A collected file the
+    pull request did not edit does not count. A shared test id is not that proof. Wording is not used to bind
+    a claim to a test."""
     if not isinstance(cmp, dict) or cmp.get("regressions"):
         return False
     if not ids_that_prove_the_change(cmp, files):

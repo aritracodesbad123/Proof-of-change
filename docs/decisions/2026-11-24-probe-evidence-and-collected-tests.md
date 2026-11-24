@@ -10,7 +10,7 @@ A probe is compiled before it is kept, not only parsed. Parsing accepts a `nonlo
 
 A probe that defines its own class or function when importing the real target fails is rejected. So is a probe that defines a class or function using a name it should have imported from the project. The existing name check reports that, and the existing one regenerate applies. Separately, when one observation from a call is the same exception or skip on both sides, every other observation from that same call that also came out the same is marked broken. Those values are not evidence. A field that differs is a real result and is kept. A different call is left alone.
 
-The rule that says the tests already prove a change now accepts a test file the run actually collected. The file does not have to be named `test_*.py` or `*_test.py`. Collection is read from the junit ids and from the stored list of collected files. A test id that both sides already had does not count. The separate cross-run settlement set is unchanged: it still uses only default-named edited test files.
+The rule that says the tests already prove a change now accepts an edited test file the run actually collected. The file still has to be one the pull request edits. It does not have to be named `test_*.py` or `*_test.py`. Collection is read from the junit ids and from the stored list of collected files. A file that was collected but not edited does not count. A test id that both sides already had does not count. The separate cross-run settlement set is unchanged: it still uses only default-named edited test files.
 
 ## Why
 
@@ -30,7 +30,7 @@ Compile every probe with `compile(src, name, 'exec')`. Rejected probes use the e
 
 Reject stand-in definitions in the existing name check. Mark every observation from a broken call broken.
 
-Let the tests-prove rule read the files the run collected. Do not widen the cross-run settlement set.
+Let the tests-prove rule read edited files the run collected, whatever their names. Do not count a collected file the pull request did not edit. Do not widen the cross-run settlement set.
 
 Nothing here rewrites a saved record. Nothing here calls a model during a replay.
 
@@ -42,7 +42,7 @@ Counting a measured zero changed lines as a hit would have verified a probe that
 
 Sending a crashed probe back more than once would spend another model call. The daily run uses the one rewrite that already existed.
 
-Guessing that any changed `.py` file is a test, without a junit id that resolves to it, would have treated library code as a passing test. The id has to resolve to a file the pull request changed, or to a file the run recorded as collected.
+Counting every collected file, including one the pull request did not edit, would have let an old flaky test that flipped from fail to pass prove a change it does not cover. The file has to be edited and collected.
 
 ## What it means for you
 
@@ -52,4 +52,4 @@ A probe that does not compile is sent back once. A daily run does the same for a
 
 A probe that defines a fake class when the import fails is not run. Values from a call that raised the same exception on both sides are not used as evidence.
 
-A test file pytest collected counts for the tests-prove note even when its name is not `test_*.py`.
+An edited test file pytest collected counts for the tests-prove note even when its name is not `test_*.py`. A collected file the pull request did not edit does not.

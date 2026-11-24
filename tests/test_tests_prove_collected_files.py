@@ -62,6 +62,22 @@ def test_a_junit_path_counts_without_the_collected_list():
     assert prove_the_change(cmp, FILES, COVERAGE)
 
 
+def test_a_collected_file_the_pull_request_did_not_edit_does_not_prove_the_change():
+    cmp = _comparison()
+    cmp["collected_test_files"] = ["tests/program.py", "tests/untouched.py"]
+    cmp["fixed"] = ["tests/untouched.py::test_flake"]
+    assert "tests/untouched.py::test_flake" not in ids_that_prove_the_change(cmp, FILES)
+    assert ids_that_prove_the_change(cmp, FILES) == []
+    assert not prove_the_change(cmp, FILES, COVERAGE)
+    # The edited collected file still counts when its own fail-then-pass is present.
+    both = _comparison()
+    both["collected_test_files"] = ["tests/program.py", "tests/untouched.py"]
+    both["fixed"] = list(both["fixed"]) + ["tests/untouched.py::test_flake"]
+    got = ids_that_prove_the_change(both, FILES)
+    assert NODE in got
+    assert "tests/untouched.py::test_flake" not in got
+
+
 def test_a_file_the_run_did_not_collect_does_not_prove_the_change():
     cmp = _comparison()
     cmp.pop("collected_test_files")
