@@ -1,0 +1,2970 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2742-86a58ecbafa3-2026-11-25",
+ "date_ist": "2026-11-25 11:50 IST",
+ "run_date": "2026-11-25",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2742,
+  "url": "https://github.com/PyCQA/isort/pull/2742",
+  "title": "Keep the comment of a wrapped `X as X` import",
+  "base_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "86a58ecbafa3459f711460e5df68507ff7346d50",
+  "merge_commit": null,
+  "tested_main_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "Enesuygurs",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-24T12:21:06Z",
+ "updated_at_ist": "2026-11-24 17:51 IST",
+ "ci_state": "passing",
+ "ci_detail": "1 check runs completed without failure",
+ "tested_at_ist": "2026-11-25 11:50 IST",
+ "files": {
+  "all": [
+   "isort/parse.py",
+   "tests/unit/test_regressions.py"
+  ],
+  "package_py": [
+   "isort/parse.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_regressions.py, tests/unit/test_parse.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 168,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.5,
+   "pytest_summary": "168 passed in 2.60s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 170,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.3,
+   "pytest_summary": "170 passed in 2.38s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 168,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.6,
+   "pytest_summary": "168 passed in 1.74s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 170,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "170 passed in 1.90s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 168,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.6,
+   "pytest_summary": "168 passed in 1.72s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 170,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.2,
+   "pytest_summary": "170 passed in 2.13s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2742/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 6,
+  "changed_lines_covered": 6,
+  "files": [
+   {
+    "file": "isort/parse.py",
+    "changed_lines_total": 6,
+    "changed_lines_covered": 6
+   }
+  ],
+  "seconds": 5.0,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "86a58ecbafa3459f711460e5df68507ff7346d50",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.7 GB (of 15.6 GB).",
+   "Setup check: free disk 88.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort \u00b7 PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: seed-isort-config \u00b7 PyPI \u2014 https://pypi.org/project/seed-isort-config/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: Create sharable configuration presets for isort \u00b7 Issue #970 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/970",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: THIRDPARTY module detected as FIRSTPARTY in 5.0 \u00b7 Issue #1696 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1696",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Installed black 26.10.1 from project (named by the error and listed in the project) on main and pr.",
+   "Installed hypothesis 6.170.17 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: could_not_verify: not fully verified: the changed code's test module(s) tests.unit.test_parse failed to load on both sides, so they did not run: 2 test(s) fail on main and pass on the PR; 146 test(s) ran on main, 146 on the PR; 0 new test(s) pass, 143 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_parse), so their tests did not run; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe: claim(s) C4 proven; probe model-probe3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change",
+   "After rerun: could_not_verify: could not verify: an agreeing probe result is advisory (the probe input may not reach the changed code; the tests already prove the change); that note does not verify the pull request (2 test(s) fail on main and pass on the PR; 170 test(s) ran on main, 170 on the PR; 0 new test(s) pass, 168 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe3 has no measured line coverage (no coverage data); it does not count as covering the change)"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "Dockerfile",
+   "README.md",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/release.yml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   "example_isort_formatting_plugin/pyproject.toml",
+   "example_shared_isort_profile/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "black",
+    "requirement": "black>=25.9.0",
+    "version": "26.10.1",
+    "versions": {
+     "main": "26.10.1",
+     "pr": "26.10.1"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis>=6.140.3",
+    "version": "6.170.17",
+    "versions": {
+     "main": "6.170.17",
+     "pr": "6.170.17"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: the changed code's test module(s) tests.unit.test_parse failed to load on both sides, so they did not run: 2 test(s) fail on main and pass on the PR; 146 test(s) ran on main, 146 on the PR; 0 new test(s) pass, 143 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_parse), so their tests did not run; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe: claim(s) C4 proven; probe model-probe3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change"
+    },
+    {
+     "round": 2,
+     "verdict": "could_not_verify",
+     "reason": "could not verify: an agreeing probe result is advisory (the probe input may not reach the changed code; the tests already prove the change); that note does not verify the pull request (2 test(s) fail on main and pass on the PR; 170 test(s) ran on main, 170 on the PR; 0 new test(s) pass, 168 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe3 has no measured line coverage (no coverage data); it does not count as covering the change)"
+    }
+   ],
+   "installed": [
+    {
+     "package": "black",
+     "requirement": "black>=25.9.0",
+     "version": "26.10.1",
+     "versions": {
+      "main": "26.10.1",
+      "pr": "26.10.1"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "package": "hypothesis",
+     "requirement": "hypothesis>=6.140.3",
+     "version": "6.170.17",
+     "versions": {
+      "main": "6.170.17",
+      "pr": "6.170.17"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "main_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "pr_sha": "86a58ecbafa3459f711460e5df68507ff7346d50",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "5b4633e874f42e1c35e96eedab4147b9f996d7d7",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ f5b5649f3ed4 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 86a58ecbafa3"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Keep the comment of a wrapped `X as X` import",
+    "source_quote": "Keep the comment of a wrapped `X as X` import",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2a",
+    "text": "After alias handling the original name X is still in just_imports, so the plain-name loop in parse.file_contents gives the comment to a plain X.",
+    "source_quote": "After alias handling the original name X is still in just_imports, so the plain-name loop in parse.file_contents gives the comment to a plain X.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true,
+    "quote_match": "loose"
+   },
+   {
+    "id": "C2b",
+    "text": "That name isn't imported directly, so the comment is never written.",
+    "source_quote": "That name isn't imported directly, so the comment is never written.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C3",
+    "text": "This change skips names that are only imported under an alias in that loop, so the comment stays with the aliased import.",
+    "source_quote": "This change skips names that are only imported under an alias in that loop, so the comment stays with the aliased import.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "With remove_redundant_aliases the import becomes a plain X, so the existing behaviour is kept there.",
+    "source_quote": "With remove_redundant_aliases the import becomes a plain X, so the existing behaviour is kept there.",
+    "testable": true,
+    "expect": "same",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C5c",
+    "text": "It fails before the change and passes after it.",
+    "source_quote": "It fails before the change and passes after it.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The unit tests, ruff, flake8 and the isort self-check pass.",
+    "source_quote": "The unit tests, ruff, flake8 and the isort self-check pass.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C2a",
+    "source_quote": "After alias handling the original name X is still in just_imports, so the plain-name loop in parse.file_contents gives the comment to a plain X."
+   },
+   {
+    "claim": "C4",
+    "source_quote": "With remove_redundant_aliases the import becomes a plain X, so the existing behaviour is kept there."
+   }
+  ],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p1",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nisort.parse\\nfrom isort.settings import DEFAULT_CONFIG\\n\\ncode = \\\"\\\"\\\"from mypackage.config import \\\\\\n    ConfigurationManager as \\\\\\n    ConfigurationManager  # comment\\\"\\\"\\\"\\n\\nparsed = isort.parse.file_contents(code, config=DEFAULT_CONFIG)\\nnested_comments = parsed.categorized_comm"
+    },
+    "outcome": "still fails: unmatched '}' (line 20)",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   },
+   {
+    "attempt": 1,
+    "probe": "p2",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nisort.parse\\nfrom isort.settings import DEFAULT_CONFIG\\n\\nconfig = DEFAULT_CONFIG._replace(remove_redundant_aliases=True)\\ncode = \\\"\\\"\\\"from mypackage.config import \\\\\\n    ConfigurationManager as \\\\\\n    ConfigurationManager  # comment\\\"\\\"\\\"\\n\\nparsed = isort.parse.file_contents(code, "
+    },
+    "outcome": "no fixed probe returned"
+   },
+   {
+    "attempt": 2,
+    "probe": "p1",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nisort.parse\\nfrom isort.settings import DEFAULT_CONFIG\\n\\ncode = \\\"\\\"\\\"from mypackage.config import \\\\\\n    ConfigurationManager as \\\\\\n    ConfigurationManager  # comment\\\"\\\"\\\"\\n\\nparsed = isort.parse.file_contents(code, config=DEFAULT_CONFIG)\\nnested_comments = parsed.categorized_comm"
+    },
+    "outcome": "still fails: unmatched '}' (line 18)",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   },
+   {
+    "attempt": 2,
+    "probe": "p2",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nisort.parse\\nfrom isort.settings import DEFAULT_CONFIG\\n\\nconfig = DEFAULT_CONFIG._replace(remove_redundant_aliases=True)\\ncode = \\\"\\\"\\\"from mypackage.config import \\\\\\n    ConfigurationManager as \\\\\\n    ConfigurationManager  # comment\\\"\\\"\\\"\\n\\nparsed = isort.parse.file_contents(code, "
+    },
+    "outcome": "no fixed probe returned"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "isort.parse.file_contents"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "f1b6e7fa11b05eef6eb75405c141d4233d48b74ce2586c8b95edd2df6673e598",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-25T06:23:47.782822+00:00",
+    "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1520,
+     "base_files": {
+      "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "768020ca38a24cad9f9f84f16e32247df6434d495cfbcfe89751bf6ab777fb1f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-25T06:23:47.783038+00:00",
+    "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1520,
+     "base_files": {
+      "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "1a53858250ed4c127766a41dc51b63d26b94452adcd73b7f87412314ec3ce407",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-25T06:23:47.783129+00:00",
+    "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+    "inputs": {
+     "title_chars": 45,
+     "body_chars": 1520,
+     "base_files": {
+      "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "9a9957edd9642f7a9a7b861e81e02d39c0db54905aafee76409bfe52a46e62b9",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-25T06:23:47.785816+00:00",
+    "inputs_sha256": "48903dcdf858e9068994e1a16320d552e97a1e098fe105f6e31a067d6f8e818e",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-25T06:23:48.056418+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_parse.py"
+  ],
+  "pr": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_parse.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "f5b5649f3ed445717aa327152a582193bed2269f",
+   "installed": "f5b5649f3ed445717aa327152a582193bed2269f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "86a58ecbafa3459f711460e5df68507ff7346d50",
+   "installed": "86a58ecbafa3459f711460e5df68507ff7346d50",
+   "ok": true
+  }
+ },
+ "base_head_sha": "f5b5649f3ed445717aa327152a582193bed2269f",
+ "comparison": {
+  "same": 168,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.unit.test_regressions::test_comment_kept_on_the_wrapped_alias_it_was_written_on",
+   "tests.unit.test_regressions::test_comment_kept_on_wrapped_import_aliased_to_its_own_name"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 170,
+   "pr": 170
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.unit.test_regressions::test_comment_kept_on_the_wrapped_alias_it_was_written_on": "AssertionError: assert 'from pkg imp...port b as b\\n' == 'from pkg imp...tr-defined]\\n'",
+   "tests.unit.test_regressions::test_comment_kept_on_wrapped_import_aliased_to_its_own_name": "AssertionError: assert 'from mypacka...tionManager\\n' == 'from mypacka...mport-alias\\n'"
+  },
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "f1b6e7fa11b05eef6eb75405c141d4233d48b74ce2586c8b95edd2df6673e598",
+    "target": "PyCQA/isort#2742",
+    "about": "Probe for C1, C3, C5c",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Keep the comment of a wrapped `X as X` import",
+      "covers": [
+       "p1.comment"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "This change skips names that are only imported under an alias in that loop, so the comment stays with the aliased import.",
+      "covers": [
+       "p1.comment"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5c",
+      "source": "PR description",
+      "text": "It fails before the change and passes after it.",
+      "covers": [
+       "p1.comment"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p1.comment": null
+      },
+      {
+       "p1.comment": null
+      },
+      {
+       "p1.comment": null
+      }
+     ],
+     "pr": [
+      {
+       "p1.comment": null
+      },
+      {
+       "p1.comment": null
+      },
+      {
+       "p1.comment": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p1.comment",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p1.comment\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p1.comment\""
+       }
+      },
+      "advisory": true,
+      "linked_by": "tests_prove",
+      "note": "the probe input may not reach the changed code; the tests already prove the change"
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "f1b6e7fa11b05eef6eb75405c141d4233d48b74ce2586c8b95edd2df6673e598",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-25T06:23:47.782822+00:00",
+     "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1520,
+      "base_files": {
+       "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:23:48.056418+00:00"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "768020ca38a24cad9f9f84f16e32247df6434d495cfbcfe89751bf6ab777fb1f",
+    "target": "PyCQA/isort#2742",
+    "about": "Probe for C4",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "With remove_redundant_aliases the import becomes a plain X, so the existing behaviour is kept there.",
+      "covers": [
+       "p2.comment"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p2.comment": null
+      },
+      {
+       "p2.comment": null
+      },
+      {
+       "p2.comment": null
+      }
+     ],
+     "pr": [
+      {
+       "p2.comment": null
+      },
+      {
+       "p2.comment": null
+      },
+      {
+       "p2.comment": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p2.comment",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.comment\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.comment\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "768020ca38a24cad9f9f84f16e32247df6434d495cfbcfe89751bf6ab777fb1f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-25T06:23:47.783038+00:00",
+     "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1520,
+      "base_files": {
+       "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:23:48.056418+00:00"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "1a53858250ed4c127766a41dc51b63d26b94452adcd73b7f87412314ec3ce407",
+    "target": "PyCQA/isort#2742",
+    "about": "Probe for C6",
+    "claims": [
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "The unit tests, ruff, flake8 and the isort self-check pass.",
+      "covers": [
+       "p3.dummy"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p3.dummy": 42
+      },
+      {
+       "p3.dummy": 42
+      },
+      {
+       "p3.dummy": 42
+      }
+     ],
+     "pr": [
+      {
+       "p3.dummy": 42
+      },
+      {
+       "p3.dummy": 42
+      },
+      {
+       "p3.dummy": 42
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p3.dummy",
+      "state": "same",
+      "label": "proven",
+      "claim": "C6",
+      "main": 42,
+      "pr": 42,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p3.dummy\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p3.dummy\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "1a53858250ed4c127766a41dc51b63d26b94452adcd73b7f87412314ec3ce407",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-25T06:23:47.783129+00:00",
+     "inputs_sha256": "979d6fee17cc295094b3ee0e6b2cc0f72ae7655afc7790b4683eeed6de7f6349",
+     "inputs": {
+      "title_chars": 45,
+      "body_chars": 1520,
+      "base_files": {
+       "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:23:48.056418+00:00"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "9a9957edd9642f7a9a7b861e81e02d39c0db54905aafee76409bfe52a46e62b9",
+    "target": "PyCQA/isort#2742",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "isort.parse.file_contents.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.parse.file_contents.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.parse.file_contents.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.parse.file_contents.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.parse.file_contents.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.parse.file_contents.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.parse.file_contents.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.parse.file_contents.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.parse.file_contents.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.parse.file_contents.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.parse.file_contents.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.parse.file_contents.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.parse.file_contents.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": [
+       [
+        "abc"
+       ],
+       [
+        "abc"
+       ],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       1,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "pr": [
+       [
+        "abc"
+       ],
+       [
+        "abc"
+       ],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       1,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.parse.file_contents.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.parse.file_contents.input4\""
+       }
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call"
+     },
+     {
+      "name": "isort.parse.file_contents.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.parse.file_contents.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.parse.file_contents.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.parse.file_contents.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.parse.file_contents.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.parse.file_contents.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.parse.file_contents.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.parse.file_contents.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.parse.file_contents.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": [
+       [],
+       [],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       0,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "pr": [
+       [],
+       [],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       0,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.parse.file_contents.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.parse.file_contents.input9\""
+       }
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call"
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "9a9957edd9642f7a9a7b861e81e02d39c0db54905aafee76409bfe52a46e62b9",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-25T06:23:47.785816+00:00",
+     "inputs_sha256": "48903dcdf858e9068994e1a16320d552e97a1e098fe105f6e31a067d6f8e818e",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "isort/parse.py": "cb0a50a4b0e8c36a2eeb5678c3a580f1ebb2b1b79d96da913b74e7510468e8a0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:23:48.056418+00:00"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate"
+    }
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "proven",
+    "proven"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1",
+     "name": "p1.comment",
+     "label": "needs_human",
+     "claim": "C1"
+    }
+   ],
+   "proven_claims": [
+    "C4",
+    "C6"
+   ],
+   "reason": "probe: 1 observation(s) need attention: p1.comment does not differ although the claim says it does (C1); probe: claim(s) C4, C6 proven; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   },
+   "model-probe2": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   },
+   "model-probe3": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   },
+   "diff-api": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: an agreeing probe result is advisory (the probe input may not reach the changed code; the tests already prove the change); that note does not verify the pull request (2 test(s) fail on main and pass on the PR; 170 test(s) ran on main, 170 on the PR; 0 new test(s) pass, 168 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe3 has no measured line coverage (no coverage data); it does not count as covering the change)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: an agreeing probe result is advisory (the probe input may not reach the changed code; the tests already prove the change); that note does not verify the pull request (2 test(s) fail on main and pass on the PR; 170 test(s) ran on main, 170 on the PR; 0 new test(s) pass, 168 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): p1.comment (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe2 has no measured line coverage (no coverage data); it does not count as covering the change; probe model-probe3 has no measured line coverage (no coverage data); it does not count as covering the change)",
+ "changed_lines_total": 6,
+ "changed_lines_covered": 6,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "6 of 6 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/parse.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 260.0,
+  "tests": 18.0
+ },
+ "cost": {
+  "ai_calls": 5,
+  "failed_ai_calls": 0,
+  "input_tokens": 23748,
+  "output_tokens": 42020,
+  "thinking_tokens": 38902,
+  "cost_usd": 0.044942,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.044942,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 260.0,
+   "tests": 18.0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.017333,
+  "total_cost_usd": 0.062275,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-25/748f814/isort-2742"
+ }
+}
