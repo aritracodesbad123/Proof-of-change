@@ -919,7 +919,7 @@
  },
  "pdf_push": {
   "ok": true,
-  "attempts": 2,
+  "attempts": 1,
   "error": null,
   "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-25/748f814/isort-2810"
  }
