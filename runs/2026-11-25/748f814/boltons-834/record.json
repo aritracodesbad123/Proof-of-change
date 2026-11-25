@@ -1,0 +1,926 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-834-b1e388fb3e11-2026-11-25",
+ "date_ist": "2026-11-25 11:57 IST",
+ "run_date": "2026-11-25",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 834,
+  "url": "https://github.com/mahmoud/boltons/pull/834",
+  "title": "fix(strutils): preserve unmapped diaeresis characters in asciify",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b1e388fb3e11a88614d8a33465ec8530b52176eb",
+  "merge_commit": "a080f6c63fd0e4d560a7440b1e0c9f75e8edb7f2",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "sogav21",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-24T07:25:33Z",
+ "updated_at_ist": "2026-11-24 12:55 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-25 11:57 IST",
+ "files": {
+  "all": [
+   "boltons/strutils.py",
+   "tests/test_strutils.py"
+  ],
+  "package_py": [
+   "boltons/strutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_strutils.py, tests/test_fileutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "46 passed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "48 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "46 passed in 0.61s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "48 passed in 0.62s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "46 passed in 0.61s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 48,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "48 passed in 0.64s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-834/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "boltons/strutils.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 2.1,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "b1e388fb3e11a88614d8a33465ec8530b52176eb",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.3 GB (of 15.6 GB).",
+   "Setup check: free disk 88.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/README.md at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/README.md",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: GitHub - mahmoud/boltons at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/tree/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "tox.ini",
+   "setup.cfg",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "a080f6c63fd0e4d560a7440b1e0c9f75e8edb7f2",
+  "merge_commit": "a080f6c63fd0e4d560a7440b1e0c9f75e8edb7f2",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "b1e388fb3e11a88614d8a33465ec8530b52176eb"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit a080f6c63fd0 (refs/pull/834/merge) of head b1e388fb3e11"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When an unmapped character has a Unicode decomposition ending in a combining diaeresis, apply the ordinary decomposition handling.",
+    "source_quote": "When an unmapped character has a Unicode decomposition ending in a combining diaeresis, apply the ordinary decomposition handling.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Explicit transliterations, including German umlauts, still take precedence.",
+    "source_quote": "Explicit transliterations, including German umlauts, still take precedence.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "Base characters that cannot be encoded as ASCII follow the existing fallback of replacement with `?` or omission with `ignore=True`.",
+    "source_quote": "Base characters that cannot be encoded as ASCII follow the existing fallback of replacement with `?` or omission with `ignore=True`.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C4",
+    "text": "It fails in both modes on the original code.",
+    "source_quote": "It fails in both modes on the original code.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C5",
+    "text": "The full suite and doctests passed on Windows with CPython 3.11.15 and 3.14.4 (776 passed and 1 skipped on each).",
+    "source_quote": "The full suite and doctests passed on Windows with CPython 3.11.15 and 3.14.4 (776 passed and 1 skipped on each).",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "a97d570b788968e66ba9daf4dee209949a3575db0f13fafd51738fd3899a8581",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-25T06:28:44.664639+00:00",
+    "inputs_sha256": "086d464d74a3f36641918ece973f13149ed8333feeecfd28277d0d894e535331",
+    "inputs": {
+     "title_chars": 64,
+     "body_chars": 1628,
+     "base_files": {
+      "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-25T06:28:44.858986+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_strutils.py",
+   "tests/test_fileutils.py"
+  ],
+  "pr": [
+   "tests/test_strutils.py",
+   "tests/test_fileutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "a080f6c63fd0e4d560a7440b1e0c9f75e8edb7f2",
+   "installed": "a080f6c63fd0e4d560a7440b1e0c9f75e8edb7f2",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 46,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_strutils::test_asciify_precomposed_diaeresis[False]",
+   "tests.test_strutils::test_asciify_precomposed_diaeresis[True]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 48,
+   "pr": 48
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_strutils::test_asciify_precomposed_diaeresis[False]": "AssertionError: assert b' aeoeue ' == b'EeIi aeoeue EeIi'",
+   "tests.test_strutils::test_asciify_precomposed_diaeresis[True]": "AssertionError: assert b' aeoeue ' == b'EeIi aeoeue EeIi'"
+  },
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-probe1-rewrite",
+    "source": "model",
+    "path": "model-probes/model-probe1-rewrite.py",
+    "sha256": "fd6e7a605c1a2103fc0603c0f8c24a0936f20898cfa74f404db859ba398056d6",
+    "target": "mahmoud/boltons#834",
+    "about": "Testing C1 and C2 claims for asciify function",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When an unmapped character has a Unicode decomposition ending in a combining diaeresis, apply the ordinary decomposition handling.",
+      "covers": [
+       "c1.normal.*",
+       "c1.ignore.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Explicit transliterations, including German umlauts, still take precedence.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-rewrite-main-1.jsonl",
+      "probe-model-probe1-rewrite-main-2.jsonl",
+      "probe-model-probe1-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-rewrite-pr-1.jsonl",
+      "probe-model-probe1-rewrite-pr-2.jsonl",
+      "probe-model-probe1-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "fd6e7a605c1a2103fc0603c0f8c24a0936f20898cfa74f404db859ba398056d6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-25T06:29:06.395764+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "a97d570b788968e66ba9daf4dee209949a3575db0f13fafd51738fd3899a8581",
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:29:06.395795+00:00"
+    },
+    "rewrite_of": "model-probe1",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/strutils.py",
+       "changed_lines_total": 5,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-probe1-rewrite.json",
+     "changed_lines_touched": 4
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  },
+  "rewrite": {
+   "before": [
+    {
+     "id": "model-probe1",
+     "source": "model",
+     "path": "model-probes/model-probe1.py",
+     "sha256": "a97d570b788968e66ba9daf4dee209949a3575db0f13fafd51738fd3899a8581",
+     "target": "mahmoud/boltons#834",
+     "about": "Testing C1 and C2 claims for asciify function",
+     "claims": [
+      {
+       "id": "C1",
+       "source": "PR description",
+       "text": "When an unmapped character has a Unicode decomposition ending in a combining diaeresis, apply the ordinary decomposition handling.",
+       "covers": [
+        "c1.normal.*",
+        "c1.ignore.*"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C2",
+       "source": "PR description",
+       "text": "Explicit transliterations, including German umlauts, still take precedence.",
+       "covers": [
+        "c2.*"
+       ],
+       "expect": "same"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 0.1,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 0.1,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 0.1,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 0.1,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 0.1,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 0.1,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe1-main-1.jsonl",
+       "probe-model-probe1-main-2.jsonl",
+       "probe-model-probe1-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe1-pr-1.jsonl",
+       "probe-model-probe1-pr-2.jsonl",
+       "probe-model-probe1-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 0
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 0
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 0
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe1-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe1-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "a97d570b788968e66ba9daf4dee209949a3575db0f13fafd51738fd3899a8581",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-25T06:28:44.664639+00:00",
+      "inputs_sha256": "086d464d74a3f36641918ece973f13149ed8333feeecfd28277d0d894e535331",
+      "inputs": {
+       "title_chars": 64,
+       "body_chars": 1628,
+       "base_files": {
+        "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-25T06:28:44.858986+00:00"
+     }
+    }
+   ],
+   "probes": [
+    {
+     "probe": "model-probe1",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 0}",
+     "parse_error": "non-json output: the last line of stdout is not one JSON object",
+     "rejected_probe": "model-probes/model-probe1.rejected.py",
+     "rejected_stdout": [
+      "model-probe1.rejected-main-1.stdout",
+      "model-probe1.rejected-main-2.stdout",
+      "model-probe1.rejected-main-3.stdout",
+      "model-probe1.rejected-pr-1.stdout",
+      "model-probe1.rejected-pr-2.stdout",
+      "model-probe1.rejected-pr-3.stdout"
+     ],
+     "result": "rewritten once for unparsed output (still crashes on main)"
+    }
+   ]
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1-rewrite": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 5,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe1-rewrite"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 48 test(s) ran on main, 48 on the PR; 0 new test(s) pass, 46 unchanged; probe model-probe1-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1 expect a difference but no observation matches (2 test(s) fail on main and pass on the PR; 48 test(s) ran on main, 48 on the PR; 0 new test(s) pass, 46 unchanged; probe model-probe1-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "probe_rewrite_cap": {
+  "with_rewrite": "could_not_verify",
+  "without_rewrite": "could_not_verify",
+  "final": "could_not_verify"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/strutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 84.9,
+  "tests": 6.5
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 17692,
+  "output_tokens": 10948,
+  "thinking_tokens": 9415,
+  "cost_usd": 0.015161,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.015161,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 84.9,
+   "tests": 6.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00566,
+  "total_cost_usd": 0.020821,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-25/748f814/boltons-834"
+ }
+}
