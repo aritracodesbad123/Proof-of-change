@@ -1,0 +1,1235 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-5306-ffba6e632540-2026-11-25",
+ "date_ist": "2026-11-25 11:32 IST",
+ "run_date": "2026-11-25",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 5306,
+  "url": "https://github.com/urllib3/urllib3/pull/5306",
+  "title": "Raise DecodeError on incomplete gzip/deflate response bodies",
+  "base_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+  "merge_commit": null,
+  "tested_main_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "Kesavamoorthig06",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-22T10:57:52Z",
+ "updated_at_ist": "2026-11-22 16:27 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-25 11:32 IST",
+ "files": {
+  "all": [
+   "changelog/5306.bugfix.rst",
+   "src/urllib3/response.py",
+   "test/test_response.py"
+  ],
+  "package_py": [
+   "src/urllib3/response.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/5306.bugfix.rst",
+   "test/test_response.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: test/test_response.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 61,
+   "failed": 0,
+   "error": 1,
+   "skipped": 34,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 4.0,
+   "pytest_summary": "60 passed, 34 skipped in 2.48s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 62,
+   "failed": 0,
+   "error": 1,
+   "skipped": 27,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 4.4,
+   "pytest_summary": "61 passed, 27 skipped in 2.77s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 69,
+   "failed": 0,
+   "error": 1,
+   "skipped": 31,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 3.9,
+   "pytest_summary": "68 passed, 31 skipped in 2.36s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 69,
+   "failed": 0,
+   "error": 1,
+   "skipped": 25,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 4.5,
+   "pytest_summary": "68 passed, 25 skipped in 2.92s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 62,
+   "failed": 0,
+   "error": 1,
+   "skipped": 27,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 4.2,
+   "pytest_summary": "61 passed, 27 skipped in 2.38s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 62,
+   "failed": 0,
+   "error": 1,
+   "skipped": 28,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 4.5,
+   "pytest_summary": "61 passed, 28 skipped in 2.88s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-5306/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "failed",
+  "why": "coverage run produced no data (exit 3); see coverage-pytest.log",
+  "seconds": 6.7
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "behind",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.7 GB (of 15.6 GB).",
+   "Setup check: free disk 88.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: urllib3/README.md at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/README.md",
+   "Source: urllib3 \u00b7 PyPI \u2014 https://pypi.org/project/urllib3/",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/tree/main",
+   "Source: urllib3/docs/user-guide.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/docs/user-guide.rst",
+   "Source: Localization of The Urllib3 Documentation \u00b7 Issue #4951 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/4951",
+   "Source: PyPI recent updates for urllib3 \u2014 https://pypi.org/rss/project/urllib3/releases.xml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install trustme>=1.2.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "noxfile.py",
+   "setup.cfg",
+   ".github/workflows/lint.yml",
+   ".github/workflows/changelog.yml",
+   ".github/workflows/scorecards.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/ci.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/downstream.yml",
+   "docs/contributing.rst",
+   "docs/Makefile",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "trustme>=1.2.1",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "trustme>=1.2.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: trustme>=1.2.1."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "trustme",
+    "requirement": "trustme>=1.2.1",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 5306,
+  "head_sha": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+  "base_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "main_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+  "pr_sha": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "3db5970fcc56666ed5e7d450816ece9cce55589f",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 5ebe9bf9f691 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head ffba6e632540"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Incomplete gzip or deflate response bodies will raise DecodeError instead of returning partial data silently.",
+    "source_quote": "Raise DecodeError on incomplete gzip/deflate response bodies",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "A truncated gzip or deflate response body currently decodes to partial data with no error when HTTP framing can't detect the truncation (no Content-Length, connection close).",
+    "source_quote": "A truncated gzip or deflate response body currently decodes to partial data with no error when HTTP framing can't detect the truncation (no Content-Length, connection close).",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C3",
+    "text": "Mid-stream corruption raises DecodeError, but a stream that simply ends early is silently accepted:",
+    "source_quote": "Mid-stream corruption raises DecodeError, but a stream that simply ends early is silently accepted:",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C4",
+    "text": "This PR mirrors that for gzip and deflate: `flush()` now raises DecodeError when the compressed stream never completed.",
+    "source_quote": "This PR mirrors that for gzip and deflate: `flush()` now raises DecodeError when the compressed stream never completed.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Garbage after a complete gzip member is still tolerated (unchanged), and empty bodies behave as before.",
+    "source_quote": "Garbage after a complete gzip member is still tolerated (unchanged), and empty bodies behave as before.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C1",
+     "C4",
+     "C5"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "3051863aa69a235caa9beb68bef465db17157ab4f1d0176fe60c82ed95ff4fe6",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-25T06:13:31.068502+00:00",
+    "inputs_sha256": "587a836084864c545ee7576c3b1d07b06d3a4e59e7797d86e09b41c914ec8d02",
+    "inputs": {
+     "title_chars": 60,
+     "body_chars": 1214,
+     "base_files": {
+      "src/urllib3/response.py": "857e4f1c01dce95126c368d0d95668e6ac142e46a675e34d0c3aa7024ce173ec"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-socket>=0.7.0",
+  "pytest-timeout>=2.3.1",
+  "pytest-memray==1.8.0 ; python_full_version < '3.15' and implementation_name == 'cpython' and sys_platform != 'win32'",
+  "pytest-pyodide>=0.58.4"
+ ],
+ "pr_side_started_at": "2026-11-25T06:13:31.360261+00:00",
+ "test_targets": {
+  "main": [
+   "test/test_response.py"
+  ],
+  "pr": [
+   "test/test_response.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "urllib3",
+   "expected": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+   "installed": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+   "ok": true
+  },
+  "pr": {
+   "dist": "urllib3",
+   "expected": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+   "installed": "ffba6e632540d9a8b050be74e1f3a07cc702bfe6",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-socket>=0.7.0",
+   "pytest-timeout>=2.3.1",
+   "pytest-memray==1.8.0 ; python_full_version < '3.15' and implementation_name == 'cpython' and sys_platform != 'win32'",
+   "pytest-pyodide>=0.58.4"
+  ],
+  "installed": true
+ },
+ "pytest_plugins_off": [
+  "asyncio"
+ ],
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "worked",
+  "main_error": "",
+  "pr_error": ""
+ },
+ "collection_plugin_note": "Setup: pytest plugin asyncio was turned off. Pytest stopped at startup the same way on both sides, and the traceback pointed into that third-party plugin (AttributeError: module 'pytest' has no attribute 'pyodide_options_stack'). The tests were run again with the plugin turned off. This does not change how the verdict is chosen. Detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: worked.",
+ "base_head_sha": "5ebe9bf9f691646dcabdb259ffabfc6108ded5e8",
+ "comparison": {
+  "same": 64,
+  "same_skipped_both": 20,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 9,
+  "new_tests_passing_ids": [
+   "test.test_response.TestResponse::test_decode_deflate_incomplete_preload_content",
+   "test.test_response.TestResponse::test_decode_deflate_incomplete_read",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[preload-1]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[preload-2]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[preload-3]",
+   "test.test_response.TestResponse::test_decode_gzip_empty_body",
+   "test.test_response.TestResponse::test_decode_gzip_incomplete_preload_content",
+   "test.test_response.TestResponse::test_decode_gzip_incomplete_read",
+   "test.test_response.TestResponse::test_decode_gzip_incomplete_read1"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [
+   "test.test_response.TestResponse::test_cache_content_with_explicit_read_call[read_args0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read1--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read1-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate2-read--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate2-read-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate2-read1-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[gzip-read1--1]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[brotli-stream]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[deflate1-read_chunked]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[deflate1-stream]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[deflate2-read_chunked]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[zstd-read_chunked]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[zstd-stream]",
+   "test.test_response.TestResponse::test_read_chunked_with_trailing_data_does_not_hang[deflate1]",
+   "test.test_response.TestResponse::test_read_chunked_with_trailing_data_does_not_hang[deflate2]",
+   "test.test_response.TestResponse::test_read_chunked_with_trailing_data_does_not_hang[gzip]"
+  ],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate2-read1--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[gzip-read--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[gzip-read-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[gzip-read1-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[zstd-read--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[zstd-read-0]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[zstd-read1--1]",
+   "test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[zstd-read1-0]",
+   "test.test_response.TestResponse::test_decode_zstd_incomplete_read1[foo]",
+   "test.test_response.TestResponse::test_decode_zstd_incomplete_read1[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+   "test.test_response.TestResponse::test_decode_zstd_read1[foo]",
+   "test.test_response.TestResponse::test_decode_zstd_read1[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+   "test.test_response.TestResponse::test_read_chunked_with_trailing_data_does_not_hang[zstd]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[brotli-read]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[deflate1-read1]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[deflate1-read]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[deflate2-read1]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[deflate2-read]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[gzip-read1]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[gzip-read]"
+  ],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [
+   "test.test_response.TestResponse::test_decode_deflate_complete_empty_stream",
+   "test.test_response.TestResponse::test_decode_deflate_empty_body",
+   "test.test_response.TestResponse::test_decode_deflate_raw_complete_stream",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-1]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-2]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-3]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read1-1]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read1-2]",
+   "test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read1-3]",
+   "test.test_response.TestResponse::test_decode_gzip_truncated_before_first_output[1]",
+   "test.test_response.TestResponse::test_decode_gzip_truncated_before_first_output[2]",
+   "test.test_response.TestResponse::test_decode_gzip_truncated_before_first_output[3]",
+   "test.test_response.TestResponse::test_decode_gzip_truncated_before_first_output[9]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[brotli-read_chunked]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[deflate2-stream]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[gzip-read_chunked]",
+   "test.test_response.TestResponse::test_read_chunked_with_all_data_already_in_decompressor[gzip-stream]",
+   "test.test_response.TestResponse::test_read_with_all_data_already_in_decompressor[zstd-read1]"
+  ],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "pytest::internal"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "pytest::internal": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   }
+  },
+  "executed": {
+   "main": 62,
+   "pr": 63
+  },
+  "messages": {},
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": false,
+  "problems": [
+   "main run 1: pytest exit 3",
+   "pr run 1: pytest exit 3",
+   "main run 2: pytest exit 3",
+   "pr run 2: pytest exit 3",
+   "main run 3: pytest exit 3",
+   "pr run 3: pytest exit 3"
+  ],
+  "detail": "pytest exit 3; 1 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "3051863aa69a235caa9beb68bef465db17157ab4f1d0176fe60c82ed95ff4fe6",
+    "target": "urllib3/urllib3#5306",
+    "about": "Test incomplete gzip/deflate, garbage after complete gzip, and empty gzip body",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Incomplete gzip or deflate response bodies will raise DecodeError instead of returning partial data silently.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "This PR mirrors that for gzip and deflate: `flush()` now raises DecodeError when the compressed stream never completed.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "Garbage after a complete gzip member is still tolerated (unchanged), and empty bodies behave as before.",
+      "covers": [
+       "c5.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c1.incomplete_gzip_exception": null,
+       "c1.incomplete_deflate_output": "aGVsbG8g",
+       "c1.incomplete_deflate_exception": null,
+       "c4.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c4.incomplete_gzip_exception": null,
+       "c4.incomplete_deflate_output": "aGVsbG8g",
+       "c4.incomplete_deflate_exception": null,
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      },
+      {
+       "c1.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c1.incomplete_gzip_exception": null,
+       "c1.incomplete_deflate_output": "aGVsbG8g",
+       "c1.incomplete_deflate_exception": null,
+       "c4.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c4.incomplete_gzip_exception": null,
+       "c4.incomplete_deflate_output": "aGVsbG8g",
+       "c4.incomplete_deflate_exception": null,
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      },
+      {
+       "c1.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c1.incomplete_gzip_exception": null,
+       "c1.incomplete_deflate_output": "aGVsbG8g",
+       "c1.incomplete_deflate_exception": null,
+       "c4.incomplete_gzip_output": "aGVsbG8gd29ybA==",
+       "c4.incomplete_gzip_exception": null,
+       "c4.incomplete_deflate_output": "aGVsbG8g",
+       "c4.incomplete_deflate_exception": null,
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      }
+     ],
+     "pr": [
+      {
+       "c1.incomplete_gzip_output": null,
+       "c1.incomplete_gzip_exception": "DecodeError",
+       "c1.incomplete_deflate_output": null,
+       "c1.incomplete_deflate_exception": "DecodeError",
+       "c4.incomplete_gzip_output": null,
+       "c4.incomplete_gzip_exception": "DecodeError",
+       "c4.incomplete_deflate_output": null,
+       "c4.incomplete_deflate_exception": "DecodeError",
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      },
+      {
+       "c1.incomplete_gzip_output": null,
+       "c1.incomplete_gzip_exception": "DecodeError",
+       "c1.incomplete_deflate_output": null,
+       "c1.incomplete_deflate_exception": "DecodeError",
+       "c4.incomplete_gzip_output": null,
+       "c4.incomplete_gzip_exception": "DecodeError",
+       "c4.incomplete_deflate_output": null,
+       "c4.incomplete_deflate_exception": "DecodeError",
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      },
+      {
+       "c1.incomplete_gzip_output": null,
+       "c1.incomplete_gzip_exception": "DecodeError",
+       "c1.incomplete_deflate_output": null,
+       "c1.incomplete_deflate_exception": "DecodeError",
+       "c4.incomplete_gzip_output": null,
+       "c4.incomplete_gzip_exception": "DecodeError",
+       "c4.incomplete_deflate_output": null,
+       "c4.incomplete_deflate_exception": "DecodeError",
+       "c5.garbage_gzip_output": "aGVsbG8gd29ybGQ=",
+       "c5.garbage_gzip_exception": null,
+       "c5.empty_gzip_output": "",
+       "c5.empty_gzip_exception": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.incomplete_deflate_exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": "DecodeError",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "DecodeError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.incomplete_deflate_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.incomplete_deflate_exception\""
+       }
+      }
+     },
+     {
+      "name": "c1.incomplete_deflate_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "aGVsbG8g",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "aGVsbG8g",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.incomplete_deflate_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.incomplete_deflate_output\""
+       }
+      }
+     },
+     {
+      "name": "c1.incomplete_gzip_exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": "DecodeError",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "DecodeError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.incomplete_gzip_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.incomplete_gzip_exception\""
+       }
+      }
+     },
+     {
+      "name": "c1.incomplete_gzip_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "aGVsbG8gd29ybA==",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "aGVsbG8gd29ybA==",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.incomplete_gzip_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.incomplete_gzip_output\""
+       }
+      }
+     },
+     {
+      "name": "c4.incomplete_deflate_exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": null,
+      "pr": "DecodeError",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "DecodeError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.incomplete_deflate_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.incomplete_deflate_exception\""
+       }
+      }
+     },
+     {
+      "name": "c4.incomplete_deflate_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "aGVsbG8g",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "aGVsbG8g",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.incomplete_deflate_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.incomplete_deflate_output\""
+       }
+      }
+     },
+     {
+      "name": "c4.incomplete_gzip_exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": null,
+      "pr": "DecodeError",
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": "DecodeError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c4.incomplete_gzip_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c4.incomplete_gzip_exception\""
+       }
+      }
+     },
+     {
+      "name": "c4.incomplete_gzip_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "aGVsbG8gd29ybA==",
+      "pr": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "aGVsbG8gd29ybA==",
+        "pr": null
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.incomplete_gzip_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.incomplete_gzip_output\""
+       }
+      }
+     },
+     {
+      "name": "c5.empty_gzip_exception",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.empty_gzip_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.empty_gzip_exception\""
+       }
+      }
+     },
+     {
+      "name": "c5.empty_gzip_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c5.empty_gzip_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c5.empty_gzip_output\""
+       }
+      }
+     },
+     {
+      "name": "c5.garbage_gzip_exception",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c5.garbage_gzip_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c5.garbage_gzip_exception\""
+       }
+      }
+     },
+     {
+      "name": "c5.garbage_gzip_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": "aGVsbG8gd29ybGQ=",
+      "pr": "aGVsbG8gd29ybGQ=",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"c5.garbage_gzip_output\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"c5.garbage_gzip_output\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "3051863aa69a235caa9beb68bef465db17157ab4f1d0176fe60c82ed95ff4fe6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-25T06:13:31.068502+00:00",
+     "inputs_sha256": "587a836084864c545ee7576c3b1d07b06d3a4e59e7797d86e09b41c914ec8d02",
+     "inputs": {
+      "title_chars": 60,
+      "body_chars": 1214,
+      "base_files": {
+       "src/urllib3/response.py": "857e4f1c01dce95126c368d0d95668e6ac142e46a675e34d0c3aa7024ce173ec"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-25T06:13:31.360261+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 4,
+     "changed_lines_covered": 4,
+     "files": [
+      {
+       "file": "src/urllib3/response.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C4",
+    "C5"
+   ],
+   "reason": "probe: claim(s) C1, C4, C5 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 4,
+    "changed_lines_total": 4,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "pytest exit code(s) not explained by identical failures on both sides: main run 1: pytest exit 3; pr run 1: pytest exit 3; main run 2: pytest exit 3 (26 flaky test(s): test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read--1], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read-0], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1--1], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1-0], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read--1] (+21); 18 test(s) stable on the base and unstable only on the pull request, too mixed to call a regression: test.test_response.TestResponse::test_decode_deflate_complete_empty_stream, test.test_response.TestResponse::test_decode_deflate_empty_body, test.test_response.TestResponse::test_decode_deflate_raw_complete_stream, test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-1], test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-2] (+13); 16 test(s) removed on the PR side; 62 test(s) ran on main, 63 on the PR; 9 new test(s) pass, 63 unchanged (20 of them skipped on both sides); 1 test failure(s) pre-existing and identical on both sides); probe: claim(s) C1, C4, C5 proven",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "pytest exit code(s) not explained by identical failures on both sides: main run 1: pytest exit 3; pr run 1: pytest exit 3; main run 2: pytest exit 3 (26 flaky test(s): test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read--1], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read-0], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1--1], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[brotli-read1-0], test.test_response.TestResponse::test_decode_with_max_length_close_to_compressed_data_size[deflate1-read--1] (+21); 18 test(s) stable on the base and unstable only on the pull request, too mixed to call a regression: test.test_response.TestResponse::test_decode_deflate_complete_empty_stream, test.test_response.TestResponse::test_decode_deflate_empty_body, test.test_response.TestResponse::test_decode_deflate_raw_complete_stream, test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-1], test.test_response.TestResponse::test_decode_deflate_truncated_before_first_output[read-2] (+13); 16 test(s) removed on the PR side; 62 test(s) ran on main, 63 on the PR; 9 new test(s) pass, 63 unchanged (20 of them skipped on both sides); 1 test failure(s) pre-existing and identical on both sides); probe: claim(s) C1, C4, C5 proven",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage run produced no data (exit 3); see coverage-pytest.log)",
+  "measurement": "not measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/response.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/5306.bugfix.rst",
+   "test/test_response.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 725.4,
+  "tests": 25.5
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 27606,
+  "output_tokens": 27274,
+  "thinking_tokens": 25973,
+  "cost_usd": 0.032828,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.032828,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 725.4,
+   "tests": 25.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.04836,
+  "total_cost_usd": 0.081188,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-25/748f814/urllib3-5306"
+ }
+}
