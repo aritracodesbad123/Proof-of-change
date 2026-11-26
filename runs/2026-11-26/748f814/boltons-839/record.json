@@ -1,0 +1,1385 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-839-937104dd1764-2026-11-26",
+ "date_ist": "2026-11-26 11:58 IST",
+ "run_date": "2026-11-26",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 839,
+  "url": "https://github.com/mahmoud/boltons/pull/839",
+  "title": "Reject anonymous format fields under python -O",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "937104dd17645d093673e365e995c12ac50d31bd",
+  "merge_commit": "428b9f4516389e324295d19a84d6ec2780f88930",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "draarivpatel-ui",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-25T21:29:36Z",
+ "updated_at_ist": "2026-11-26 02:59 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-26 11:58 IST",
+ "files": {
+  "all": [
+   "boltons/formatutils.py",
+   "tests/test_formatutils.py"
+  ],
+  "package_py": [
+   "boltons/formatutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_formatutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_formatutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 5,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "5 passed in 0.54s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 7,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "7 passed in 0.56s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 5,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "5 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 7,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "7 passed in 0.64s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 5,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "5 passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 7,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "7 passed in 0.55s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-839/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "boltons/formatutils.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 1.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "937104dd17645d093673e365e995c12ac50d31bd",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.7 GB (of 15.6 GB).",
+   "Setup check: free disk 88.5 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] lookup failed.",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "tox.ini",
+   "setup.cfg",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "428b9f4516389e324295d19a84d6ec2780f88930",
+  "merge_commit": "428b9f4516389e324295d19a84d6ec2780f88930",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "937104dd17645d093673e365e995c12ac50d31bd"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 428b9f451638 (refs/pull/839/merge) of head 937104dd1764"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Under python -O, get_format_args('{}') raises ValueError: encountered anonymous positional argument.",
+    "source_quote": "`python -O -c \"from boltons.formatutils import get_format_args; print(get_format_args('{}'))\"` raised `ValueError: encountered anonymous positional argument` after the change (previously printed `([], [('', <class 'str'>)])`).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Before the fix, running under python -O caused get_format_args('{}') to return a named argument with an empty name instead of raising ValueError.",
+    "source_quote": "`get_format_args` validated against anonymous positional arguments with an `assert`, so running under `python -O` stripped the check and `get_format_args('{}')` returned a named argument with an empty name instead of raising `ValueError`.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "boltons.formatutils.get_format_args"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "be174172fcd82d5fa9ec5a773cd79d7f520389513344a1670bdaf549664621e6",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-26T06:29:01.659572+00:00",
+    "inputs_sha256": "81ae54668fe0c8d1eb723eca3a763e7f0af08cb0de8db13450d8cac545649043",
+    "inputs": {
+     "title_chars": 46,
+     "body_chars": 2013,
+     "base_files": {
+      "boltons/formatutils.py": "15c7963d5c97b11ec7a419e9e4aec7c20ca765bcf701306510c9c57c7eaeb1a4"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "896718a770a94b9acbd9078f41c8a7cf1ab30535c41357e806df0748c8f13373",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-26T06:29:01.660960+00:00",
+    "inputs_sha256": "8cb0bc8416c136cec423d2994057c4677ed96307099fa6e458ed2d0f8a250e8e",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/formatutils.py": "15c7963d5c97b11ec7a419e9e4aec7c20ca765bcf701306510c9c57c7eaeb1a4"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-26T06:29:01.840316+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_formatutils.py"
+  ],
+  "pr": [
+   "tests/test_formatutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "428b9f4516389e324295d19a84d6ec2780f88930",
+   "installed": "428b9f4516389e324295d19a84d6ec2780f88930",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 5,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 2,
+  "new_tests_passing_ids": [
+   "tests.test_formatutils::test_get_format_args_anonymous_raises",
+   "tests.test_formatutils::test_get_format_args_anonymous_raises_under_optimization"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 5,
+   "pr": 7
+  },
+  "messages": {},
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "be174172fcd82d5fa9ec5a773cd79d7f520389513344a1670bdaf549664621e6",
+    "target": "mahmoud/boltons#839",
+    "about": "Test get_format_args for '{}' in normal and optimized modes",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Under python -O, get_format_args('{}') raises ValueError: encountered anonymous positional argument.",
+      "covers": [
+       "c1.normal",
+       "c1.optimized"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "[[], [('', 'str')]]"
+      },
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "[[], [('', 'str')]]"
+      },
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "[[], [('', 'str')]]"
+      }
+     ],
+     "pr": [
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "ValueError"
+      },
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "ValueError"
+      },
+      {
+       "c1.normal": "ValueError",
+       "c1.optimized": "ValueError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.normal",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C1",
+      "main": "ValueError",
+      "pr": "ValueError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.normal\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.normal\""
+       }
+      }
+     },
+     {
+      "name": "c1.optimized",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "[[], [('', 'str')]]",
+      "pr": "ValueError",
+      "diffs": [
+       {
+        "field": "",
+        "main": "[[], [('', 'str')]]",
+        "pr": "ValueError"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.optimized\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.optimized\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "be174172fcd82d5fa9ec5a773cd79d7f520389513344a1670bdaf549664621e6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-26T06:29:01.659572+00:00",
+     "inputs_sha256": "81ae54668fe0c8d1eb723eca3a763e7f0af08cb0de8db13450d8cac545649043",
+     "inputs": {
+      "title_chars": 46,
+      "body_chars": 2013,
+      "base_files": {
+       "boltons/formatutils.py": "15c7963d5c97b11ec7a419e9e4aec7c20ca765bcf701306510c9c57c7eaeb1a4"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:29:01.840316+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 4,
+     "changed_lines_covered": 4,
+     "files": [
+      {
+       "file": "boltons/formatutils.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "896718a770a94b9acbd9078f41c8a7cf1ab30535c41357e806df0748c8f13373",
+    "target": "mahmoud/boltons#839",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      },
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      },
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      },
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      },
+      {
+       "boltons.formatutils.get_format_args.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input4": [
+        [],
+        []
+       ],
+       "boltons.formatutils.get_format_args.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.formatutils.get_format_args.input9": [
+        [],
+        []
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.formatutils.get_format_args.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": [
+       [],
+       []
+      ],
+      "pr": [
+       [],
+       []
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input4\""
+       }
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call"
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.formatutils.get_format_args.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": [
+       [],
+       []
+      ],
+      "pr": [
+       [],
+       []
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.formatutils.get_format_args.input9\""
+       }
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call"
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "896718a770a94b9acbd9078f41c8a7cf1ab30535c41357e806df0748c8f13373",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-26T06:29:01.660960+00:00",
+     "inputs_sha256": "8cb0bc8416c136cec423d2994057c4677ed96307099fa6e458ed2d0f8a250e8e",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/formatutils.py": "15c7963d5c97b11ec7a419e9e4aec7c20ca765bcf701306510c9c57c7eaeb1a4"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:29:01.840316+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 4,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/formatutils.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "not_testable",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1"
+   ],
+   "reason": "probe: claim(s) C1 proven; probe: 1 probe(s) could not run on either side; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 4,
+    "changed_lines_total": 4,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 4,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "verified",
+ "reason": "5 test(s) ran on main, 7 on the PR; 2 new test(s) pass, 5 unchanged; probe: claim(s) C1 proven; probe: 1 probe(s) could not run on either side",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "5 test(s) ran on main, 7 on the PR; 2 new test(s) pass, 5 unchanged; probe: claim(s) C1 proven; probe: 1 probe(s) could not run on either side",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/formatutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_formatutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 67.6,
+  "tests": 6.2
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 5093,
+  "output_tokens": 6364,
+  "thinking_tokens": 5550,
+  "cost_usd": 0.007255,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.007255,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 67.6,
+   "tests": 6.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.004507,
+  "total_cost_usd": 0.011762,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-26/748f814/boltons-839"
+ }
+}
