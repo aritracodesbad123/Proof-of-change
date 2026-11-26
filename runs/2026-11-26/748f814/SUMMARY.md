@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-26 on 748f814
 
-9 report(s) in this folder: 3 need attention, 4 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+10 report(s) in this folder: 3 need attention, 4 could not be verified, 3 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -25,3 +25,4 @@
 | COULD NOT VERIFY | lincolnloop/python-qrcode#442: Fix the radius of half-size circles in SVG path output | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 12 test(s) ran on main, 12 on the PR; 0 new test(s) pass, 14 unchanged (3 of them skipped on both sides); probe model-probe1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count | [PDF](python_qrcode-442/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#838: fix: infer table columns from mappings with mixed key types | 2 test(s) fail on main and pass on the PR; 12 test(s) ran on main, 13 on the PR; 1 new test(s) pass, 10 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): c2.comparable (C2); probe: claim(s) C2 proven | [PDF](boltons-838/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#839: Reject anonymous format fields under python -O | 5 test(s) ran on main, 7 on the PR; 2 new test(s) pass, 5 unchanged; probe: claim(s) C1 proven; probe: 1 probe(s) could not run on either side | [PDF](boltons-839/REPORT.pdf) |
+| VERIFIED | Textualize/rich#3789: Fix parsing of RGB codes that use colon delimiters | 1 test(s) fail on main and pass on the PR; 24 test(s) ran on main, 25 on the PR; 1 new test(s) pass, 23 unchanged; probe: 2 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): c2.colon_delimited_style (C2); c2.semicolon_delimited_style (C2) | [PDF](rich-3789/REPORT.pdf) |
