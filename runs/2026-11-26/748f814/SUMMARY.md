@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-26 on 748f814
 
-8 report(s) in this folder: 3 need attention, 3 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+9 report(s) in this folder: 3 need attention, 4 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -10,6 +10,7 @@
 - **COULD NOT VERIFY**: python-attrs/attrs#1667: perf: optimize asdict, astuple, and fields fast paths. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 341 test(s) ran on main, 342 on the PR; 1 new test(s) pass, 341 unchanged
 - **COULD NOT VERIFY**: pytest-dev/pytest#15384: Move collection error abort from pytest_runtestloop to pytest_collection. Tests produced no results on both sides (collection failed; see pytest logs); probe: claim(s) C1 proven; probe: 1 other observation(s) identical on both sides
 - **COULD NOT VERIFY**: pytest-dev/pytest#15458: Fix two races between cleanups of the same temporary root. Tests produced no results on both sides (collection failed; see pytest logs)
+- **COULD NOT VERIFY**: lincolnloop/python-qrcode#442: Fix the radius of half-size circles in SVG path output. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 12 test(s) ran on main, 12 on the PR; 0 new test(s) pass, 14 unchanged (3 of them skipped on both sides); probe model-probe1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count
 
 ## All reports
 
@@ -21,5 +22,6 @@
 | COULD NOT VERIFY | python-attrs/attrs#1667: perf: optimize asdict, astuple, and fields fast paths | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 341 test(s) ran on main, 342 on the PR; 1 new test(s) pass, 341 unchanged | [PDF](attrs-1667/REPORT.pdf) |
 | COULD NOT VERIFY | pytest-dev/pytest#15384: Move collection error abort from pytest_runtestloop to pytest_collection | Tests produced no results on both sides (collection failed; see pytest logs); probe: claim(s) C1 proven; probe: 1 other observation(s) identical on both sides | [PDF](pytest-15384/REPORT.pdf) |
 | COULD NOT VERIFY | pytest-dev/pytest#15458: Fix two races between cleanups of the same temporary root | Tests produced no results on both sides (collection failed; see pytest logs) | [PDF](pytest-15458/REPORT.pdf) |
+| COULD NOT VERIFY | lincolnloop/python-qrcode#442: Fix the radius of half-size circles in SVG path output | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 12 test(s) ran on main, 12 on the PR; 0 new test(s) pass, 14 unchanged (3 of them skipped on both sides); probe model-probe1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count | [PDF](python_qrcode-442/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#838: fix: infer table columns from mappings with mixed key types | 2 test(s) fail on main and pass on the PR; 12 test(s) ran on main, 13 on the PR; 1 new test(s) pass, 10 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): c2.comparable (C2); probe: claim(s) C2 proven | [PDF](boltons-838/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#839: Reject anonymous format fields under python -O | 5 test(s) ran on main, 7 on the PR; 2 new test(s) pass, 5 unchanged; probe: claim(s) C1 proven; probe: 1 probe(s) could not run on either side | [PDF](boltons-839/REPORT.pdf) |
