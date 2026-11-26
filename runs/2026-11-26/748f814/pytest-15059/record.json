@@ -1,0 +1,3545 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pytest-dev-pytest-15059-719cf80204cf-2026-11-26",
+ "date_ist": "2026-11-26 11:47 IST",
+ "run_date": "2026-11-26",
+ "who": "ops/daily_run.py",
+ "repo": "pytest-dev/pytest",
+ "library": "pytest",
+ "pr": {
+  "repo": "pytest-dev/pytest",
+  "number": 15059,
+  "url": "https://github.com/pytest-dev/pytest/pull/15059",
+  "title": "Preserve encoding and error handling of the replaced streams",
+  "base_sha": "9efd0121a4396da80c20d7c3b7844825966612f6",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "719cf80204cf220251916957b17b78233e67d16d",
+  "merge_commit": null,
+  "tested_main_sha": "9efd0121a4396da80c20d7c3b7844825966612f6",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "SemTiOne",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-25T20:58:52Z",
+ "updated_at_ist": "2026-11-26 02:28 IST",
+ "ci_state": "pending",
+ "ci_detail": "1/34 still running",
+ "tested_at_ist": "2026-11-26 11:47 IST",
+ "files": {
+  "all": [
+   "changelog/4389.bugfix.rst",
+   "pyproject.toml",
+   "src/_pytest/capture.py",
+   "testing/test_capture.py"
+  ],
+  "package_py": [
+   "src/_pytest/capture.py"
+  ],
+  "compiled": [
+   "pyproject.toml"
+  ],
+  "other": [
+   "changelog/4389.bugfix.rst",
+   "testing/test_capture.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: testing/test_capture.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 3,
+   "seconds": 1.6,
+   "pytest_summary": "INTERNALERROR> The event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"f",
+   "junit": false
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "pytest-15059/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "coverage has not been run for this check"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "719cf80204cf220251916957b17b78233e67d16d",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 12.4 GB (of 15.6 GB).",
+   "Setup check: free disk 88.5 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] lookup failed.",
+   "Query: pytest python setup install instructions https://github.com/pytest-dev/pytest site:github.com/pytest-dev/pytest",
+   "Query: pytest python documentation install https://github.com/pytest-dev/pytest site:github.com/pytest-dev/pytest",
+   "Query: pytest python install requirements https://pypi.org/project/pytest/ https://github.com/pytest-dev/pytest site:pypi.org",
+   "Setup plan: the PR changes install docs (pyproject.toml); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: exceptiongroup is noted, installed with the project.",
+   "Setup plan: iniconfig is noted, installed with the project.",
+   "Setup plan: packaging is noted, installed with the project.",
+   "Setup plan: pluggy is noted, installed with the project.",
+   "Setup plan: pygments is noted, installed with the project.",
+   "Setup plan: tomli is noted, installed with the project.",
+   "Setup plan: install argcomplete (listed in the dev extra) on main and pr.",
+   "Setup plan: install asynctest; python_version<'3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install attrs>=23.1 (listed in the dev extra) on main and pr.",
+   "Setup plan: install coverage>=7.5 (listed in the dev extra) on main and pr.",
+   "Setup plan: install hypothesis>=6.75 (listed in the dev extra) on main and pr.",
+   "Setup plan: install mock (listed in the dev extra) on main and pr.",
+   "Setup plan: install numpy>=1.26 (listed in the dev extra) on main and pr.",
+   "Setup plan: install pexpect>=4.9 (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-xdist>=3.5 (listed in the dev extra) on main and pr.",
+   "Setup plan: install pyyaml (listed in the dev extra) on main and pr.",
+   "Setup plan: install requests (listed in the dev extra) on main and pr.",
+   "Setup plan: install setuptools (listed in the dev extra) on main and pr.",
+   "Setup plan: install xmlschema (listed in the dev extra) on main and pr.",
+   "Setup plan: install pygments-pytest>=2.5.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-removed-in>=0.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx>=9 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-trio>=1.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-svg2pdfconverter (listed in requirements.txt) on main and pr.",
+   "Setup plan: install furo (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-towncrier (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-issues (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-inline-tabs (listed in requirements.txt) on main and pr.",
+   "Setup plan: install anyio[trio]==4.15.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install django==6.1.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-asyncio==1.4.1.post1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-bdd==9.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-cov==7.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-django==4.14.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-flakes==4.0.5 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-html==4.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-mock==3.17.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-rerunfailures==16.7 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-sugar==1.1.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-trio==0.8.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-twisted==1.14.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install twisted==26.10.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-xvfb==3.1.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pre-commit>=4 (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install regendoc>=0.8.1 (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install pyinstaller (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install towncrier (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install pypandoc_binary (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install tabulate[widechars] (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install tqdm (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install requests-cache (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install platformdirs (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed argcomplete 3.8.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed asynctest  from pyproject (listed in the dev extra) on main and pr.",
+   "Installed attrs 26.1.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed coverage 7.17.5 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed hypothesis 6.170.17 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed mock 5.2.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed numpy 2.5.5 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pexpect 4.9.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pyyaml 6.0.4 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed requests 2.34.2 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed setuptools 84.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed xmlschema 4.3.2 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pygments-pytest 2.5.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-removed-in 0.2.3 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinxcontrib-trio 1.2.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinxcontrib-svg2pdfconverter 2.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed furo 2025.12.19 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinxcontrib-towncrier 0.5.0a0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-issues 6.0.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-inline-tabs 2025.12.21.14 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed anyio 4.15.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed django 6.1.2 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-asyncio 1.4.1.post1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-bdd 9.0.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-cov 7.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-django 4.14.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-flakes 4.0.5 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-html 4.2.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-mock 3.17.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-rerunfailures 16.7 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-sugar 1.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-trio 0.8.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-twisted 1.14.3 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed twisted 26.10.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-xvfb 3.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pre-commit 4.7.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed regendoc 0.9.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed pyinstaller 6.22.3 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed towncrier 26.9.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed pypandoc_binary 1.17 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed tabulate 0.10.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed tqdm 4.70.1 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed requests-cache 1.3.3 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed platformdirs 4.14.8 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "tox.ini",
+   "CONTRIBUTING.rst",
+   "README.rst",
+   ".github/workflows/test.yml",
+   ".github/workflows/deploy.yml",
+   ".github/workflows/stale.yml",
+   ".github/workflows/doc-check-links.yml",
+   ".github/workflows/prepare-release-pr.yml",
+   ".github/workflows/update-plugin-list.yml",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "pyproject.toml"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama>=0.4; sys_platform=='win32'",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "exceptiongroup>=1; python_version<'3.11'",
+     "name": "exceptiongroup",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "iniconfig>=2",
+     "name": "iniconfig",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "packaging>=24",
+     "name": "packaging",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pluggy>=1.6,<2",
+     "name": "pluggy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pygments>=2.15",
+     "name": "pygments",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tomli>=2; python_version<'3.11'",
+     "name": "tomli",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "argcomplete",
+     "name": "argcomplete",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "asynctest; python_version<'3.11'",
+     "name": "asynctest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "attrs>=23.1",
+     "name": "attrs",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coverage>=7.5",
+     "name": "coverage",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesis>=6.75",
+     "name": "hypothesis",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mock",
+     "name": "mock",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "numpy>=1.26",
+     "name": "numpy",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pexpect>=4.9",
+     "name": "pexpect",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist>=3.5",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyyaml",
+     "name": "pyyaml",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests",
+     "name": "requests",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "setuptools",
+     "name": "setuptools",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "xmlschema",
+     "name": "xmlschema",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pygments-pytest>=2.5.0",
+     "name": "pygments-pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-removed-in>=0.2.0",
+     "name": "sphinx-removed-in",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx>=9",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-trio>=1.2.0",
+     "name": "sphinxcontrib-trio",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-svg2pdfconverter",
+     "name": "sphinxcontrib-svg2pdfconverter",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "furo",
+     "name": "furo",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-towncrier",
+     "name": "sphinxcontrib-towncrier",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-issues",
+     "name": "sphinx-issues",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-inline-tabs",
+     "name": "sphinx-inline-tabs",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "anyio[trio]==4.15.1",
+     "name": "anyio",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django==6.1.2",
+     "name": "django",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-asyncio==1.4.1.post1",
+     "name": "pytest-asyncio",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-bdd==9.0.0",
+     "name": "pytest-bdd",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov==7.1.0",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-django==4.14.0",
+     "name": "pytest-django",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-flakes==4.0.5",
+     "name": "pytest-flakes",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-html==4.2.0",
+     "name": "pytest-html",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mock==3.17.0",
+     "name": "pytest-mock",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-rerunfailures==16.7",
+     "name": "pytest-rerunfailures",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-sugar==1.1.1",
+     "name": "pytest-sugar",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-trio==0.8.0",
+     "name": "pytest-trio",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-twisted==1.14.3",
+     "name": "pytest-twisted",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twisted==26.10.0",
+     "name": "twisted",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xvfb==3.1.1",
+     "name": "pytest-xvfb",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit>=4",
+     "name": "pre-commit",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "regendoc>=0.8.1",
+     "name": "regendoc",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyinstaller",
+     "name": "pyinstaller",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "towncrier",
+     "name": "towncrier",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pypandoc_binary",
+     "name": "pypandoc_binary",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tabulate[widechars]",
+     "name": "tabulate",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tqdm",
+     "name": "tqdm",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests-cache",
+     "name": "requests-cache",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "platformdirs",
+     "name": "platformdirs",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "argcomplete",
+    "asynctest; python_version<'3.11'",
+    "attrs>=23.1",
+    "coverage>=7.5",
+    "hypothesis>=6.75",
+    "mock",
+    "numpy>=1.26",
+    "pexpect>=4.9",
+    "pytest-xdist>=3.5",
+    "pyyaml",
+    "requests",
+    "setuptools",
+    "xmlschema",
+    "pygments-pytest>=2.5.0",
+    "sphinx-removed-in>=0.2.0",
+    "sphinx>=9",
+    "sphinxcontrib-trio>=1.2.0",
+    "sphinxcontrib-svg2pdfconverter",
+    "furo",
+    "sphinxcontrib-towncrier",
+    "sphinx-issues",
+    "sphinx-inline-tabs",
+    "anyio[trio]==4.15.1",
+    "django==6.1.2",
+    "pytest-asyncio==1.4.1.post1",
+    "pytest-bdd==9.0.0",
+    "pytest-cov==7.1.0",
+    "pytest-django==4.14.0",
+    "pytest-flakes==4.0.5",
+    "pytest-html==4.2.0",
+    "pytest-mock==3.17.0",
+    "pytest-rerunfailures==16.7",
+    "pytest-sugar==1.1.1",
+    "pytest-trio==0.8.0",
+    "pytest-twisted==1.14.3",
+    "twisted==26.10.0",
+    "pytest-xvfb==3.1.1",
+    "pre-commit>=4",
+    "regendoc>=0.8.1",
+    "pyinstaller",
+    "towncrier",
+    "pypandoc_binary",
+    "tabulate[widechars]",
+    "tqdm",
+    "requests-cache",
+    "platformdirs"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 53 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: argcomplete, asynctest; python_version<'3.11', attrs>=23.1, coverage>=7.5, hypothesis>=6.75, mock, numpy>=1.26, pexpect>=4.9, pytest-xdist>=3.5, pyyaml, requests, setuptools. 7 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 46
+  },
+  "installs": [
+   {
+    "package": "argcomplete",
+    "requirement": "argcomplete",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "asynctest",
+    "requirement": "asynctest; python_version<'3.11'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "attrs",
+    "requirement": "attrs>=23.1",
+    "version": "26.1.0",
+    "versions": {
+     "main": "26.1.0",
+     "pr": "26.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "coverage",
+    "requirement": "coverage>=7.5",
+    "version": "7.17.5",
+    "versions": {
+     "main": "7.17.5",
+     "pr": "7.17.5"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis>=6.75",
+    "version": "6.170.17",
+    "versions": {
+     "main": "6.170.17",
+     "pr": "6.170.17"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mock",
+    "requirement": "mock",
+    "version": "5.2.0",
+    "versions": {
+     "main": "5.2.0",
+     "pr": "5.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "numpy",
+    "requirement": "numpy>=1.26",
+    "version": "2.5.5",
+    "versions": {
+     "main": "2.5.5",
+     "pr": "2.5.5"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pexpect",
+    "requirement": "pexpect>=4.9",
+    "version": "4.9.0",
+    "versions": {
+     "main": "4.9.0",
+     "pr": "4.9.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist>=3.5",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pyyaml",
+    "requirement": "pyyaml",
+    "version": "6.0.4",
+    "versions": {
+     "main": "6.0.4",
+     "pr": "6.0.4"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "requests",
+    "requirement": "requests",
+    "version": "2.34.2",
+    "versions": {
+     "main": "2.34.2",
+     "pr": "2.34.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "setuptools",
+    "requirement": "setuptools",
+    "version": "84.2.1",
+    "versions": {
+     "main": "84.2.1",
+     "pr": "84.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "xmlschema",
+    "requirement": "xmlschema",
+    "version": "4.3.2",
+    "versions": {
+     "main": "4.3.2",
+     "pr": "4.3.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pygments-pytest",
+    "requirement": "pygments-pytest>=2.5.0",
+    "version": "2.5.0",
+    "versions": {
+     "main": "2.5.0",
+     "pr": "2.5.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-removed-in",
+    "requirement": "sphinx-removed-in>=0.2.0",
+    "version": "0.2.3",
+    "versions": {
+     "main": "0.2.3",
+     "pr": "0.2.3"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx",
+    "requirement": "sphinx>=9",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinxcontrib-trio",
+    "requirement": "sphinxcontrib-trio>=1.2.0",
+    "version": "1.2.0",
+    "versions": {
+     "main": "1.2.0",
+     "pr": "1.2.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinxcontrib-svg2pdfconverter",
+    "requirement": "sphinxcontrib-svg2pdfconverter",
+    "version": "2.1.0",
+    "versions": {
+     "main": "2.1.0",
+     "pr": "2.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "furo",
+    "requirement": "furo",
+    "version": "2025.12.19",
+    "versions": {
+     "main": "2025.12.19",
+     "pr": "2025.12.19"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinxcontrib-towncrier",
+    "requirement": "sphinxcontrib-towncrier",
+    "version": "0.5.0a0",
+    "versions": {
+     "main": "0.5.0a0",
+     "pr": "0.5.0a0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-issues",
+    "requirement": "sphinx-issues",
+    "version": "6.0.0",
+    "versions": {
+     "main": "6.0.0",
+     "pr": "6.0.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-inline-tabs",
+    "requirement": "sphinx-inline-tabs",
+    "version": "2025.12.21.14",
+    "versions": {
+     "main": "2025.12.21.14",
+     "pr": "2025.12.21.14"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "anyio",
+    "requirement": "anyio[trio]==4.15.1",
+    "version": "4.15.1",
+    "versions": {
+     "main": "4.15.1",
+     "pr": "4.15.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "django",
+    "requirement": "django==6.1.2",
+    "version": "6.1.2",
+    "versions": {
+     "main": "6.1.2",
+     "pr": "6.1.2"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-asyncio",
+    "requirement": "pytest-asyncio==1.4.1.post1",
+    "version": "1.4.1.post1",
+    "versions": {
+     "main": "1.4.1.post1",
+     "pr": "1.4.1.post1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-bdd",
+    "requirement": "pytest-bdd==9.0.0",
+    "version": "9.0.0",
+    "versions": {
+     "main": "9.0.0",
+     "pr": "9.0.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov==7.1.0",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-django",
+    "requirement": "pytest-django==4.14.0",
+    "version": "4.14.0",
+    "versions": {
+     "main": "4.14.0",
+     "pr": "4.14.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-flakes",
+    "requirement": "pytest-flakes==4.0.5",
+    "version": "4.0.5",
+    "versions": {
+     "main": "4.0.5",
+     "pr": "4.0.5"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-html",
+    "requirement": "pytest-html==4.2.0",
+    "version": "4.2.0",
+    "versions": {
+     "main": "4.2.0",
+     "pr": "4.2.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mock",
+    "requirement": "pytest-mock==3.17.0",
+    "version": "3.17.0",
+    "versions": {
+     "main": "3.17.0",
+     "pr": "3.17.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-rerunfailures",
+    "requirement": "pytest-rerunfailures==16.7",
+    "version": "16.7",
+    "versions": {
+     "main": "16.7",
+     "pr": "16.7"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-sugar",
+    "requirement": "pytest-sugar==1.1.1",
+    "version": "1.1.1",
+    "versions": {
+     "main": "1.1.1",
+     "pr": "1.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-trio",
+    "requirement": "pytest-trio==0.8.0",
+    "version": "0.8.0",
+    "versions": {
+     "main": "0.8.0",
+     "pr": "0.8.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-twisted",
+    "requirement": "pytest-twisted==1.14.3",
+    "version": "1.14.3",
+    "versions": {
+     "main": "1.14.3",
+     "pr": "1.14.3"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "twisted",
+    "requirement": "twisted==26.10.0",
+    "version": "26.10.0",
+    "versions": {
+     "main": "26.10.0",
+     "pr": "26.10.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xvfb",
+    "requirement": "pytest-xvfb==3.1.1",
+    "version": "3.1.1",
+    "versions": {
+     "main": "3.1.1",
+     "pr": "3.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pre-commit",
+    "requirement": "pre-commit>=4",
+    "version": "4.7.0",
+    "versions": {
+     "main": "4.7.0",
+     "pr": "4.7.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "regendoc",
+    "requirement": "regendoc>=0.8.1",
+    "version": "0.9.0",
+    "versions": {
+     "main": "0.9.0",
+     "pr": "0.9.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pyinstaller",
+    "requirement": "pyinstaller",
+    "version": "6.22.3",
+    "versions": {
+     "main": "6.22.3",
+     "pr": "6.22.3"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "towncrier",
+    "requirement": "towncrier",
+    "version": "26.9.0",
+    "versions": {
+     "main": "26.9.0",
+     "pr": "26.9.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pypandoc_binary",
+    "requirement": "pypandoc_binary",
+    "version": "1.17",
+    "versions": {
+     "main": "1.17",
+     "pr": "1.17"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tabulate",
+    "requirement": "tabulate[widechars]",
+    "version": "0.10.0",
+    "versions": {
+     "main": "0.10.0",
+     "pr": "0.10.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tqdm",
+    "requirement": "tqdm",
+    "version": "4.70.1",
+    "versions": {
+     "main": "4.70.1",
+     "pr": "4.70.1"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "requests-cache",
+    "requirement": "requests-cache",
+    "version": "1.3.3",
+    "versions": {
+     "main": "1.3.3",
+     "pr": "1.3.3"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "platformdirs",
+    "requirement": "platformdirs",
+    "version": "4.14.8",
+    "versions": {
+     "main": "4.14.8",
+     "pr": "4.14.8"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "main_sha": "9efd0121a4396da80c20d7c3b7844825966612f6",
+  "pr_sha": "719cf80204cf220251916957b17b78233e67d16d",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "9efd0121a4396da80c20d7c3b7844825966612f6",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "6ee1cb9c1dd5892ddf34f5e152128cf30015331e",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 9efd0121a439 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 719cf80204cf"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Preserve encoding and error handling of the replaced streams",
+    "source_quote": "Preserve encoding and error handling of the replaced streams",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "Captured `sys.stdout` and `sys.stderr` now use the encoding and error handler of the streams they replace.",
+    "source_quote": "Captured `sys.stdout` and `sys.stderr` now use the encoding and error handler of the streams they replace.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "When either setting is missing or is not a string, capture falls back to UTF-8 and `strict`.",
+    "source_quote": "When either setting is missing or is not a string, capture falls back to UTF-8 and `strict`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Text writes use those settings.",
+    "source_quote": "Text writes use those settings.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Bytes written directly through `.buffer` are decoded using the selected encoding when captured output is read back, with undecodable bytes replaced.",
+    "source_quote": "Bytes written directly through `.buffer` are decoded using the selected encoding when captured output is read back, with undecodable bytes replaced.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "`stdin` capture is unchanged.",
+    "source_quote": "`stdin` capture is unchanged.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "Binary fixtures still return bytes; text written through them is encoded with the replaced streams' encoding and error handler.",
+    "source_quote": "Binary fixtures still return bytes; text written through them is encoded with the replaced streams' encoding and error handler.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "model_unmatched_covers": [
+   "C2:c2.stdout_text",
+   "C2:c2.stderr_text",
+   "C4:c2.stdout_text",
+   "C4:c2.stderr_text",
+   "C3:p2.stdout_text",
+   "C3:p2.stdout_no_exception",
+   "C6:p3.stdin_read_exception",
+   "C7:p4.stdout_bytes",
+   "C7:p4.stdout_bytes_type"
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "359b5e2c36406ecf29d56af125636c0e98d61cb66dffb06e16ea016b8ea98503",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-26T06:20:05.161037+00:00",
+    "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+    "inputs": {
+     "title_chars": 60,
+     "body_chars": 690,
+     "base_files": {
+      "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "2976a783599d462e73daca22e72ed7d174b4ad4f8e7a75e8b1578f7f4eca717c",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-26T06:20:05.161166+00:00",
+    "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+    "inputs": {
+     "title_chars": 60,
+     "body_chars": 690,
+     "base_files": {
+      "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "23dadd86f270c6aa330e52055adc5d4ccd447d9b4d8ca859ca4f10a46bac913e",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-26T06:20:05.161245+00:00",
+    "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+    "inputs": {
+     "title_chars": 60,
+     "body_chars": 690,
+     "base_files": {
+      "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe4.py",
+    "source": "model",
+    "sha256": "62774371e56efd08bddf53211c8c210373fb5eaa45b7a8eb923409350a91d8c2",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-26T06:20:05.161321+00:00",
+    "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+    "inputs": {
+     "title_chars": 60,
+     "body_chars": 690,
+     "base_files": {
+      "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "argcomplete",
+  "asynctest",
+  "attrs",
+  "coverage",
+  "hypothesis",
+  "mock",
+  "numpy",
+  "pexpect",
+  "pytest-xdist",
+  "pyyaml",
+  "requests",
+  "setuptools",
+  "xmlschema",
+  "pytest-xdist>=3.5"
+ ],
+ "pr_side_started_at": "2026-11-26T06:20:05.388391+00:00",
+ "test_targets": {
+  "main": [
+   "testing/test_capture.py"
+  ],
+  "pr": [
+   "testing/test_capture.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "pytest",
+   "expected": "9efd0121a4396da80c20d7c3b7844825966612f6",
+   "installed": "9efd0121a4396da80c20d7c3b7844825966612f6",
+   "ok": true
+  },
+  "pr": {
+   "dist": "pytest",
+   "expected": "719cf80204cf220251916957b17b78233e67d16d",
+   "installed": "719cf80204cf220251916957b17b78233e67d16d",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-xdist>=3.5"
+  ],
+  "installed": true
+ },
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "failed again",
+  "main_error": "pytest.PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.",
+  "pr_error": "pytest.PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset."
+ },
+ "collection_plugin_note": "Setup: detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: failed again. Main: pytest.PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.. PR: pytest.PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.. The first result was kept. This does not change how the verdict is chosen.",
+ "base_head_sha": "9efd0121a4396da80c20d7c3b7844825966612f6",
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1-rewrite",
+    "source": "model",
+    "path": "model-probes/model-probe1-rewrite.py",
+    "sha256": "66867468e8ea76123ad1743d8b982a2ddc05e57ee56fa8e8e28be39dd962c34e",
+    "target": "pytest-dev/pytest#15059",
+    "about": "Test C2 and C4: text writes use the encoding and error handler of the replaced streams",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Captured `sys.stdout` and `sys.stderr` now use the encoding and error handler of the streams they replace.",
+      "covers": [
+       "c2.stdout_text",
+       "c2.stderr_text"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Text writes use those settings.",
+      "covers": [
+       "c2.stdout_text",
+       "c2.stderr_text"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-rewrite-main-1.jsonl",
+      "probe-model-probe1-rewrite-main-2.jsonl",
+      "probe-model-probe1-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-rewrite-pr-1.jsonl",
+      "probe-model-probe1-rewrite-pr-2.jsonl",
+      "probe-model-probe1-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      },
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      },
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      }
+     ],
+     "pr": [
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      },
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      },
+      {
+       "c2.stdout_text": "\u20ac",
+       "c2.stderr_text": "\u20ac"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.stderr_text",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "\u20ac",
+      "pr": "\u20ac",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.stderr_text\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.stderr_text\""
+       }
+      }
+     },
+     {
+      "name": "c2.stdout_text",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "\u20ac",
+      "pr": "\u20ac",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-rewrite-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.stdout_text\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-rewrite-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.stdout_text\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "66867468e8ea76123ad1743d8b982a2ddc05e57ee56fa8e8e28be39dd962c34e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-26T06:21:06.378209+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "359b5e2c36406ecf29d56af125636c0e98d61cb66dffb06e16ea016b8ea98503",
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:21:06.378232+00:00"
+    },
+    "rewrite_of": "model-probe1",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2-rewrite",
+    "source": "model",
+    "path": "model-probes/model-probe2-rewrite.py",
+    "sha256": "b2759fc4d798f55c2bff2be41d942c93504698023d92b319bd38741d3234904e",
+    "target": "pytest-dev/pytest#15059",
+    "about": "Test C3: fallback to UTF-8 and strict when encoding or errors is not a string",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "When either setting is missing or is not a string, capture falls back to UTF-8 and `strict`.",
+      "covers": [
+       "p2.stdout_text",
+       "p2.stdout_no_exception"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-rewrite-main-1.jsonl",
+      "probe-model-probe2-rewrite-main-2.jsonl",
+      "probe-model-probe2-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-rewrite-pr-1.jsonl",
+      "probe-model-probe2-rewrite-pr-2.jsonl",
+      "probe-model-probe2-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      },
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      },
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      }
+     ],
+     "pr": [
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      },
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      },
+      {
+       "p2.stdout_text": "hello",
+       "p2.stdout_no_exception": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p2.stdout_no_exception",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.stdout_no_exception\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p2.stdout_no_exception\""
+       }
+      }
+     },
+     {
+      "name": "p2.stdout_text",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": "hello",
+      "pr": "hello",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-rewrite-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"p2.stdout_text\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-rewrite-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"p2.stdout_text\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "b2759fc4d798f55c2bff2be41d942c93504698023d92b319bd38741d3234904e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-26T06:21:11.995702+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "2976a783599d462e73daca22e72ed7d174b4ad4f8e7a75e8b1578f7f4eca717c",
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:21:11.995722+00:00"
+    },
+    "rewrite_of": "model-probe2",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "23dadd86f270c6aa330e52055adc5d4ccd447d9b4d8ca859ca4f10a46bac913e",
+    "target": "pytest-dev/pytest#15059",
+    "about": "Test C6: stdin capture is unchanged",
+    "claims": [
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "`stdin` capture is unchanged.",
+      "covers": [
+       "p3.stdin_read_exception"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "p3.stdin_read_exception": "OSError"
+      },
+      {
+       "p3.stdin_read_exception": "OSError"
+      },
+      {
+       "p3.stdin_read_exception": "OSError"
+      }
+     ],
+     "pr": [
+      {
+       "p3.stdin_read_exception": "OSError"
+      },
+      {
+       "p3.stdin_read_exception": "OSError"
+      },
+      {
+       "p3.stdin_read_exception": "OSError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "p3.stdin_read_exception",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C6",
+      "main": "OSError",
+      "pr": "OSError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p3.stdin_read_exception\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"p3.stdin_read_exception\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "23dadd86f270c6aa330e52055adc5d4ccd447d9b4d8ca859ca4f10a46bac913e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-26T06:20:05.161245+00:00",
+     "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+     "inputs": {
+      "title_chars": 60,
+      "body_chars": 690,
+      "base_files": {
+       "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:20:05.388391+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 12,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/_pytest/capture.py",
+       "changed_lines_total": 12,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-probe3.json",
+     "changed_lines_touched": 3
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   },
+   {
+    "id": "model-probe4-rewrite",
+    "source": "model",
+    "path": "model-probes/model-probe4-rewrite.py",
+    "sha256": "22881367ddf5822ff3ef456c963c761ec048dc926b57811ff47d7e4822facdf5",
+    "target": "pytest-dev/pytest#15059",
+    "about": "Test C7: binary fixtures return bytes and text written through them is encoded with the replaced streams' encoding and error handler",
+    "claims": [
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "Binary fixtures still return bytes; text written through them is encoded with the replaced streams' encoding and error handler.",
+      "covers": [
+       "p4.stdout_bytes",
+       "p4.stdout_bytes_type"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.4,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe4-rewrite-main-1.jsonl",
+      "probe-model-probe4-rewrite-main-2.jsonl",
+      "probe-model-probe4-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe4-rewrite-pr-1.jsonl",
+      "probe-model-probe4-rewrite-pr-2.jsonl",
+      "probe-model-probe4-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "22881367ddf5822ff3ef456c963c761ec048dc926b57811ff47d7e4822facdf5",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-26T06:21:28.954427+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "62774371e56efd08bddf53211c8c210373fb5eaa45b7a8eb923409350a91d8c2",
+     "verified": true,
+     "pr_started_at": "2026-11-26T06:21:28.954456+00:00"
+    },
+    "rewrite_of": "model-probe4",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 12,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/_pytest/capture.py",
+       "changed_lines_total": 12,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-probe4-rewrite.json",
+     "changed_lines_touched": 3
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1-rewrite",
+     "name": "c2.stderr_text",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe1-rewrite",
+     "name": "c2.stdout_text",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe2-rewrite",
+     "name": "p2.stdout_no_exception",
+     "label": "needs_human",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe2-rewrite",
+     "name": "p2.stdout_text",
+     "label": "needs_human",
+     "claim": "C3"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 4 observation(s) need attention: c2.stderr_text does not differ although the claim says it does (C2); c2.stdout_text does not differ although the claim says it does (C2); p2.stdout_no_exception does not differ although the claim says it does (C3); p2.stdout_text does not differ although the claim says it does (C3); uninformative: every observation is probe-broken (the same exception or skip value on both sides); the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  },
+  "rewrite": {
+   "before": [
+    {
+     "id": "model-probe1",
+     "source": "model",
+     "path": "model-probes/model-probe1.py",
+     "sha256": "359b5e2c36406ecf29d56af125636c0e98d61cb66dffb06e16ea016b8ea98503",
+     "target": "pytest-dev/pytest#15059",
+     "about": "Test C2 and C4: text writes use the encoding and error handler of the replaced streams",
+     "claims": [
+      {
+       "id": "C2",
+       "source": "PR description",
+       "text": "Captured `sys.stdout` and `sys.stderr` now use the encoding and error handler of the streams they replace.",
+       "covers": [
+        "c2.stdout_text",
+        "c2.stderr_text"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C4",
+       "source": "PR description",
+       "text": "Text writes use those settings.",
+       "covers": [
+        "c2.stdout_text",
+        "c2.stderr_text"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe1-main-1.jsonl",
+       "probe-model-probe1-main-2.jsonl",
+       "probe-model-probe1-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe1-pr-1.jsonl",
+       "probe-model-probe1-pr-2.jsonl",
+       "probe-model-probe1-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe1-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe1-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "359b5e2c36406ecf29d56af125636c0e98d61cb66dffb06e16ea016b8ea98503",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-26T06:20:05.161037+00:00",
+      "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+      "inputs": {
+       "title_chars": 60,
+       "body_chars": 690,
+       "base_files": {
+        "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-26T06:20:05.388391+00:00"
+     }
+    },
+    {
+     "id": "model-probe2",
+     "source": "model",
+     "path": "model-probes/model-probe2.py",
+     "sha256": "2976a783599d462e73daca22e72ed7d174b4ad4f8e7a75e8b1578f7f4eca717c",
+     "target": "pytest-dev/pytest#15059",
+     "about": "Test C3: fallback to UTF-8 and strict when encoding or errors is not a string",
+     "claims": [
+      {
+       "id": "C3",
+       "source": "PR description",
+       "text": "When either setting is missing or is not a string, capture falls back to UTF-8 and `strict`.",
+       "covers": [
+        "p2.stdout_text",
+        "p2.stdout_no_exception"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe2-main-1.jsonl",
+       "probe-model-probe2-main-2.jsonl",
+       "probe-model-probe2-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe2-pr-1.jsonl",
+       "probe-model-probe2-pr-2.jsonl",
+       "probe-model-probe2-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe2-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe2-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "2976a783599d462e73daca22e72ed7d174b4ad4f8e7a75e8b1578f7f4eca717c",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-26T06:20:05.161166+00:00",
+      "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+      "inputs": {
+       "title_chars": 60,
+       "body_chars": 690,
+       "base_files": {
+        "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-26T06:20:05.388391+00:00"
+     }
+    },
+    {
+     "id": "model-probe3",
+     "source": "model",
+     "path": "model-probes/model-probe3.py",
+     "sha256": "23dadd86f270c6aa330e52055adc5d4ccd447d9b4d8ca859ca4f10a46bac913e",
+     "target": "pytest-dev/pytest#15059",
+     "about": "Test C6: stdin capture is unchanged",
+     "claims": [
+      {
+       "id": "C6",
+       "source": "PR description",
+       "text": "`stdin` capture is unchanged.",
+       "covers": [
+        "p3.stdin_read_exception"
+       ],
+       "expect": "same"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": true
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": true
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": true
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe3-main-1.jsonl",
+       "probe-model-probe3-main-2.jsonl",
+       "probe-model-probe3-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe3-pr-1.jsonl",
+       "probe-model-probe3-pr-2.jsonl",
+       "probe-model-probe3-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "p3.stdin_read_exception": "OSError"
+       },
+       {
+        "p3.stdin_read_exception": "OSError"
+       },
+       {
+        "p3.stdin_read_exception": "OSError"
+       }
+      ],
+      "pr": [
+       {
+        "p3.stdin_read_exception": "OSError"
+       },
+       {
+        "p3.stdin_read_exception": "OSError"
+       },
+       {
+        "p3.stdin_read_exception": "OSError"
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "p3.stdin_read_exception",
+       "state": "same",
+       "label": "not_testable",
+       "claim": "C6",
+       "main": "OSError",
+       "pr": "OSError",
+       "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+       "citations": {
+        "main": {
+         "file": "probe-model-probe3-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"p3.stdin_read_exception\""
+        },
+        "pr": {
+         "file": "probe-model-probe3-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"p3.stdin_read_exception\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "23dadd86f270c6aa330e52055adc5d4ccd447d9b4d8ca859ca4f10a46bac913e",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-26T06:20:05.161245+00:00",
+      "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+      "inputs": {
+       "title_chars": 60,
+       "body_chars": 690,
+       "base_files": {
+        "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-26T06:20:05.388391+00:00"
+     }
+    },
+    {
+     "id": "model-probe4",
+     "source": "model",
+     "path": "model-probes/model-probe4.py",
+     "sha256": "62774371e56efd08bddf53211c8c210373fb5eaa45b7a8eb923409350a91d8c2",
+     "target": "pytest-dev/pytest#15059",
+     "about": "Test C7: binary fixtures return bytes and text written through them is encoded with the replaced streams' encoding and error handler",
+     "claims": [
+      {
+       "id": "C7",
+       "source": "PR description",
+       "text": "Binary fixtures still return bytes; text written through them is encoded with the replaced streams' encoding and error handler.",
+       "covers": [
+        "p4.stdout_bytes",
+        "p4.stdout_bytes_type"
+       ],
+       "expect": "same"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 0.2,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 0.2,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 0.3,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe4-main-1.jsonl",
+       "probe-model-probe4-main-2.jsonl",
+       "probe-model-probe4-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe4-pr-1.jsonl",
+       "probe-model-probe4-pr-2.jsonl",
+       "probe-model-probe4-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe4-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe4-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "62774371e56efd08bddf53211c8c210373fb5eaa45b7a8eb923409350a91d8c2",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-26T06:20:05.161321+00:00",
+      "inputs_sha256": "f9d011c4d9eb042b9305426895a716f6959ce685ed08013e7663606c57a5b9a1",
+      "inputs": {
+       "title_chars": 60,
+       "body_chars": 690,
+       "base_files": {
+        "src/_pytest/capture.py": "e4b494b696e60b83f311c06250f2810d83db7548539f28bf9f3d5ffc0f292920"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-26T06:20:05.388391+00:00"
+     }
+    }
+   ],
+   "probes": [
+    {
+     "probe": "model-probe1",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once"
+    },
+    {
+     "probe": "model-probe2",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once"
+    },
+    {
+     "probe": "model-probe4",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once (still crashes on main)"
+    }
+   ]
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "partly measured",
+  "side": "main",
+  "probes": {
+   "model-probe1-rewrite": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-probe2-rewrite": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-probe3": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 12,
+    "adequacy": "not_adequate"
+   },
+   "model-probe4-rewrite": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 12,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe3",
+   "model-probe4-rewrite"
+  ]
+ },
+ "verdict": "needs_attention",
+ "reason": "needs attention: flagged claim(s) C2, C3; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "needs attention: flagged claim(s) C2, C3; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
+  "measurement": "not measured"
+ },
+ "probe_rewrite_cap": {
+  "with_rewrite": "needs_attention",
+  "without_rewrite": "could_not_verify",
+  "final": "needs_attention"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/_pytest/capture.py"
+  ],
+  "compiled_files": [
+   "pyproject.toml"
+  ],
+  "other_files": [
+   "changelog/4389.bugfix.rst",
+   "testing/test_capture.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 258.7,
+  "tests": 9.6
+ },
+ "cost": {
+  "ai_calls": 6,
+  "failed_ai_calls": 0,
+  "input_tokens": 23136,
+  "output_tokens": 43156,
+  "thinking_tokens": 40396,
+  "cost_usd": 0.045781,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.045781,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 258.7,
+   "tests": 9.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.017247,
+  "total_cost_usd": 0.063028,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-26/748f814/pytest-15059"
+ }
+}
