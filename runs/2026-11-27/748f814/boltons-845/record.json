@@ -1,0 +1,1596 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-845-2740ac127f62-2026-11-27",
+ "date_ist": "2026-11-27 11:59 IST",
+ "run_date": "2026-11-27",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 845,
+  "url": "https://github.com/mahmoud/boltons/pull/845",
+  "title": "Measure elapsed time across daylight-saving changes in relative_time",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "2740ac127f624463aa3a57741c95e7752c491b23",
+  "merge_commit": "7f6687c7db3d846876ed20ac937b2deef7780162",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Twiink",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-27T05:36:47Z",
+ "updated_at_ist": "2026-11-27 11:06 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-27 11:59 IST",
+ "files": {
+  "all": [
+   "boltons/timeutils.py",
+   "tests/test_timeutils.py"
+  ],
+  "package_py": [
+   "boltons/timeutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_timeutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 17,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "17 passed in 0.69s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 18,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "18 passed in 0.59s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 17,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "17 passed in 0.57s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 18,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "18 passed in 0.62s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 17,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "17 passed in 0.65s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 18,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "18 passed in 0.65s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-845/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "boltons/timeutils.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 2.2,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "2740ac127f624463aa3a57741c95e7752c491b23",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 4.5 GB (of 15.6 GB).",
+   "Setup check: free disk 88.4 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] lookup failed.",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "tox.ini",
+   "setup.cfg",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "7f6687c7db3d846876ed20ac937b2deef7780162",
+  "merge_commit": "7f6687c7db3d846876ed20ac937b2deef7780162",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "2740ac127f624463aa3a57741c95e7752c491b23"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 7f6687c7db3d (refs/pull/845/merge) of head 2740ac127f62"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Account for the change in their UTC offsets when calculating the elapsed duration.",
+    "source_quote": "Account for the change in their UTC offsets when calculating the elapsed duration.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The two occurrences of 01:30 during the November clock change in US Eastern time produce `0 seconds ago`.",
+    "source_quote": "The two occurrences of 01:30 during the November clock change in US Eastern time produce `0 seconds ago`.",
+    "testable": false,
+    "expect": "base",
+    "base_description": true
+   },
+   {
+    "id": "C3",
+    "text": "The same pair produces `1 hour ago` if the second timestamp is supplied in UTC.",
+    "source_quote": "The same pair produces `1 hour ago` if the second timestamp is supplied in UTC.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "probe-c1",
+    "claims": [
+     "C1"
+    ]
+   },
+   {
+    "id": "probe-c3",
+    "claims": [
+     "C3"
+    ]
+   }
+  ],
+  "diff_targets": [
+   "boltons.timeutils.decimal_relative_time"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c1.py",
+    "source": "model",
+    "sha256": "af6c144c204d5e3562d20a74eab32112dbf842bc5c719590da54b18ffb5940a7",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:06:50.485685+00:00",
+    "inputs_sha256": "09f2d46043ed9201955e47c0f56dc313f126d24c87a688da0bf6bb5b96caa48b",
+    "inputs": {
+     "title_chars": 68,
+     "body_chars": 1272,
+     "base_files": {
+      "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c3.py",
+    "source": "model",
+    "sha256": "87bf3d565e7431622a3eac4788b8ca966de7ca6ae74d20f48a9d8b81e86573a6",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:06:50.485977+00:00",
+    "inputs_sha256": "09f2d46043ed9201955e47c0f56dc313f126d24c87a688da0bf6bb5b96caa48b",
+    "inputs": {
+     "title_chars": 68,
+     "body_chars": 1272,
+     "base_files": {
+      "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "b8d6d0ef3a759281016d35f877b5e269a5ef41bc31c380cafe48d9833a02c6cb",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-27T07:06:50.488858+00:00",
+    "inputs_sha256": "0a3c13ea6c427307c192e20df8803165549056cabf573c8775764c8e3ca0dcd7",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-27T07:06:50.759055+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_timeutils.py"
+  ],
+  "pr": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "7f6687c7db3d846876ed20ac937b2deef7780162",
+   "installed": "7f6687c7db3d846876ed20ac937b2deef7780162",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 17,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_timeutils::test_relative_time_across_daylight_saving_changes"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 18,
+   "pr": 18
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_timeutils::test_relative_time_across_daylight_saving_changes": "AssertionError: assert '0 seconds ago' == '1 hour ago'"
+  },
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "source": "model",
+    "path": "model-probes/model-probe-c1.py",
+    "sha256": "af6c144c204d5e3562d20a74eab32112dbf842bc5c719590da54b18ffb5940a7",
+    "target": "mahmoud/boltons#845",
+    "about": "Test C1: Accounting for UTC offset change across DST fallback.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Account for the change in their UTC offsets when calculating the elapsed duration.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c1-main-1.jsonl",
+      "probe-model-probe-c1-main-2.jsonl",
+      "probe-model-probe-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c1-pr-1.jsonl",
+      "probe-model-probe-c1-pr-2.jsonl",
+      "probe-model-probe-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.eastern_fallback": "0 seconds ago",
+       "c1.eastern_fallback_reverse": "0 seconds ago"
+      },
+      {
+       "c1.eastern_fallback": "0 seconds ago",
+       "c1.eastern_fallback_reverse": "0 seconds ago"
+      },
+      {
+       "c1.eastern_fallback": "0 seconds ago",
+       "c1.eastern_fallback_reverse": "0 seconds ago"
+      }
+     ],
+     "pr": [
+      {
+       "c1.eastern_fallback": "1 hour ago",
+       "c1.eastern_fallback_reverse": "1 hour from now"
+      },
+      {
+       "c1.eastern_fallback": "1 hour ago",
+       "c1.eastern_fallback_reverse": "1 hour from now"
+      },
+      {
+       "c1.eastern_fallback": "1 hour ago",
+       "c1.eastern_fallback_reverse": "1 hour from now"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.eastern_fallback",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "0 seconds ago",
+      "pr": "1 hour ago",
+      "diffs": [
+       {
+        "field": "",
+        "main": "0 seconds ago",
+        "pr": "1 hour ago"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.eastern_fallback\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.eastern_fallback\""
+       }
+      }
+     },
+     {
+      "name": "c1.eastern_fallback_reverse",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "0 seconds ago",
+      "pr": "1 hour from now",
+      "diffs": [
+       {
+        "field": "",
+        "main": "0 seconds ago",
+        "pr": "1 hour from now"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.eastern_fallback_reverse\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.eastern_fallback_reverse\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "af6c144c204d5e3562d20a74eab32112dbf842bc5c719590da54b18ffb5940a7",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:06:50.485685+00:00",
+     "inputs_sha256": "09f2d46043ed9201955e47c0f56dc313f126d24c87a688da0bf6bb5b96caa48b",
+     "inputs": {
+      "title_chars": 68,
+      "body_chars": 1272,
+      "base_files": {
+       "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:06:50.759055+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/timeutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c3",
+    "source": "model",
+    "path": "model-probes/model-probe-c3.py",
+    "sha256": "87bf3d565e7431622a3eac4788b8ca966de7ca6ae74d20f48a9d8b81e86573a6",
+    "target": "mahmoud/boltons#845",
+    "about": "Test C3: Same pair yields 1 hour ago when second timestamp is in UTC.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The same pair produces `1 hour ago` if the second timestamp is supplied in UTC.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c3-main-1.jsonl",
+      "probe-model-probe-c3-main-2.jsonl",
+      "probe-model-probe-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c3-pr-1.jsonl",
+      "probe-model-probe-c3-pr-2.jsonl",
+      "probe-model-probe-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.eastern_utc": "1 hour ago"
+      },
+      {
+       "c3.eastern_utc": "1 hour ago"
+      },
+      {
+       "c3.eastern_utc": "1 hour ago"
+      }
+     ],
+     "pr": [
+      {
+       "c3.eastern_utc": "1 hour ago"
+      },
+      {
+       "c3.eastern_utc": "1 hour ago"
+      },
+      {
+       "c3.eastern_utc": "1 hour ago"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.eastern_utc",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "1 hour ago",
+      "pr": "1 hour ago",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.eastern_utc\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.eastern_utc\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "87bf3d565e7431622a3eac4788b8ca966de7ca6ae74d20f48a9d8b81e86573a6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:06:50.485977+00:00",
+     "inputs_sha256": "09f2d46043ed9201955e47c0f56dc313f126d24c87a688da0bf6bb5b96caa48b",
+     "inputs": {
+      "title_chars": 68,
+      "body_chars": 1272,
+      "base_files": {
+       "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:06:50.759055+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/timeutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "b8d6d0ef3a759281016d35f877b5e269a5ef41bc31c380cafe48d9833a02c6cb",
+    "target": "mahmoud/boltons#845",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "boltons.timeutils.decimal_relative_time.input0": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input1": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input10": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input11": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input2": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input3": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input4": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input5": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input6": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input7": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input8": {
+        "raises": "AttributeError"
+       },
+       "boltons.timeutils.decimal_relative_time.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.decimal_relative_time.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.timeutils.decimal_relative_time.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "b8d6d0ef3a759281016d35f877b5e269a5ef41bc31c380cafe48d9833a02c6cb",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-27T07:06:50.488858+00:00",
+     "inputs_sha256": "0a3c13ea6c427307c192e20df8803165549056cabf573c8775764c8e3ca0dcd7",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:06:50.759055+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "boltons/timeutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C3"
+   ],
+   "reason": "probe: claim(s) C1, C3 proven; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-probe-c3": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 2,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "verified",
+ "reason": "1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged; probe: claim(s) C1, C3 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged; probe: claim(s) C1, C3 proven",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/timeutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 2252.4,
+  "tests": 6.7
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 16946,
+  "output_tokens": 13463,
+  "thinking_tokens": 12533,
+  "cost_usd": 0.017201,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017201,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 2252.4,
+   "tests": 6.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.15016,
+  "total_cost_usd": 0.167361,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-27/748f814/boltons-845"
+ }
+}
