@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-27 on 748f814
 
-10 report(s) in this folder: 1 need attention, 4 could not be verified, 5 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+11 report(s) in this folder: 1 need attention, 4 could not be verified, 6 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -24,3 +24,4 @@
 | VERIFIED | encode/httpx#3855: Normalize default ports for uppercase and mixed-case URL schemes | 6 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (1 -> 5 ids); 659 test(s) ran on main, 663 on the PR; 5 new test(s) pass, 652 unchanged; probe: 1 observation(s) shown as advisory only (the probe input may not reach the changed code; the tests already prove the change): c2.port_http_lower (C2); probe: claim(s) C2 proven | [PDF](httpx-3855/REPORT.pdf) |
 | VERIFIED | PyCQA/isort#2813: fix: sort lazy imports by module name with force_sort_within_sections | 1 test(s) fail on main and pass on the PR; 268 test(s) ran on main, 268 on the PR; 0 new test(s) pass, 266 unchanged (1 of them skipped on both sides); 2 test failure(s) pre-existing and identical on both sides; probe: claim(s) C1, C4, C7, C8 proven | [PDF](isort-2813/REPORT.pdf) |
 | VERIFIED | Delgan/loguru#1557: perf: reduce per-record allocations in _log, _datetime, and Handler.emit | 158 test(s) ran on main, 158 on the PR; 0 new test(s) pass, 158 unchanged; probe: 7 observation(s) ignored as noise (they change between runs of the same side); probe: claim(s) C5, C6 proven | [PDF](loguru-1557/REPORT.pdf) |
+| VERIFIED | urllib3/urllib3#5391: fix(url): handle rootless paths in parse_url | 3 test(s) fail on main and pass on the PR; 598 test(s) ran on main, 598 on the PR; 0 new test(s) pass, 601 unchanged (6 of them skipped on both sides); probe: claim(s) C1, C2 proven | [PDF](urllib3-5391/REPORT.pdf) |
