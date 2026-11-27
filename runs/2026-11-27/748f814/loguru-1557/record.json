@@ -1,0 +1,2098 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Delgan-loguru-1557-206a50b8dbd6-2026-11-27",
+ "date_ist": "2026-11-27 12:43 IST",
+ "run_date": "2026-11-27",
+ "who": "ops/daily_run.py",
+ "repo": "Delgan/loguru",
+ "library": "loguru",
+ "pr": {
+  "repo": "Delgan/loguru",
+  "number": 1557,
+  "url": "https://github.com/Delgan/loguru/pull/1557",
+  "title": "perf: reduce per-record allocations in _log, _datetime, and Handler.emit",
+  "base_sha": "1b5edc5b0075804770f881db0d3589ac460ee290",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "206a50b8dbd6a895a5fea6fdecf2c122fa7db473",
+  "merge_commit": null,
+  "tested_main_sha": "e695c954089944fcd47a6e866fd25fe3fccb9ea8",
+  "tested_main_sha_label": "merge-base of the recorded base and the PR head (the recorded base is ahead of that fork; target-branch commits after the fork are not pull-request changes)"
+ },
+ "author": "alexander-src",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-26T23:30:40Z",
+ "updated_at_ist": "2026-11-27 05:00 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-27 12:43 IST",
+ "files": {
+  "all": [
+   "loguru/_colorizer.py",
+   "loguru/_datetime.py",
+   "loguru/_handler.py",
+   "loguru/_logger.py"
+  ],
+  "package_py": [
+   "loguru/_colorizer.py",
+   "loguru/_datetime.py",
+   "loguru/_handler.py",
+   "loguru/_logger.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_datetime.py, tests/test_pickling.py, tests/test_remove.py, tests/test_activation.py, tests/test_add_option_backtrace.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "158 passed in 1.80s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.4,
+   "pytest_summary": "158 passed in 1.41s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "158 passed in 1.41s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.5,
+   "pytest_summary": "158 passed in 1.42s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "158 passed in 1.35s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 158,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.2,
+   "pytest_summary": "158 passed in 1.29s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "loguru-1557/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 54,
+  "changed_lines_covered": 39,
+  "files": [
+   {
+    "file": "loguru/_colorizer.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "loguru/_datetime.py",
+    "changed_lines_total": 17,
+    "changed_lines_covered": 11
+   },
+   {
+    "file": "loguru/_handler.py",
+    "changed_lines_total": 24,
+    "changed_lines_covered": 20
+   },
+   {
+    "file": "loguru/_logger.py",
+    "changed_lines_total": 10,
+    "changed_lines_covered": 7
+   }
+  ],
+  "seconds": 2.7,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "748f814e2c9bc8dfa691622e96714fe094becf29",
+ "route": "source-pair",
+ "current_head_sha": "206a50b8dbd6a895a5fea6fdecf2c122fa7db473",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.6 GB (of 15.6 GB).",
+   "Setup check: free disk 87.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] lookup failed.",
+   "Query: loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: aiocontextvars is noted, installed with the project.",
+   "Setup plan: win32-setctime is noted, installed with the project.",
+   "Setup plan: install pre-commit==4.6.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install tox==3.27.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest==6.1.2 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-cov==2.12.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy' (listed in the dev extra) on main and pr.",
+   "Setup plan: install freezegun==1.1.0 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install mypy==v0.910 ; python_version<'3.6' (listed in the dev extra) on main and pr.",
+   "Setup plan: install Sphinx==8.2.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.1.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install myst-parser==4.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install build==1.6.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install twine==7.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.5",
+   "Installed pre-commit 4.6.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed tox 4.64.4 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest 9.1.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-cov 6.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-mypy-plugins 4.0.3 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed freezegun 1.5.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed exceptiongroup  from pyproject (listed in the dev extra) on main and pr.",
+   "Installed mypy 2.3.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed Sphinx 8.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed sphinx-rtd-theme 3.1.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed myst-parser 4.0.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed twine 7.0.0 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "tox.ini",
+   "CONTRIBUTING.rst",
+   ".github/workflows/docs.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/codeql-analysis.yml",
+   ".github/workflows/tests.yml",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama>=0.3.4 ; sys_platform=='win32'",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+     "name": "aiocontextvars",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+     "name": "win32-setctime",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+     "name": "pre-commit",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox==3.27.1 ; python_version<'3.8'",
+     "name": "tox",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+     "name": "pytest-mypy-plugins",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+     "name": "freezegun",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+     "name": "exceptiongroup",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==v0.910 ; python_version<'3.6'",
+     "name": "mypy",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+     "name": "Sphinx",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+     "name": "sphinx-rtd-theme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+     "name": "myst-parser",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "build==1.6.1 ; python_version>='3.11'",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twine==7.0.0 ; python_version>='3.11'",
+     "name": "twine",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pre-commit==4.6.0 ; python_version>='3.11'",
+    "tox==3.27.1 ; python_version<'3.8'",
+    "pytest==6.1.2 ; python_version<'3.8'",
+    "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "freezegun==1.1.0 ; python_version<'3.8'",
+    "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "mypy==v0.910 ; python_version<'3.6'",
+    "Sphinx==8.2.1 ; python_version>='3.11'",
+    "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "myst-parser==4.0.0 ; python_version>='3.11'",
+    "build==1.6.1 ; python_version>='3.11'",
+    "twine==7.0.0 ; python_version>='3.11'"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.5"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 16 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.5",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pre-commit==4.6.0 ; python_version>='3.11', tox==3.27.1 ; python_version<'3.8', pytest==6.1.2 ; python_version<'3.8', pytest-cov==2.12.1 ; python_version<'3.8', pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy', freezegun==1.1.0 ; python_version<'3.8', exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11', mypy==v0.910 ; python_version<'3.6', Sphinx==8.2.1 ; python_version>='3.11', sphinx-rtd-theme==3.1.0 ; python_version>='3.11', myst-parser==4.0.0 ; python_version>='3.11', build==1.6.1 ; python_version>='3.11'. 3 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 13
+  },
+  "installs": [
+   {
+    "package": "pre-commit",
+    "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+    "version": "4.6.0",
+    "versions": {
+     "main": "4.6.0",
+     "pr": "4.6.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tox",
+    "requirement": "tox==3.27.1 ; python_version<'3.8'",
+    "version": "4.64.4",
+    "versions": {
+     "main": "4.64.4",
+     "pr": "4.64.4"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "version": "6.2.1",
+    "versions": {
+     "main": "6.2.1",
+     "pr": "6.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mypy-plugins",
+    "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "version": "4.0.3",
+    "versions": {
+     "main": "4.0.3",
+     "pr": "4.0.3"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "freezegun",
+    "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+    "version": "1.5.0",
+    "versions": {
+     "main": "1.5.0",
+     "pr": "1.5.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "exceptiongroup",
+    "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==v0.910 ; python_version<'3.6'",
+    "version": "2.3.1",
+    "versions": {
+     "main": "2.3.1",
+     "pr": "2.3.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Sphinx",
+    "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+    "version": "8.2.1",
+    "versions": {
+     "main": "8.2.1",
+     "pr": "8.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-rtd-theme",
+    "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "version": "3.1.0",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "myst-parser",
+    "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+    "version": "4.0.0",
+    "versions": {
+     "main": "4.0.0",
+     "pr": "4.0.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "build",
+    "requirement": "build==1.6.1 ; python_version>='3.11'",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "twine",
+    "requirement": "twine==7.0.0 ; python_version>='3.11'",
+    "version": "7.0.0",
+    "versions": {
+     "main": "7.0.0",
+     "pr": "7.0.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "main_sha": "e695c954089944fcd47a6e866fd25fe3fccb9ea8",
+  "pr_sha": "206a50b8dbd6a895a5fea6fdecf2c122fa7db473",
+  "behind_target": true,
+  "explicit_base": false,
+  "supplied_base_sha": "1b5edc5b0075804770f881db0d3589ac460ee290",
+  "authoritative_base": "merge-base",
+  "target_tip_sha": "1b5edc5b0075804770f881db0d3589ac460ee290",
+  "comparison_basis": "merge-base of the recorded base and the PR head vs PR head (the PR is behind that base, so commits added to the target after the fork are not pull-request changes)"
+ },
+ "tested": {
+  "main": "master @ e695c9540899 (merge-base with the PR head)",
+  "pr": "PR head 206a50b8dbd6"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The PR reduces per-record allocations in _log, _datetime, and Handler.emit.",
+    "source_quote": "perf: reduce per-record allocations in _log, _datetime, and Handler.emit",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Median wall time for 25,000 logger.info calls dropped from 238.35 ms to 162.65 ms (a 1.47\u00d7 speed\u2011up).",
+    "source_quote": "Median wall time | 238.35 ms | 162.65 ms | **1.47x**",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "p95 latency improved from 256.15 ms to 173.21 ms and MAD from 1.53 ms to 1.20 ms.",
+    "source_quote": "p95 / MAD | 256.15 / 1.53 ms | 173.21 / 1.20 ms | 95% CI [1.45x, 1.47x]",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Peak RSS decreased from 42,484 KiB to 41,236 KiB (\u20112.9%).",
+    "source_quote": "Peak RSS | 42,484 KiB | 41,236 KiB | -2.9%",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The logged payload SHA\u2011256 hash is identical between the base commit and this PR.",
+    "source_quote": "Payload SHA-256 | 1f81e116898dc207 | identical",
+    "testable": true,
+    "expect": "same",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C6",
+    "text": "Running the test suite (excluding typehints/multiprocessing/rotation) yields 1,548 passed and 27 skipped tests, showing no regression.",
+    "source_quote": "pytest -q tests/ (excluding typehints/multiprocessing/rotation suites): 1,548 passed, 27 skipped.",
+    "testable": true,
+    "expect": "same",
+    "quote_match": "loose"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C7",
+    "text": "The PR preserves the existing _protected_lock() context manager behavior and Handler.__getstate__ pickling behavior.",
+    "source_quote": "while preserving _protected_lock() and Handler.__getstate__ pickling behavior.",
+    "testable": true,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C5",
+    "source_quote": "Payload SHA-256 | 1f81e116898dc207 | identical"
+   },
+   {
+    "claim": "C6",
+    "source_quote": "pytest -q tests/ (excluding typehints/multiprocessing/rotation suites): 1,548 passed, 27 skipped."
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "7c61a34adf54997f739bcac8bedec30667c33c739a418de2d1c4b2727ccfe23a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:15:04.097329+00:00",
+    "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+    "inputs": {
+     "title_chars": 72,
+     "body_chars": 2295,
+     "base_files": {
+      "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+      "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+      "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+      "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "cd8ef65aba3481b88b737311ed388f27b24f263b4da30bab674b6201a02cd941",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:15:04.097505+00:00",
+    "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+    "inputs": {
+     "title_chars": 72,
+     "body_chars": 2295,
+     "base_files": {
+      "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+      "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+      "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+      "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "6ec12ec0d418e82175205fe6dde6c061c907b45121bec3cddc4957ace74cad29",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:15:04.097612+00:00",
+    "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+    "inputs": {
+     "title_chars": 72,
+     "body_chars": 2295,
+     "base_files": {
+      "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+      "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+      "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+      "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe4.py",
+    "source": "model",
+    "sha256": "bbf779dca36e5435ac68de30ee654649a4d7209c6ff5e963fd19cc5a7ce48977",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-27T07:15:04.097691+00:00",
+    "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+    "inputs": {
+     "title_chars": 72,
+     "body_chars": 2295,
+     "base_files": {
+      "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+      "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+      "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+      "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pre-commit",
+  "tox",
+  "pytest",
+  "pytest-cov",
+  "pytest-mypy-plugins",
+  "colorama",
+  "freezegun",
+  "exceptiongroup",
+  "mypy",
+  "Sphinx",
+  "sphinx-rtd-theme",
+  "myst-parser",
+  "build",
+  "twine"
+ ],
+ "pr_side_started_at": "2026-11-27T07:15:04.326797+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_datetime.py",
+   "tests/test_pickling.py",
+   "tests/test_remove.py",
+   "tests/test_activation.py",
+   "tests/test_add_option_backtrace.py"
+  ],
+  "pr": [
+   "tests/test_datetime.py",
+   "tests/test_pickling.py",
+   "tests/test_remove.py",
+   "tests/test_activation.py",
+   "tests/test_add_option_backtrace.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "loguru",
+   "expected": "e695c954089944fcd47a6e866fd25fe3fccb9ea8",
+   "installed": "e695c954089944fcd47a6e866fd25fe3fccb9ea8",
+   "ok": true
+  },
+  "pr": {
+   "dist": "loguru",
+   "expected": "206a50b8dbd6a895a5fea6fdecf2c122fa7db473",
+   "installed": "206a50b8dbd6a895a5fea6fdecf2c122fa7db473",
+   "ok": true
+  }
+ },
+ "base_head_sha": "e695c954089944fcd47a6e866fd25fe3fccb9ea8",
+ "comparison": {
+  "same": 158,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 158,
+   "pr": 158
+  },
+  "messages": {},
+  "base_error_signatures": []
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "7c61a34adf54997f739bcac8bedec30667c33c739a418de2d1c4b2727ccfe23a",
+    "target": "Delgan/loguru#1557",
+    "about": "Measure per-record allocations and peak memory for 1000 log records.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The PR reduces per-record allocations in _log, _datetime, and Handler.emit.",
+      "covers": [
+       "c1.alloc_per_record",
+       "c1.alloc_total",
+       "c1.alloc_peak"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Peak RSS decreased from 42,484 KiB to 41,236 KiB (\u20112.9%).",
+      "covers": [
+       "c1.alloc_peak"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.alloc_per_record": 19.476,
+       "c1.alloc_total": 19476,
+       "c1.alloc_peak": 21841
+      },
+      {
+       "c1.alloc_per_record": 18.176,
+       "c1.alloc_total": 18176,
+       "c1.alloc_peak": 20541
+      },
+      {
+       "c1.alloc_per_record": 18.176,
+       "c1.alloc_total": 18176,
+       "c1.alloc_peak": 20541
+      }
+     ],
+     "pr": [
+      {
+       "c1.alloc_per_record": 15.491,
+       "c1.alloc_total": 15491,
+       "c1.alloc_peak": 17007
+      },
+      {
+       "c1.alloc_per_record": 15.491,
+       "c1.alloc_total": 15491,
+       "c1.alloc_peak": 17007
+      },
+      {
+       "c1.alloc_per_record": 15.491,
+       "c1.alloc_total": 15491,
+       "c1.alloc_peak": 17007
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.alloc_peak",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C4",
+      "main": 21841,
+      "pr": 17007,
+      "diffs": [
+       {
+        "field": "",
+        "main": 21841,
+        "pr": 17007
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.alloc_peak\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.alloc_peak\""
+       }
+      }
+     },
+     {
+      "name": "c1.alloc_per_record",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C1",
+      "main": 19.476,
+      "pr": 15.491,
+      "diffs": [
+       {
+        "field": "",
+        "main": 19.476,
+        "pr": 15.491
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.alloc_per_record\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.alloc_per_record\""
+       }
+      }
+     },
+     {
+      "name": "c1.alloc_total",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C1",
+      "main": 19476,
+      "pr": 15491,
+      "diffs": [
+       {
+        "field": "",
+        "main": 19476,
+        "pr": 15491
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.alloc_total\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.alloc_total\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "7c61a34adf54997f739bcac8bedec30667c33c739a418de2d1c4b2727ccfe23a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:15:04.097329+00:00",
+     "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+     "inputs": {
+      "title_chars": 72,
+      "body_chars": 2295,
+      "base_files": {
+       "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+       "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+       "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+       "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:15:04.326797+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 36,
+     "changed_lines_covered": 24,
+     "files": [
+      {
+       "file": "loguru/_colorizer.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "loguru/_datetime.py",
+       "changed_lines_total": 8,
+       "changed_lines_covered": 4
+      },
+      {
+       "file": "loguru/_handler.py",
+       "changed_lines_total": 18,
+       "changed_lines_covered": 14
+      },
+      {
+       "file": "loguru/_logger.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 24 of 36 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "cd8ef65aba3481b88b737311ed388f27b24f263b4da30bab674b6201a02cd941",
+    "target": "Delgan/loguru#1557",
+    "about": "Measure timing statistics and peak memory for 1000 log records with formatting.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Median wall time for 25,000 logger.info calls dropped from 238.35 ms to 162.65 ms (a 1.47\u00d7 speed\u2011up).",
+      "covers": [
+       "c2.median_time",
+       "c2.p95_time",
+       "c2.mad_time"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "p95 latency improved from 256.15 ms to 173.21 ms and MAD from 1.53 ms to 1.20 ms.",
+      "covers": [
+       "c2.median_time",
+       "c2.p95_time",
+       "c2.mad_time"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Peak RSS decreased from 42,484 KiB to 41,236 KiB (\u20112.9%).",
+      "covers": [
+       "c4.peak_memory"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.median_time": 7.93250001152046e-05,
+       "c2.p95_time": 0.00013535900143324398,
+       "c2.mad_time": 1.0444000508869067e-05,
+       "c4.peak_memory": 294911
+      },
+      {
+       "c2.median_time": 7.194850149971899e-05,
+       "c2.p95_time": 0.00012073800098733045,
+       "c2.mad_time": 3.3150008675875142e-06,
+       "c4.peak_memory": 274637
+      },
+      {
+       "c2.median_time": 7.463800102414098e-05,
+       "c2.p95_time": 0.00010056500104838051,
+       "c2.mad_time": 4.539000656222925e-06,
+       "c4.peak_memory": 290789
+      }
+     ],
+     "pr": [
+      {
+       "c2.median_time": 4.488799822865985e-05,
+       "c2.p95_time": 5.904899808228947e-05,
+       "c2.mad_time": 4.219982656650245e-07,
+       "c4.peak_memory": 160009
+      },
+      {
+       "c2.median_time": 4.941950101056136e-05,
+       "c2.p95_time": 5.789499846287072e-05,
+       "c2.mad_time": 4.015999365947209e-06,
+       "c4.peak_memory": 160009
+      },
+      {
+       "c2.median_time": 4.443649959284812e-05,
+       "c2.p95_time": 5.7320998166687787e-05,
+       "c2.mad_time": 4.0200029616244137e-07,
+       "c4.peak_memory": 160009
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.mad_time",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C2",
+      "main": 1.0444000508869067e-05,
+      "pr": 4.219982656650245e-07,
+      "diffs": [
+       {
+        "field": "",
+        "main": 1.0444000508869067e-05,
+        "pr": 4.219982656650245e-07
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.mad_time\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.mad_time\""
+       }
+      }
+     },
+     {
+      "name": "c2.median_time",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C2",
+      "main": 7.93250001152046e-05,
+      "pr": 4.488799822865985e-05,
+      "diffs": [
+       {
+        "field": "",
+        "main": 7.93250001152046e-05,
+        "pr": 4.488799822865985e-05
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.median_time\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.median_time\""
+       }
+      }
+     },
+     {
+      "name": "c2.p95_time",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C2",
+      "main": 0.00013535900143324398,
+      "pr": 5.904899808228947e-05,
+      "diffs": [
+       {
+        "field": "",
+        "main": 0.00013535900143324398,
+        "pr": 5.904899808228947e-05
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.p95_time\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.p95_time\""
+       }
+      }
+     },
+     {
+      "name": "c4.peak_memory",
+      "state": "flaky",
+      "label": "flaky",
+      "claim": "C4",
+      "main": 294911,
+      "pr": 160009,
+      "diffs": [
+       {
+        "field": "",
+        "main": 294911,
+        "pr": 160009
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.peak_memory\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.peak_memory\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "cd8ef65aba3481b88b737311ed388f27b24f263b4da30bab674b6201a02cd941",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:15:04.097505+00:00",
+     "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+     "inputs": {
+      "title_chars": 72,
+      "body_chars": 2295,
+      "base_files": {
+       "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+       "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+       "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+       "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:15:04.326797+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 36,
+     "changed_lines_covered": 27,
+     "files": [
+      {
+       "file": "loguru/_colorizer.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "loguru/_datetime.py",
+       "changed_lines_total": 8,
+       "changed_lines_covered": 5
+      },
+      {
+       "file": "loguru/_handler.py",
+       "changed_lines_total": 18,
+       "changed_lines_covered": 14
+      },
+      {
+       "file": "loguru/_logger.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 6
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 27 of 36 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "6ec12ec0d418e82175205fe6dde6c061c907b45121bec3cddc4957ace74cad29",
+    "target": "Delgan/loguru#1557",
+    "about": "Verify that the logged payload SHA-256 is identical.",
+    "claims": [
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The logged payload SHA\u2011256 hash is identical between the base commit and this PR.",
+      "covers": [
+       "c5.payload_sha256"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      },
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      },
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      }
+     ],
+     "pr": [
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      },
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      },
+      {
+       "c5.payload_sha256": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c5.payload_sha256",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57",
+      "pr": "1a7df0e94b0ff2a8d2bf29053c55255c1dc71c0840b58b5c107dd0c942196d57",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.payload_sha256\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c5.payload_sha256\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "6ec12ec0d418e82175205fe6dde6c061c907b45121bec3cddc4957ace74cad29",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:15:04.097612+00:00",
+     "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+     "inputs": {
+      "title_chars": 72,
+      "body_chars": 2295,
+      "base_files": {
+       "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+       "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+       "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+       "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:15:04.326797+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 36,
+     "changed_lines_covered": 27,
+     "files": [
+      {
+       "file": "loguru/_colorizer.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "loguru/_datetime.py",
+       "changed_lines_total": 8,
+       "changed_lines_covered": 5
+      },
+      {
+       "file": "loguru/_handler.py",
+       "changed_lines_total": 18,
+       "changed_lines_covered": 14
+      },
+      {
+       "file": "loguru/_logger.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 6
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 27 of 36 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe4",
+    "source": "model",
+    "path": "model-probes/model-probe4.py",
+    "sha256": "bbf779dca36e5435ac68de30ee654649a4d7209c6ff5e963fd19cc5a7ce48977",
+    "target": "Delgan/loguru#1557",
+    "about": "Run a basic logging sanity check to detect regressions.",
+    "claims": [
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "Running the test suite (excluding typehints/multiprocessing/rotation) yields 1,548 passed and 27 skipped tests, showing no regression.",
+      "covers": [
+       "c6.test_passed",
+       "c6.test_error"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe4-main-1.jsonl",
+      "probe-model-probe4-main-2.jsonl",
+      "probe-model-probe4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe4-pr-1.jsonl",
+      "probe-model-probe4-pr-2.jsonl",
+      "probe-model-probe4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      },
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      },
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      }
+     ],
+     "pr": [
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      },
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      },
+      {
+       "c6.test_passed": true,
+       "c6.test_error": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c6.test_error",
+      "state": "same",
+      "label": "proven",
+      "claim": "C6",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c6.test_error\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c6.test_error\""
+       }
+      }
+     },
+     {
+      "name": "c6.test_passed",
+      "state": "same",
+      "label": "proven",
+      "claim": "C6",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe4-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c6.test_passed\""
+       },
+       "pr": {
+        "file": "probe-model-probe4-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c6.test_passed\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "bbf779dca36e5435ac68de30ee654649a4d7209c6ff5e963fd19cc5a7ce48977",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-27T07:15:04.097691+00:00",
+     "inputs_sha256": "ae0730568ddac036798a764494622ce9d870e5482c403eacbbee8d757370de1f",
+     "inputs": {
+      "title_chars": 72,
+      "body_chars": 2295,
+      "base_files": {
+       "loguru/_colorizer.py": "2efa6db06e5f23f7a49ef49034a09ccb03561feed3cf8fc9db36b27db5a6e734",
+       "loguru/_datetime.py": "5bf693694f373ead6938c01ba61ab94e95f76893bb6c2c8156b5a247ff093e57",
+       "loguru/_handler.py": "a9147c82ff9873652b8444b889025e2198caa7a098d12fb8862c5547545b63f4",
+       "loguru/_logger.py": "e200580be6e553b04388cb1df0e5ce2f02f4d838d839a5c3c41b031b8e9501ed"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-27T07:15:04.326797+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 36,
+     "changed_lines_covered": 21,
+     "files": [
+      {
+       "file": "loguru/_colorizer.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "loguru/_datetime.py",
+       "changed_lines_total": 8,
+       "changed_lines_covered": 4
+      },
+      {
+       "file": "loguru/_handler.py",
+       "changed_lines_total": 18,
+       "changed_lines_covered": 13
+      },
+      {
+       "file": "loguru/_logger.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 21 of 36 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe4.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "flaky",
+    "flaky",
+    "flaky",
+    "flaky",
+    "flaky",
+    "flaky",
+    "flaky",
+    "proven",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C5",
+    "C6"
+   ],
+   "reason": "probe: 7 observation(s) ignored as noise (they change between runs of the same side); probe: claim(s) C5, C6 proven",
+   "ignored_noise": [
+    "c1.alloc_peak",
+    "c1.alloc_per_record",
+    "c1.alloc_total",
+    "c2.mad_time",
+    "c2.median_time",
+    "c2.p95_time",
+    "c4.peak_memory"
+   ],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_tests_prove": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 24,
+    "changed_lines_total": 36,
+    "adequacy": "adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 27,
+    "changed_lines_total": 36,
+    "adequacy": "adequate"
+   },
+   "model-probe3": {
+    "status": "measured",
+    "changed_lines_covered": 27,
+    "changed_lines_total": 36,
+    "adequacy": "adequate"
+   },
+   "model-probe4": {
+    "status": "measured",
+    "changed_lines_covered": 21,
+    "changed_lines_total": 36,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "158 test(s) ran on main, 158 on the PR; 0 new test(s) pass, 158 unchanged; probe: 7 observation(s) ignored as noise (they change between runs of the same side); probe: claim(s) C5, C6 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "158 test(s) ran on main, 158 on the PR; 0 new test(s) pass, 158 unchanged; probe: 7 observation(s) ignored as noise (they change between runs of the same side); probe: claim(s) C5, C6 proven",
+ "changed_lines_total": 54,
+ "changed_lines_covered": 39,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "39 of 54 changed executable line(s) ran (72%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "loguru/_colorizer.py",
+   "loguru/_datetime.py",
+   "loguru/_handler.py",
+   "loguru/_logger.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 142.3,
+  "tests": 14.5
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 34053,
+  "output_tokens": 19370,
+  "thinking_tokens": 15049,
+  "cost_usd": 0.027649,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.027649,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 142.3,
+   "tests": 14.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.009487,
+  "total_cost_usd": 0.037136,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-27/748f814/loguru-1557"
+ }
+}
