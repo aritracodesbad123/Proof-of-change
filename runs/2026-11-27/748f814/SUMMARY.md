@@ -1,0 +1,15 @@
+# Proof-of-Change go/no-go: 2026-11-27 on 748f814
+
+2 report(s) in this folder: 1 need attention, 1 could not be verified, 0 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+
+## Needs a decision first
+
+- **NEEDS ATTENTION**: python-attrs/attrs#1673: Collect class-body attributes when these= is passed. 5 test(s) fail on main and pass on the PR; 467 test(s) ran on main, 467 on the PR; 0 new test(s) pass, 464 unchanged (2 of them skipped on both sides); probe: claim(s) C3, C6, C7 proven; probe model-probe2-rewrite is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; a probe rewrite cannot raise the verdict: without the rewrite it is needs_attention
+- **COULD NOT VERIFY**: mahmoud/boltons#842: Fix `asciify` dropping diaeresis letters not in `DEACCENT_MAP` (Ë, ë, Ï, ï). Could not verify: claim(s) C4, C5, C7 expect a difference but no observation matches (1 test(s) fail on main and pass on the PR; 47 test(s) ran on main, 47 on the PR; 0 new test(s) pass, 46 unchanged; probe model-probe1-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
+
+## All reports
+
+| Verdict | Subject | Why | Report |
+|---|---|---|---|
+| NEEDS ATTENTION | python-attrs/attrs#1673: Collect class-body attributes when these= is passed | 5 test(s) fail on main and pass on the PR; 467 test(s) ran on main, 467 on the PR; 0 new test(s) pass, 464 unchanged (2 of them skipped on both sides); probe: claim(s) C3, C6, C7 proven; probe model-probe2-rewrite is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; a probe rewrite cannot raise the verdict: without the rewrite it is needs_attention | [PDF](attrs-1673/REPORT.pdf) |
+| COULD NOT VERIFY | mahmoud/boltons#842: Fix `asciify` dropping diaeresis letters not in `DEACCENT_MAP` (Ë, ë, Ï, ï) | Could not verify: claim(s) C4, C5, C7 expect a difference but no observation matches (1 test(s) fail on main and pass on the PR; 47 test(s) ran on main, 47 on the PR; 0 new test(s) pass, 46 unchanged; probe model-probe1-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](boltons-842/REPORT.pdf) |
