@@ -2494,7 +2494,7 @@
  },
  "pdf_push": {
   "ok": true,
-  "attempts": 1,
+  "attempts": 2,
   "error": null,
   "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-28/748f814/urllib3-5397"
  }
